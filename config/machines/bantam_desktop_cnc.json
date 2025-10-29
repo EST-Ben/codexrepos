@@ -1,0 +1,20 @@
+{
+  "workarea_mm": [
+    178,
+    178,
+    101
+  ],
+  "spindle_rpm_range": [
+    10000,
+    26000
+  ],
+  "max_feed_mm_min": 3000,
+  "rigidity_class": "light_industrial",
+  "id": "bantam_desktop_cnc",
+  "brand": "Bantam Tools",
+  "model": "Bantam Tools Desktop CNC",
+  "type": "CNC_Mill",
+  "material_presets": {},
+  "supports": {},
+  "safe_speed_ranges": {}
+}

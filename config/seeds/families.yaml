@@ -1,0 +1,325 @@
+bambu_corexy:
+  brand: Bambu Lab
+  type: FDM
+  defaults:
+    motion_system: CoreXY
+    enclosed: true
+    build_volume_mm: [256, 256, 256]
+    nozzle_diameters: [0.2, 0.4, 0.6, 0.8]
+    max_nozzle_temp_c: 300
+    max_bed_temp_c: 120
+    supports:
+      ams: true
+      input_shaping: true
+      linear_advance: false
+    safe_speed_ranges:
+      print: [40, 300]
+      travel: [120, 350]
+      accel: [1000, 20000]
+    material_presets:
+      PLA:
+        nozzle_c: [195, 220]
+        bed_c: [45, 65]
+        fan_pct: [60, 100]
+      PETG:
+        nozzle_c: [225, 250]
+        bed_c: [70, 90]
+        fan_pct: [0, 40]
+      ABS:
+        nozzle_c: [235, 260]
+        bed_c: [90, 110]
+        fan_pct: [0, 10]
+    capabilities: [auto_bed_level, lidar_flow, timelapse]
+prusa_bedslinger:
+  brand: Prusa
+  type: FDM
+  defaults:
+    motion_system: BedSlinger
+    enclosed: false
+    build_volume_mm: [250, 210, 220]
+    nozzle_diameters: [0.25, 0.4, 0.6]
+    max_nozzle_temp_c: 300
+    max_bed_temp_c: 120
+    supports:
+      input_shaping: false
+      linear_advance: true
+    safe_speed_ranges:
+      print: [30, 150]
+      travel: [120, 200]
+      accel: [500, 5000]
+    material_presets:
+      PLA:
+        nozzle_c: [195, 220]
+        bed_c: [50, 65]
+        fan_pct: [60, 100]
+      PETG:
+        nozzle_c: [230, 250]
+        bed_c: [70, 90]
+        fan_pct: [0, 40]
+      ASA:
+        nozzle_c: [245, 260]
+        bed_c: [90, 110]
+        fan_pct: [0, 10]
+creality_corexy:
+  brand: Creality
+  type: FDM
+  defaults:
+    motion_system: CoreXY
+    enclosed: true
+    build_volume_mm: [220, 220, 250]
+    nozzle_diameters: [0.4, 0.6]
+    max_nozzle_temp_c: 300
+    max_bed_temp_c: 110
+    supports:
+      input_shaping: true
+    safe_speed_ranges:
+      print: [40, 250]
+      travel: [120, 300]
+      accel: [1000, 15000]
+    material_presets:
+      PLA:
+        nozzle_c: [195, 220]
+        bed_c: [45, 60]
+        fan_pct: [60, 100]
+      PETG:
+        nozzle_c: [225, 250]
+        bed_c: [70, 85]
+        fan_pct: [0, 40]
+creality_bedslinger:
+  brand: Creality
+  type: FDM
+  defaults:
+    motion_system: BedSlinger
+    enclosed: false
+    build_volume_mm: [220, 220, 250]
+    nozzle_diameters: [0.4, 0.6]
+    max_nozzle_temp_c: 285
+    max_bed_temp_c: 100
+    supports:
+      input_shaping: false
+    safe_speed_ranges:
+      print: [30, 150]
+      travel: [100, 200]
+      accel: [500, 5000]
+    material_presets:
+      PLA:
+        nozzle_c: [195, 220]
+        bed_c: [50, 60]
+        fan_pct: [60, 100]
+      PETG:
+        nozzle_c: [225, 245]
+        bed_c: [70, 85]
+        fan_pct: [0, 40]
+anycubic_fdm:
+  brand: Anycubic
+  type: FDM
+  defaults:
+    motion_system: BedSlinger
+    enclosed: false
+    build_volume_mm: [220, 220, 250]
+    nozzle_diameters: [0.4, 0.6]
+    max_nozzle_temp_c: 260
+    max_bed_temp_c: 100
+    safe_speed_ranges:
+      print: [30, 150]
+      travel: [100, 200]
+      accel: [500, 5000]
+elegoo_neptune:
+  brand: ELEGOO
+  type: FDM
+  defaults:
+    motion_system: BedSlinger
+    enclosed: false
+    build_volume_mm: [235, 235, 280]
+    nozzle_diameters: [0.4]
+    max_nozzle_temp_c: 260
+    max_bed_temp_c: 110
+qidi_x_series:
+  brand: QIDI Tech
+  type: FDM
+  defaults:
+    motion_system: CoreXY
+    enclosed: true
+    build_volume_mm: [280, 280, 270]
+    nozzle_diameters: [0.4, 0.6]
+    max_nozzle_temp_c: 300
+    max_bed_temp_c: 120
+ultimaker_s_series:
+  brand: UltiMaker
+  type: FDM
+  defaults:
+    motion_system: Cartesian
+    enclosed: false
+    build_volume_mm: [330, 240, 300]
+    nozzle_diameters: [0.25, 0.4, 0.6, 0.8]
+    max_nozzle_temp_c: 300
+    max_bed_temp_c: 140
+raise3d_pro:
+  brand: Raise3D
+  type: FDM
+  defaults:
+    motion_system: IDEX
+    enclosed: true
+    build_volume_mm: [300, 300, 300]
+    nozzle_diameters: [0.4, 0.6]
+    max_nozzle_temp_c: 300
+    max_bed_temp_c: 120
+extra_popular_fdm:
+  brand: Generic
+  type: FDM
+  defaults:
+    motion_system: Cartesian
+    enclosed: false
+    nozzle_diameters: [0.4]
+    max_nozzle_temp_c: 260
+    max_bed_temp_c: 100
+formlabs_msla:
+  brand: Formlabs
+  type: MSLA
+  defaults:
+    build_volume_mm: [200, 125, 210]
+    enclosed: true
+    capabilities: [resin_heating, auto_peel]
+prusa_sl1s:
+  brand: Prusa
+  type: MSLA
+  defaults:
+    build_volume_mm: [127, 80, 150]
+    enclosed: true
+anycubic_msla:
+  brand: Anycubic
+  type: MSLA
+  defaults:
+    enclosed: true
+elegoo_msla:
+  brand: ELEGOO
+  type: MSLA
+  defaults:
+    enclosed: true
+phrozen_msla:
+  brand: Phrozen
+  type: MSLA
+  defaults:
+    enclosed: true
+carbide_shapeoko:
+  brand: Carbide 3D
+  type: CNC_Router
+  defaults:
+    workarea_mm: [1200, 1200, 100]
+    spindle_rpm_range: [10000, 24000]
+    max_feed_mm_min: 8000
+    rigidity_class: hobby_pro
+    capabilities: [bitsetter, touch_probe]
+onefinity_elite:
+  brand: Onefinity
+  type: CNC_Router
+  defaults:
+    spindle_rpm_range: [10000, 24000]
+    max_feed_mm_min: 9000
+    rigidity_class: hobby_pro
+inventables_xcarve:
+  brand: Inventables
+  type: CNC_Router
+  defaults:
+    spindle_rpm_range: [8000, 20000]
+    max_feed_mm_min: 6000
+    rigidity_class: hobby
+genmitsu_router:
+  brand: SainSmart/Genmitsu
+  type: CNC_Router
+  defaults:
+    spindle_rpm_range: [10000, 12000]
+    max_feed_mm_min: 3000
+    rigidity_class: hobby
+bantam_desktop:
+  brand: Bantam Tools
+  type: CNC_Mill
+  defaults:
+    workarea_mm: [178, 178, 101]
+    spindle_rpm_range: [10000, 26000]
+    max_feed_mm_min: 3000
+    rigidity_class: light_industrial
+tormach_pcnc:
+  brand: Tormach
+  type: CNC_Mill
+  defaults:
+    spindle_rpm_range: [200, 10000]
+    rigidity_class: light_industrial
+haas_mini_mill:
+  brand: Haas
+  type: CNC_Mill
+  defaults:
+    spindle_rpm_range: [1000, 15000]
+    rigidity_class: industrial
+avid_pro:
+  brand: Avid CNC
+  type: CNC_Router
+  defaults:
+    spindle_rpm_range: [8000, 24000]
+    max_feed_mm_min: 10000
+    rigidity_class: light_industrial
+stepcraft_d_series:
+  brand: STEPCRAFT
+  type: CNC_Router
+  defaults:
+    spindle_rpm_range: [8000, 24000]
+    rigidity_class: hobby
+millright_megav2:
+  brand: MillRight CNC
+  type: CNC_Router
+  defaults:
+    spindle_rpm_range: [8000, 24000]
+    rigidity_class: hobby
+generic_fdm_open:
+  brand: Generic
+  type: FDM
+  defaults:
+    motion_system: BedSlinger
+    enclosed: false
+    build_volume_mm: [220, 220, 250]
+    nozzle_diameters: [0.4]
+    max_nozzle_temp_c: 260
+    max_bed_temp_c: 90
+    safe_speed_ranges:
+      print: [20, 120]
+      travel: [80, 180]
+      accel: [300, 3000]
+    capabilities: [auto_bed_level]
+generic_fdm_enclosed:
+  brand: Generic
+  type: FDM
+  defaults:
+    motion_system: CoreXY
+    enclosed: true
+    build_volume_mm: [256, 256, 256]
+    nozzle_diameters: [0.4]
+    max_nozzle_temp_c: 300
+    max_bed_temp_c: 110
+    safe_speed_ranges:
+      print: [30, 220]
+      travel: [90, 260]
+      accel: [500, 8000]
+    capabilities: [input_shaping]
+generic_msla_mid:
+  brand: Generic
+  type: MSLA
+  defaults:
+    build_volume_mm: [200, 125, 210]
+    enclosed: true
+    capabilities: [resin_heating]
+generic_router_hobby:
+  brand: Generic
+  type: CNC_Router
+  defaults:
+    workarea_mm: [800, 800, 120]
+    spindle_rpm_range: [10000, 22000]
+    max_feed_mm_min: 5000
+    rigidity_class: hobby_pro
+generic_vmc:
+  brand: Generic
+  type: CNC_Mill
+  defaults:
+    workarea_mm: [500, 400, 400]
+    spindle_rpm_range: [1000, 15000]
+    max_feed_mm_min: 8000
+    rigidity_class: industrial
