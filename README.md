@@ -14,6 +14,18 @@ the pipeline can be demoed without a trained model.
 Run `python scripts/build_machines.py` after editing the seed files under
 `config/seeds/` to regenerate the JSON machine profiles.
 
+## Repository layout
+
+This repository includes all assets discussed during the staged scaffold:
+
+- `app/` – Expo React Native client with onboarding, results, and Jest tests.
+- `server/` – FastAPI backend, machine registry, rules engine, and API tests.
+- `config/machines/` – Generated machine profiles plus `_schema.json`.
+- `config/seeds/` – Editable YAML seeds for families and registry entries.
+- `config/slicer_adapters/` – TypeScript maps for Cura, PrusaSlicer, Bambu Studio, and OrcaSlicer.
+- `scripts/` – Build, validation, and mock inference helpers (with offline fallbacks).
+- `types/` – Shared TypeScript contracts for machine profiles.
+
 ## How to add a new machine
 
 1. Add or update the appropriate family entry in `config/seeds/families.yaml`
