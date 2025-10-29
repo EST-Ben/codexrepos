@@ -1,0 +1,21 @@
+{
+  "motion_system": "Delta",
+  "enclosed": false,
+  "nozzle_diameters": [
+    0.4
+  ],
+  "max_nozzle_temp_c": 260,
+  "max_bed_temp_c": 100,
+  "id": "flsun_v400",
+  "brand": "Generic",
+  "model": "V400",
+  "type": "FDM",
+  "material_presets": {},
+  "supports": {},
+  "safe_speed_ranges": {},
+  "build_volume_mm": [
+    300,
+    300,
+    410
+  ]
+}
