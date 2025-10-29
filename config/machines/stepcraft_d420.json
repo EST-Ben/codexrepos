@@ -1,0 +1,19 @@
+{
+  "spindle_rpm_range": [
+    8000,
+    24000
+  ],
+  "rigidity_class": "hobby",
+  "id": "stepcraft_d420",
+  "brand": "STEPCRAFT",
+  "model": "STEPCRAFT D.420",
+  "type": "CNC_Router",
+  "material_presets": {},
+  "supports": {},
+  "safe_speed_ranges": {},
+  "workarea_mm": [
+    400,
+    300,
+    140
+  ]
+}

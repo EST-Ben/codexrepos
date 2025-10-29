@@ -1,0 +1,19 @@
+{
+  "spindle_rpm_range": [
+    8000,
+    24000
+  ],
+  "rigidity_class": "hobby",
+  "id": "stepcraft_d600",
+  "brand": "STEPCRAFT",
+  "model": "STEPCRAFT D.600",
+  "type": "CNC_Router",
+  "material_presets": {},
+  "supports": {},
+  "safe_speed_ranges": {},
+  "workarea_mm": [
+    600,
+    400,
+    140
+  ]
+}

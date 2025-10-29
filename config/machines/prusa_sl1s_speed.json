@@ -1,0 +1,15 @@
+{
+  "build_volume_mm": [
+    127,
+    80,
+    150
+  ],
+  "enclosed": true,
+  "id": "prusa_sl1s_speed",
+  "brand": "Prusa",
+  "model": "SL1S SPEED",
+  "type": "MSLA",
+  "material_presets": {},
+  "supports": {},
+  "safe_speed_ranges": {}
+}
