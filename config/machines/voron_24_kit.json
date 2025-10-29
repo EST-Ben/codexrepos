@@ -1,0 +1,24 @@
+{
+  "motion_system": "CoreXY",
+  "enclosed": true,
+  "nozzle_diameters": [
+    0.4
+  ],
+  "max_nozzle_temp_c": 260,
+  "max_bed_temp_c": 100,
+  "id": "voron_24_kit",
+  "brand": "Generic",
+  "model": "2.4 (Kit)",
+  "type": "FDM",
+  "material_presets": {},
+  "supports": {},
+  "safe_speed_ranges": {},
+  "build_volume_mm": [
+    300,
+    300,
+    300
+  ],
+  "capabilities": [
+    "input_shaping"
+  ]
+}

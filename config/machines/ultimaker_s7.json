@@ -1,0 +1,24 @@
+{
+  "motion_system": "Cartesian",
+  "enclosed": false,
+  "build_volume_mm": [
+    330,
+    240,
+    300
+  ],
+  "nozzle_diameters": [
+    0.25,
+    0.4,
+    0.6,
+    0.8
+  ],
+  "max_nozzle_temp_c": 300,
+  "max_bed_temp_c": 140,
+  "id": "ultimaker_s7",
+  "brand": "UltiMaker",
+  "model": "S7",
+  "type": "FDM",
+  "material_presets": {},
+  "supports": {},
+  "safe_speed_ranges": {}
+}

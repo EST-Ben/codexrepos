@@ -1,0 +1,22 @@
+{
+  "motion_system": "IDEX",
+  "enclosed": true,
+  "build_volume_mm": [
+    300,
+    300,
+    300
+  ],
+  "nozzle_diameters": [
+    0.4,
+    0.6
+  ],
+  "max_nozzle_temp_c": 300,
+  "max_bed_temp_c": 120,
+  "id": "raise3d_pro3",
+  "brand": "Raise3D",
+  "model": "Pro3",
+  "type": "FDM",
+  "material_presets": {},
+  "supports": {},
+  "safe_speed_ranges": {}
+}

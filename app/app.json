@@ -1,0 +1,9 @@
+{
+  "expo": {
+    "name": "codex-app",
+    "slug": "codex-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light"
+  }
+}
