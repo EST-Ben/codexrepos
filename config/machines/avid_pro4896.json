@@ -1,0 +1,20 @@
+{
+  "spindle_rpm_range": [
+    8000,
+    24000
+  ],
+  "max_feed_mm_min": 10000,
+  "rigidity_class": "light_industrial",
+  "id": "avid_pro4896",
+  "brand": "Avid CNC",
+  "model": "Avid PRO4896",
+  "type": "CNC_Router",
+  "material_presets": {},
+  "supports": {},
+  "safe_speed_ranges": {},
+  "workarea_mm": [
+    1219,
+    2438,
+    152
+  ]
+}

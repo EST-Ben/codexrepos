@@ -1,0 +1,19 @@
+{
+  "build_volume_mm": [
+    300,
+    200,
+    300
+  ],
+  "enclosed": true,
+  "capabilities": [
+    "resin_heating",
+    "auto_peel"
+  ],
+  "id": "formlabs_form4l",
+  "brand": "Formlabs",
+  "model": "Form 4L",
+  "type": "MSLA",
+  "material_presets": {},
+  "supports": {},
+  "safe_speed_ranges": {}
+}

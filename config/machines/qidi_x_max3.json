@@ -1,0 +1,22 @@
+{
+  "motion_system": "CoreXY",
+  "enclosed": true,
+  "build_volume_mm": [
+    325,
+    325,
+    315
+  ],
+  "nozzle_diameters": [
+    0.4,
+    0.6
+  ],
+  "max_nozzle_temp_c": 300,
+  "max_bed_temp_c": 120,
+  "id": "qidi_x_max3",
+  "brand": "QIDI Tech",
+  "model": "X-Max 3",
+  "type": "FDM",
+  "material_presets": {},
+  "supports": {},
+  "safe_speed_ranges": {}
+}
