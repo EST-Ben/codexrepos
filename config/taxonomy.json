@@ -1,1 +1,44 @@
-{}
+{
+  "issues": {
+    "stringing": {
+      "cues": ["wispy strands", "ooze between features"],
+      "category": "fdm",
+      "risk": "medium"
+    },
+    "underextrusion": {
+      "cues": ["gaps in walls", "thin extrusion"],
+      "category": "fdm",
+      "risk": "medium"
+    },
+    "ringing": {
+      "cues": ["echoing ripples", "ghosting around sharp corners"],
+      "category": "fdm",
+      "risk": "low"
+    },
+    "layer_shift": {
+      "cues": ["sudden offset", "shifted layers"],
+      "category": "fdm",
+      "risk": "high"
+    },
+    "z_banding": {
+      "cues": ["periodic ridges", "vertical waves"],
+      "category": "fdm",
+      "risk": "low"
+    },
+    "resin_peel": {
+      "cues": ["delamination", "peel lines"],
+      "category": "msla",
+      "risk": "medium"
+    },
+    "cnc_chatter": {
+      "cues": ["audible chatter", "wavy finish"],
+      "category": "cnc",
+      "risk": "medium"
+    },
+    "general_tuning": {
+      "cues": ["general improvements"],
+      "category": "generic",
+      "risk": "low"
+    }
+  }
+}

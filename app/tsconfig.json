@@ -13,5 +13,5 @@
     "target": "ESNext",
     "types": ["react", "react-native", "expo"]
   },
-  "extends": "expo/tsconfig.base"
+  "extends": "./node_modules/expo/tsconfig.base"
 }

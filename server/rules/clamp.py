@@ -1,8 +1,4 @@
-"""Backward compatibility shim for rules engine imports."""
-from __future__ import annotations
-
-from server.rules.clamp import RulesEngine
-"""Rules engine that clamps recommendations to machine limits."""
+"""Clamp parameter targets so they stay within machine limits."""
 from __future__ import annotations
 
 from typing import Any, Dict, Iterable, Mapping, Tuple
@@ -28,9 +24,13 @@ class RulesEngine:
                 "print_speed",
                 "travel_speed",
                 "accel",
+                "jerk",
                 "fan_speed",
                 "flow_rate",
                 "retraction_distance",
+                "spindle_rpm",
+                "feed_rate",
+                "doc",
             },
             "max_factor": 0.95,
             "note": "Intermediate mode unlocks motion controls with moderate guard rails.",
