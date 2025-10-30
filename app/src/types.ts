@@ -1,48 +1,35 @@
-export type {
-  ExperienceLevel,
-  MachineRef,
-  AnalyzeRequestMeta,
-  Prediction,
-  Suggestion,
-  SuggestionChange,
-  AnalyzeResponse,
-} from '../../types/common';
+export type ExperienceLevel = 'Beginner' | 'Intermediate' | 'Advanced';
 
-export type { MachineProfile } from '../../types/machine';
-
-export interface MachineSummary extends MachineRef {
+export interface MachineSummary {
+  id: string;
+  brand?: string;
+  model?: string;
   aliases?: string[];
-  capabilities?: string[];
-  safe_speed_ranges?: Record<string, number[]>;
-  material_presets?: Record<string, Record<string, number[]>>;
-  max_nozzle_temp_c?: number;
-  max_bed_temp_c?: number;
-  spindle_rpm_range?: [number, number];
-  max_feed_mm_min?: number;
-  notes?: string;
-  type?: string;
-  supports?: Record<string, boolean>;
 }
 
-export type SlicerId = 'cura' | 'prusaslicer' | 'bambu' | 'orca';
+export interface AnalyzeResponse {
+  machine: { id: string; brand?: string; model?: string };
+  issue: string;
+  confidence: number;
+  recommendations: string[];
+  parameter_targets: Record<string, number>;
+  applied: {
+    parameters: Record<string, number>;
+    hidden_parameters: string[];
+    experience_level: ExperienceLevel;
+    clamped_to_machine_limits: boolean;
+    explanations: string[];
+  };
+  capability_notes: string[];
+}
 
-export interface ProfileState {
+export interface ExportDiff {
+  slicer: 'cura' | 'prusaslicer' | 'bambu' | 'orca';
+  diff: Record<string, number | string | boolean>;
+  source_keys: string[];
+}
+
+export interface OnboardingState {
+  selectedMachines: string[];
   experience: ExperienceLevel;
-  machines: MachineRef[];
-  material?: string;
-  materialByMachine?: Record<string, string | undefined>;
 }
-
-export interface AnalysisHistoryRecord {
-  imageId: string;
-  machineId: string;
-  machine?: MachineRef;
-  timestamp: number;
-  predictions: Prediction[];
-  response?: AnalyzeResponse;
-  material?: string;
-  localUri?: string;
-  summary?: MachineSummary;
-}
-
-export type HistoryMap = Record<string, AnalysisHistoryRecord[]>;

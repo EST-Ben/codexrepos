@@ -1,58 +1,31 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import type { MachineRef, ProfileState } from '../types';
+import type { ExperienceLevel, OnboardingState } from '../types';
 
-export const PROFILE_STORAGE_KEY = 'machine-diagnostics:profile';
+export const ONBOARDING_STORAGE_KEY = 'machine-diagnostics:onboarding';
 
-export interface StoredProfile extends ProfileState {
-  materialByMachine: Record<string, string | undefined>;
-}
-
-export const DEFAULT_PROFILE: StoredProfile = {
+export const DEFAULT_ONBOARDING_STATE: OnboardingState = {
+  selectedMachines: [],
   experience: 'Beginner',
-  machines: [],
-  material: 'PLA',
-  materialByMachine: {},
 };
 
-function normalizeProfile(data: Partial<ProfileState> | null | undefined): StoredProfile {
-  if (!data) {
-    return { ...DEFAULT_PROFILE };
-  }
-  const machines: MachineRef[] = Array.isArray(data.machines)
-    ? data.machines.filter((item): item is MachineRef =>
-        !!item && typeof item.id === 'string' && typeof item.brand === 'string' && typeof item.model === 'string',
-      )
-    : [];
-  const materialByMachine =
-    typeof data.materialByMachine === 'object' && data.materialByMachine
-      ? Object.fromEntries(
-          Object.entries(data.materialByMachine).map(([key, value]) => [key, typeof value === 'string' ? value : undefined]),
-        )
-      : {};
-  return {
-    experience: (data.experience as StoredProfile['experience']) ?? DEFAULT_PROFILE.experience,
-    machines,
-    material: typeof data.material === 'string' ? data.material : DEFAULT_PROFILE.material,
-    materialByMachine,
-  };
-}
-
-export async function loadStoredProfile(): Promise<StoredProfile> {
-  const raw = await AsyncStorage.getItem(PROFILE_STORAGE_KEY);
+export async function loadOnboardingState(): Promise<OnboardingState> {
+  const raw = await AsyncStorage.getItem(ONBOARDING_STORAGE_KEY);
   if (!raw) {
-    return { ...DEFAULT_PROFILE };
+    return { ...DEFAULT_ONBOARDING_STATE };
   }
   try {
-    const parsed = JSON.parse(raw) as Partial<ProfileState>;
-    return normalizeProfile(parsed);
+    const parsed = JSON.parse(raw) as Partial<OnboardingState>;
+    return {
+      selectedMachines: parsed.selectedMachines ?? [],
+      experience: (parsed.experience as ExperienceLevel) ?? 'Beginner',
+    };
   } catch (err) {
-    console.warn('Failed to parse stored profile', err);
-    return { ...DEFAULT_PROFILE };
+    console.warn('Failed to parse onboarding state', err);
+    return { ...DEFAULT_ONBOARDING_STATE };
   }
 }
 
-export async function saveStoredProfile(profile: ProfileState): Promise<void> {
-  const normalized = normalizeProfile(profile);
-  await AsyncStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(normalized));
+export async function saveOnboardingState(state: OnboardingState): Promise<void> {
+  await AsyncStorage.setItem(ONBOARDING_STORAGE_KEY, JSON.stringify(state));
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { fetchMachines } from '../api/client';
 import type { MachineSummary } from '../types';
@@ -25,9 +25,7 @@ export function useMachineRegistry() {
     load();
   }, [load]);
 
-  const lookup = useMemo(() => new Map(machines.map((machine) => [machine.id, machine])), [machines]);
-
-  return { machines, lookup, loading, error, refresh: load };
+  return { machines, loading, error, refresh: load };
 }
 
 export function filterMachines(machines: MachineSummary[], query: string): MachineSummary[] {

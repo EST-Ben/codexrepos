@@ -78,18 +78,3 @@ guidance while advanced users unlock broader tuning ranges.
 4. Optionally run `python scripts/validate_machines.py` or the PyTest suite to
    ensure the new profile validates against the schema.
 5. Commit the updated seeds and generated JSON files.
-
-## Acceptance criteria
-
-- After onboarding, each selected printer appears as its own tab with a Camera
-  button.
-- Taking or uploading a photo submits multipart form-data to `/api/analyze`
-  containing the machine ID, experience level, and optional material.
-- The server responds with predictions, machine-aware suggestions, and a slicer
-  profile diff, which the UI renders as bounded sliders with rationale and
-  export buttons for Cura, PrusaSlicer, Bambu Studio, and OrcaSlicer.
-- Low-confidence analyses surface generic guidance, and all suggestions stay
-  within machine and material limits.
-- The provided tests pass (subject to local dependency availability) and the
-  demo script under `scripts/demo_analyze.sh` returns plausible output when the
-  server is running.

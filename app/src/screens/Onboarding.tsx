@@ -1,32 +1,34 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import type { ExperienceLevel, MachineRef, ProfileState } from '../types';
+import type { ExperienceLevel, OnboardingState } from '../types';
 import { filterMachines, useMachineRegistry } from '../hooks/useMachineRegistry';
+import { saveOnboardingState } from '../storage/onboarding';
 
 interface OnboardingProps {
-  initialProfile: ProfileState;
-  onComplete(state: ProfileState): Promise<void>;
+  initialSelection: string[];
+  initialExperience: ExperienceLevel;
+  onComplete(state: OnboardingState): void;
 }
 
 const EXPERIENCE_OPTIONS: ExperienceLevel[] = ['Beginner', 'Intermediate', 'Advanced'];
 
-const MATERIAL_PLACEHOLDER = 'PLA';
-
-export const OnboardingScreen: React.FC<OnboardingProps> = ({ initialProfile, onComplete }) => {
+export const OnboardingScreen: React.FC<OnboardingProps> = ({
+  initialSelection,
+  initialExperience,
+  onComplete,
+}) => {
   const { machines, loading, error, refresh } = useMachineRegistry();
   const [step, setStep] = useState<number>(0);
-  const [selected, setSelected] = useState<string[]>(initialProfile.machines.map((item) => item.id));
-  const [experience, setExperience] = useState<ExperienceLevel>(initialProfile.experience);
+  const [selected, setSelected] = useState<string[]>(initialSelection);
+  const [experience, setExperience] = useState<ExperienceLevel>(initialExperience);
   const [query, setQuery] = useState<string>('');
   const [saving, setSaving] = useState<boolean>(false);
-  const [material, setMaterial] = useState<string>(initialProfile.material ?? MATERIAL_PLACEHOLDER);
 
   useEffect(() => {
-    setSelected(initialProfile.machines.map((item) => item.id));
-    setExperience(initialProfile.experience);
-    setMaterial(initialProfile.material ?? MATERIAL_PLACEHOLDER);
-  }, [initialProfile]);
+    setSelected(initialSelection);
+    setExperience(initialExperience);
+  }, [initialExperience, initialSelection]);
 
   const filtered = useMemo(() => filterMachines(machines, query), [machines, query]);
 
@@ -42,25 +44,13 @@ export const OnboardingScreen: React.FC<OnboardingProps> = ({ initialProfile, on
       return;
     }
     setSaving(true);
-    const machineLookup = new Map(machines.map((item) => [item.id, item]));
-    const refs: MachineRef[] = selected.map((id) => {
-      const summary = machineLookup.get(id);
-      return {
-        id,
-        brand: summary?.brand ?? 'Unknown',
-        model: summary?.model ?? id,
-      };
-    });
-    const payload: ProfileState = {
+    const payload: OnboardingState = {
+      selectedMachines: selected,
       experience,
-      machines: refs,
-      material: material.trim() || undefined,
     };
-    try {
-      await onComplete(payload);
-    } finally {
-      setSaving(false);
-    }
+    await saveOnboardingState(payload);
+    setSaving(false);
+    onComplete(payload);
   };
 
   return (
@@ -145,14 +135,6 @@ export const OnboardingScreen: React.FC<OnboardingProps> = ({ initialProfile, on
             <Text style={styles.summaryTitle}>Summary</Text>
             <Text style={styles.paragraph}>Machines selected: {selected.length || 'None yet'}.</Text>
             <Text style={styles.paragraph}>Experience: {experience}</Text>
-            <Text style={styles.paragraph}>Preferred material: {material || 'Not set'}</Text>
-            <TextInput
-              accessibilityLabel="Preferred material"
-              placeholder="Preferred material (PLA, PETG, ABS…)"
-              value={material}
-              onChangeText={setMaterial}
-              style={styles.input}
-            />
           </View>
         </View>
       )}

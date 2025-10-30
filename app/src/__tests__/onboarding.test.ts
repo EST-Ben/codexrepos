@@ -1,11 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {
-  DEFAULT_PROFILE,
-  PROFILE_STORAGE_KEY,
-  loadStoredProfile,
-  saveStoredProfile,
-} from '../storage/onboarding';
+import { loadOnboardingState, saveOnboardingState, ONBOARDING_STORAGE_KEY } from '../storage/onboarding';
+import { deriveParameterRanges, filterParametersForExperience } from '../state/onboarding';
 
 jest.mock('@react-native-async-storage/async-storage', () => {
   let store: Record<string, string> = {};
@@ -26,51 +22,44 @@ jest.mock('@react-native-async-storage/async-storage', () => {
   };
 });
 
-describe('profile storage helpers', () => {
-  beforeEach(async () => {
-    await AsyncStorage.clear();
-    (AsyncStorage.getItem as jest.Mock).mockClear();
-    (AsyncStorage.setItem as jest.Mock).mockClear();
-  });
-
-  it('persists profile state with machine references', async () => {
-    const profile = {
-      experience: 'Intermediate' as const,
-      material: 'PETG',
-      machines: [
-        { id: 'bambu_p1s', brand: 'Bambu Lab', model: 'P1S' },
-        { id: 'prusa_mk4', brand: 'Prusa', model: 'MK4' },
-      ],
-      materialByMachine: { bambu_p1s: 'PLA' },
-    };
-    await saveStoredProfile(profile);
+describe('onboarding storage helpers', () => {
+  it('persists onboarding state to AsyncStorage', async () => {
+    const state = { selectedMachines: ['bambu_p1p'], experience: 'Intermediate' as const };
+    await saveOnboardingState(state);
     expect(AsyncStorage.setItem).toHaveBeenCalledWith(
-      PROFILE_STORAGE_KEY,
-      JSON.stringify({
-        experience: 'Intermediate',
-        machines: profile.machines,
-        material: 'PETG',
-        materialByMachine: { bambu_p1s: 'PLA' },
-      }),
+      ONBOARDING_STORAGE_KEY,
+      JSON.stringify(state),
     );
   });
 
-  it('hydrates with defaults when nothing stored', async () => {
+  it('hydrates onboarding state with defaults when nothing stored', async () => {
     (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(null);
-    const result = await loadStoredProfile();
-    expect(result).toEqual(DEFAULT_PROFILE);
+    const result = await loadOnboardingState();
+    expect(result.selectedMachines).toEqual([]);
+    expect(result.experience).toBe('Beginner');
+  });
+});
+
+describe('experience filters', () => {
+  const parameters = {
+    nozzle_temp: 210,
+    bed_temp: 60,
+    print_speed: 120,
+    travel_speed: 150,
+    accel: 4000,
+    retraction_distance: 0.8,
+  };
+
+  it('limits beginner parameters to core controls', () => {
+    const result = filterParametersForExperience(parameters, 'Beginner');
+    expect(Object.keys(result)).toEqual(['nozzle_temp', 'bed_temp', 'print_speed']);
   });
 
-  it('drops malformed machine entries when loading', async () => {
-    const malformed = {
-      experience: 'Advanced',
-      machines: [{ id: 'missing_brand' }],
-      material: 'ABS',
-    };
-    (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(JSON.stringify(malformed));
-    const result = await loadStoredProfile();
-    expect(result.machines).toEqual([]);
-    expect(result.experience).toBe('Advanced');
-    expect(result.material).toBe('ABS');
+  it('widens ranges for advanced users', () => {
+    const beginnerRanges = deriveParameterRanges(parameters, 'Beginner');
+    const advancedRanges = deriveParameterRanges(parameters, 'Advanced');
+    expect(advancedRanges.nozzle_temp.max - advancedRanges.nozzle_temp.min).toBeGreaterThan(
+      beginnerRanges.nozzle_temp.max - beginnerRanges.nozzle_temp.min,
+    );
   });
 });
