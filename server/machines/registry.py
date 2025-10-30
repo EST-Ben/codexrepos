@@ -79,6 +79,16 @@ def machine_summaries() -> List[MachineSummary]:
                 "brand": profile.get("brand"),
                 "model": profile.get("model"),
                 "aliases": profile.get("aliases", []),
+                "type": profile.get("type"),
+                "capabilities": profile.get("capabilities", []),
+                "safe_speed_ranges": profile.get("safe_speed_ranges"),
+                "material_presets": profile.get("material_presets"),
+                "max_nozzle_temp_c": profile.get("max_nozzle_temp_c"),
+                "max_bed_temp_c": profile.get("max_bed_temp_c"),
+                "spindle_rpm_range": profile.get("spindle_rpm_range"),
+                "max_feed_mm_min": profile.get("max_feed_mm_min"),
+                "supports": profile.get("supports"),
+                "notes": profile.get("notes"),
             }
         )
     summaries.sort(key=lambda item: (str(item.get("brand") or "").lower(), str(item.get("model") or "")))

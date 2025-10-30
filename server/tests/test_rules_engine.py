@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from server.app.rules import RulesEngine
+from server.models.api import AnalyzeRequestMeta, Prediction
+from server.rules.suggest import suggest
 from server.machines import resolve_machine
 
 
@@ -35,3 +37,16 @@ def test_rules_engine_experience_filters() -> None:
     assert 'accel' not in beginner['parameters']
     advanced = engine.clamp_to_machine(machine, parameters, 'Advanced')
     assert 'accel' in advanced['parameters']
+
+
+def test_suggestions_respect_machine_bounds() -> None:
+    meta = AnalyzeRequestMeta(machine_id='bambu_p1s', experience='Advanced', material='PLA')
+    suggestions, low_confidence = suggest([Prediction(issue_id='under_extrusion', confidence=0.9)], meta)
+    assert low_confidence is False
+    machine = resolve_machine('bambu_p1s')
+    max_nozzle = machine['max_nozzle_temp_c']
+    max_print = machine['safe_speed_ranges']['print'][1]
+    change_map = {change.param: change for change in suggestions[0].changes}
+    assert change_map['nozzle_temp'].new_target <= max_nozzle
+    assert change_map['print_speed'].new_target <= max_print
+    assert suggestions[0].clamped_to_machine_limits is True
