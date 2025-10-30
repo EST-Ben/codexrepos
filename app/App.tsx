@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
+import AnalyzeFromPhoto from "./src/components/AnalyzeFromPhoto"; // adjust the path if your file lives elsewhere
 
 import { OnboardingScreen } from './src/screens/Onboarding';
 import { ResultsScreen } from './src/screens/Results';

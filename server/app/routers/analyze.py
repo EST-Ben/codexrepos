@@ -1,7 +1,7 @@
 """Diagnostics analyze endpoint."""
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Literal
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
@@ -18,7 +18,8 @@ class AnalyzeRequest(BaseModel):
     machine: str = Field(..., description="Machine id, alias, or fuzzy name")
     material: str = Field("PLA", description="Material code")
     issues: List[str] = Field(default_factory=list, description="Observed issues")
-    experience: str = Field("Intermediate", regex="^(Beginner|Intermediate|Advanced)$")
+    # Pydantic v2: use Literal instead of Field(..., regex=...)
+    experience: Literal["Beginner", "Intermediate", "Advanced"] = "Intermediate"
     payload: Dict[str, Any] = Field(default_factory=dict)
 
 
@@ -39,7 +40,9 @@ def analyze(payload: AnalyzeRequest):
     prediction = pipeline.predict(request_payload, machine)
 
     engine = RulesEngine()
-    applied = engine.clamp_to_machine(machine, prediction.parameter_targets, payload.experience)
+    applied = engine.clamp_to_machine(
+        machine, prediction.parameter_targets, payload.experience
+    )
 
     return {
         "machine": {

@@ -22,6 +22,21 @@ class DiagnosticPipeline:
     def predict(self, payload: Mapping[str, Any], machine: MachineProfile) -> Prediction:
         issue = self._resolve_issue(payload.get("issues", []))
         material = str(payload.get("material") or "PLA").upper()
+        return self._predict_common(material, issue, machine)
+
+    def predict_from_image(self, img_bytes: bytes, machine: MachineProfile, material: str = "PLA") -> Prediction:
+        """
+        Image-based stub. Detects a likely issue label from raw image bytes, then
+        reuses the same heuristic mapping as `predict`. Replace `_detect_issue_from_image`
+        with a real vision model when available.
+        """
+        material = (material or "PLA").upper()
+        issue = self._detect_issue_from_image(img_bytes, machine, material)
+        return self._predict_common(material, issue, machine)
+
+    # --- shared core -------------------------------------------------------------
+
+    def _predict_common(self, material: str, issue: str, machine: MachineProfile) -> Prediction:
         capability_notes: List[str] = []
 
         if machine.get("type") == "FDM":
@@ -49,6 +64,17 @@ class DiagnosticPipeline:
         for item in issues:
             if item:
                 return str(item)
+        return "general_tuning"
+
+    def _detect_issue_from_image(self, img_bytes: bytes, machine: MachineProfile, material: str) -> str:
+        """
+        Stub image classifier.
+        TODO: Replace with a real vision model (e.g., ONNX/TFLite/remote API).
+        For now, return a plausible default that ties into heuristic rules.
+        """
+        # naive placeholder: choose a common FDM artifact for demo purposes
+        if (machine.get("type") or "FDM") == "FDM":
+            return "stringing"
         return "general_tuning"
 
     def _predict_fdm(
@@ -93,7 +119,8 @@ class DiagnosticPipeline:
             "Re-run auto bed levelling after major temperature changes.",
         ]
 
-        if "ringing" in issue.lower():
+        issue_l = issue.lower()
+        if "ringing" in issue_l:
             if motion == "BedSlinger":
                 accel *= 0.6
                 jerk *= 0.7
@@ -101,8 +128,15 @@ class DiagnosticPipeline:
             else:
                 accel *= 0.85
                 recommendations.append("CoreXY machines handle ringing with moderate accel reductions.")
-        if "underextrusion" in issue.lower():
+        if "underextrusion" in issue_l:
             recommendations.append("Check filament path friction and consider a slight flow increase.")
+        if "stringing" in issue_l:
+            fan = min(fan + 10.0, 100.0)
+            recommendations += [
+                "Increase retraction distance slightly.",
+                "Lower nozzle temperature by 5–10°C if layer adhesion remains acceptable.",
+                "Ensure filament is dry; moisture exacerbates stringing.",
+            ]
 
         parameter_targets = {
             "nozzle_temp": float(nozzle),
