@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from server.app.rules import RulesEngine
+from server.rules import RulesEngine
 from server.models.api import AnalyzeRequestMeta, Prediction
 from server.rules.suggest import suggest
 from server.machines import resolve_machine

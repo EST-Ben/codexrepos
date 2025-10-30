@@ -1,38 +1,30 @@
 # server/app/routers/analyze_image.py
-from typing import Literal
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile
-from server.machines import MachineProfile, resolve_machine
-from ..ml.pipeline import DiagnosticPipeline  # you’ll adapt this to handle images
-from ..rules import RulesEngine
+from __future__ import annotations
 
-router = APIRouter(tags=["analyze"])
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from pydantic import BaseModel
+from typing import Optional
 
-@router.post("/analyze/image")
-async def analyze_image(
-    machine: str = Form(...),
-    material: str = Form("PLA"),
-    experience: Literal["Beginner", "Intermediate", "Advanced"] = Form("Intermediate"),
+from server.rules import RulesEngine  # ✅ absolute import to avoid shadowing
+from server.machines import resolve_machine
+
+router = APIRouter(tags=["analyze-image"])
+
+# If you keep this router, mount with prefix="/api" in main.py or
+# just rely on the top-level /api/analyze in main.py (your choice).
+
+class AnalyzeImageMeta(BaseModel):
+    machine_id: str
+    experience: str = "Intermediate"
+    material: str = "PLA"
+    app_version: Optional[str] = None
+
+
+@router.post("/analyze-image")
+async def analyze_image_route(
     image: UploadFile = File(...),
+    meta: str = Form(...),
 ):
-    try:
-        m: MachineProfile = resolve_machine(machine)
-    except KeyError as exc:
-        raise HTTPException(status_code=404, detail=str(exc)) from exc
-
-    img_bytes = await image.read()
-
-    # TODO: call your vision model here (local or hosted) to detect issues
-    # e.g., prediction = VisionModel.predict(img_bytes, material)
-    # For now, stub:
-    prediction = DiagnosticPipeline().predict_from_image(img_bytes, m, material)
-
-    applied = RulesEngine().clamp_to_machine(m, prediction.parameter_targets, experience)
-    return {
-        "machine": {"id": m.get("id"), "brand": m.get("brand"), "model": m.get("model")},
-        "issue": prediction.issue,
-        "confidence": prediction.confidence,
-        "recommendations": prediction.recommendations,
-        "parameter_targets": prediction.parameter_targets,
-        "applied": applied,
-        "capability_notes": prediction.capability_notes,
-    }
+    # You can forward to main’s handler if you prefer a single codepath,
+    # or implement a lighter alternative here.
+    raise HTTPException(status_code=501, detail="Use POST /api/analyze (multipart) at server.main")

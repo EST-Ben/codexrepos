@@ -1,8 +1,7 @@
-"""Clamp parameter targets so they stay within machine limits."""
+# server/rules/clamp.py
 from __future__ import annotations
 
 from typing import Any, Dict, Iterable, Mapping, Tuple
-
 from server.machines import MachineProfile
 
 ExperienceLevel = str
@@ -24,13 +23,9 @@ class RulesEngine:
                 "print_speed",
                 "travel_speed",
                 "accel",
-                "jerk",
                 "fan_speed",
                 "flow_rate",
                 "retraction_distance",
-                "spindle_rpm",
-                "feed_rate",
-                "doc",
             },
             "max_factor": 0.95,
             "note": "Intermediate mode unlocks motion controls with moderate guard rails.",
@@ -60,10 +55,12 @@ class RulesEngine:
             if allowed != "*" and key not in allowed:
                 hidden.add(key)
                 continue
+
             min_bound, max_bound = self._bounds_for(machine, key)
             effective_max = max_bound
             if isinstance(max_bound, (int, float)) and max_factor < 1.0:
                 effective_max = max_bound * max_factor
+
             new_value = value
             if isinstance(new_value, (int, float)):
                 if min_bound is not None and new_value < min_bound:
@@ -76,6 +73,7 @@ class RulesEngine:
                     explanations.append(f"Reduced {key} to {effective_max} based on limits.")
                 if isinstance(new_value, float):
                     new_value = round(new_value, 3)
+
             clamped[key] = new_value
 
         return {
@@ -158,6 +156,3 @@ class RulesEngine:
         if isinstance(value, (int, float)):
             return float(value)
         return None
-
-
-__all__ = ["RulesEngine"]

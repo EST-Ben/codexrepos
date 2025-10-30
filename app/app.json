@@ -1,9 +1,32 @@
 {
   "expo": {
-    "name": "codex-app",
-    "slug": "codex-app",
+    "name": "3D Diagnostics",
+    "slug": "3d-diagnostics",
+    "scheme": "diagnostics",
     "version": "1.0.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "light"
+
+    "plugins": ["expo-image-picker"],
+
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Allow access to choose a failed print photo.",
+        "NSCameraUsageDescription": "Allow camera to capture failed print photos."
+      }
+    },
+
+    "android": {
+      "permissions": ["READ_MEDIA_IMAGES", "CAMERA"],
+      "package": "com.example.diagnostics"
+    },
+
+    "extra": {
+      "API_URL": "http://192.168.0.35:8000",
+
+      "EXPO_PUBLIC_API_BASE": "http://192.168.0.35:8000/api",
+
+      "eas": { "projectId": "local" }
+    }
   }
 }

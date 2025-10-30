@@ -1,121 +1,114 @@
-"""FastAPI application entry point for diagnostics analysis."""
+# server/main.py
 from __future__ import annotations
 
-import json
-import time
-import uuid
-from collections import deque
-from pathlib import Path
-from typing import Deque
+import os
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile, status
-from fastapi.responses import JSONResponse
+# Routers mounted under /api
+from server.app.routers import machines as machines_router
+from server.app.routers import analyze as analyze_router
+from server.app.routers import analyze_image as analyze_image_router
 
-from server.inference import InferenceEngine
-from server.machines import reload_registry, resolve_machine
-from server.models.api import AnalyzeRequestMeta, AnalyzeResponse, Prediction
-from server.rules import suggest
-from server.settings import (
-    MAX_UPLOAD_BYTES,
-    RATE_LIMIT_REQUESTS,
-    RATE_LIMIT_WINDOW_SECONDS,
-    UPLOAD_DIR,
+# Optional: lazy helpers from your existing code
+def _load_pipeline_and_rules():
+    # Predict image: prefer server.inference, fallback server.ml
+    try:
+        from server.inference.pipeline import DiagnosticPipeline  # type: ignore
+    except Exception:
+        try:
+            from server.ml.pipeline import DiagnosticPipeline  # type: ignore
+        except Exception as exc:
+            raise RuntimeError(
+                "Could not import DiagnosticPipeline from server.inference.pipeline or server.ml.pipeline"
+            ) from exc
+
+    from server.rules.suggest import suggest  # your rules engine entrypoint
+    from server.machines import resolve_machine
+
+    def predict_image(image_path: str, meta: dict):
+        pipe = DiagnosticPipeline()
+        return pipe.predict_image(image_path, meta)
+
+    return predict_image, suggest, resolve_machine
+
+
+app = FastAPI(title="3D Diagnostics API", version="0.1.0")
+
+# Permissive CORS for dev
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+    allow_credentials=True,
 )
-from server.slicer import diff as slicer_diff
 
-try:  # pragma: no cover - optional import during refactor
-    from server.app.routers import export, machines
-except ModuleNotFoundError:  # pragma: no cover - compatibility
-    export = machines = None  # type: ignore
-
-app = FastAPI(title="Diagnostics AI", version="0.2.0")
-
-INFERENCE_ENGINE = InferenceEngine()
-_RATE_LIMIT_BUCKET: Deque[float] = deque()
+# ---------- Health ----------
+@app.get("/health")
+def health():
+    mode = os.environ.get("INFERENCE_MODE", "stub")
+    return {"status": "ok", "mode": mode}
 
 
-@app.on_event("startup")
-def _startup() -> None:
-    reload_registry()
+# ---------- Multipart /api/analyze (image) ----------
+# Keep this here for the camera flow in your app
+@app.post("/api/analyze")
+async def analyze_image(
+    image: UploadFile = File(...),
+    meta: str = Form(..., description="JSON string: {machine_id, experience, material, app_version}"),
+):
+    import json
+    import tempfile
+    import shutil
 
-
-def _enforce_rate_limit() -> None:
-    now = time.monotonic()
-    window_start = now - RATE_LIMIT_WINDOW_SECONDS
-    while _RATE_LIMIT_BUCKET and _RATE_LIMIT_BUCKET[0] < window_start:
-        _RATE_LIMIT_BUCKET.popleft()
-    if len(_RATE_LIMIT_BUCKET) >= RATE_LIMIT_REQUESTS:
-        raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="Rate limit exceeded")
-    _RATE_LIMIT_BUCKET.append(now)
-
-
-async def _store_upload(image: UploadFile, image_id: str) -> Path:
-    extension = Path(image.filename or "upload.jpg").suffix or ".jpg"
-    destination = (UPLOAD_DIR / f"{image_id}{extension}").resolve()
-    size = 0
-    chunk_size = 1024 * 1024
-    with destination.open("wb") as buffer:
-        while True:
-            chunk = await image.read(chunk_size)
-            if not chunk:
-                break
-            size += len(chunk)
-            if size > MAX_UPLOAD_BYTES:
-                buffer.close()
-                destination.unlink(missing_ok=True)
-                raise HTTPException(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail="Image too large")
-            buffer.write(chunk)
-    await image.close()
-    return destination
-
-
-if machines is not None:
-    app.include_router(machines.router, prefix="/api")
-if export is not None:
-    app.include_router(export.router, prefix="/api")
-
-
-@app.post("/api/analyze", response_model=AnalyzeResponse)
-async def analyze(image: UploadFile = File(...), meta: str = Form(...)) -> AnalyzeResponse:
-    _enforce_rate_limit()
     try:
-        meta_payload = json.loads(meta)
-    except json.JSONDecodeError as exc:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Invalid meta JSON: {exc}") from exc
+        meta_obj = json.loads(meta or "{}")
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Invalid meta JSON: {exc}") from exc
 
-    request_meta = AnalyzeRequestMeta(**meta_payload)
+    upload_dir = os.environ.get("UPLOAD_DIR") or os.path.join(tempfile.gettempdir(), "uploads")
+    os.makedirs(upload_dir, exist_ok=True)
+
+    # save file to disk
+    suffix = os.path.splitext(image.filename or "upload.jpg")[-1] or ".jpg"
+    fd, tmp_path = tempfile.mkstemp(prefix="img_", suffix=suffix, dir=upload_dir)
+    os.close(fd)
+    with open(tmp_path, "wb") as w:
+        shutil.copyfileobj(image.file, w)
+
+    # run inference + suggestions
     try:
-        resolve_machine(request_meta.machine_id)
-    except KeyError as exc:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+        predict_image, suggest, resolve_machine = _load_pipeline_and_rules()
 
-    image_id = uuid.uuid4().hex
-    image_path = await _store_upload(image, image_id)
+        machine_id = meta_obj.get("machine_id") or meta_obj.get("machine")  # flexibility
+        if not machine_id:
+            raise HTTPException(status_code=400, detail="meta.machine_id is required")
 
-    predictions, explanations = INFERENCE_ENGINE.predict(image_path)
-    suggestions, low_confidence = suggest(predictions, request_meta)
+        machine = resolve_machine(machine_id)
+        prediction = predict_image(tmp_path, meta_obj)  # your pipeline returns structured result
+        suggestions = suggest(prediction, machine, meta_obj.get("experience", "Intermediate"))
+    finally:
+        try:
+            os.remove(tmp_path)
+        except Exception:
+            pass
 
-    slicer_profile_diff = slicer_diff.apply(
-        suggestions,
-        base_profile=request_meta.base_profile or {},
-        slicer="generic",
-    )
-
-    response = AnalyzeResponse(
-        predictions=[Prediction(issue_id=p.issue_id, confidence=p.confidence) for p in predictions],
-        explanations=explanations,
-        suggestions=suggestions,
-        slicer_profile_diff=slicer_profile_diff,
-        image_id=image_id,
-        version="ai-alpha-1",
-        low_confidence=low_confidence,
-    )
-    return response
-
-
-@app.exception_handler(HTTPException)
-async def http_exception_handler(_, exc: HTTPException) -> JSONResponse:  # pragma: no cover - simple wrapper
-    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+    return {
+        "machine": {"id": machine.get("id"), "brand": machine.get("brand"), "model": machine.get("model")},
+        "predictions": getattr(prediction, "predictions", []),
+        "issue": getattr(prediction, "issue", None),
+        "confidence": getattr(prediction, "confidence", None),
+        "explanations": getattr(prediction, "explanations", []),
+        "suggestions": suggestions.get("suggestions"),
+        "parameter_targets": suggestions.get("parameter_targets"),
+        "slicer_profile_diff": suggestions.get("slicer_profile_diff"),
+        "capability_notes": getattr(prediction, "capability_notes", []),
+        "version": "mvp-0.1",
+    }
 
 
-__all__ = ["app"]
+# ---------- Mount routers under /api ----------
+app.include_router(machines_router.router, prefix="/api")
+app.include_router(analyze_router.router, prefix="/api")
+app.include_router(analyze_image_router.router, prefix="/api")
