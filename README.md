@@ -9,6 +9,32 @@ popular slicers. The FastAPI service loads generated machine profiles, exposes
 lookup and export endpoints, and ships with a deterministic diagnostics stub so
 the pipeline can be demoed without a trained model.
 
+## Quick start
+
+1. **Install dependencies**
+   - Python 3.11 (Miniforge recommended on Windows)
+   - Node.js 18 LTS and Yarn/NPM
+2. **Start the FastAPI backend**
+   ```powershell
+   # From the repo root
+   ./serve_api.ps1      # PowerShell
+   #   or
+   serve_api.bat        # Command Prompt
+   ```
+3. **Start the Expo client in LAN mode**
+   ```powershell
+   # Replace <LAN-IP> with your computer's LAN address
+   ./serve_app.ps1 -ApiUrl "http://<LAN-IP>:8000"
+   #   or (CMD)
+   set API_URL=http://<LAN-IP>:8000
+   serve_app.bat
+   ```
+4. Scan the QR code with the Expo Go app, ensure `/api/machines` loads in the UI, then capture or pick
+   a photo to test `/api/analyze`.
+
+See [`LOCAL_DEV.md`](LOCAL_DEV.md) for the full Windows + Miniforge walkthrough, including curl smoke
+tests and firewall notes.
+
 ## Generating machine profiles
 
 Run `python scripts/build_machines.py` after editing the seed files under
@@ -32,7 +58,7 @@ The AI photo workflow is enabled end-to-end in this repository. Configure the
 following environment variables before starting the backend:
 
 - `UPLOAD_DIR` – directory where uploaded analysis photos are stored.
-  Defaults to `/tmp/uploads` and is created automatically if missing.
+  Defaults to `C:\tmp\uploads` on Windows or `<temp>/uploads` elsewhere and is created automatically if missing.
 - `MODEL_PATH` – path to a trained model checkpoint (e.g.,
   `./server/models/best.pt`). When running in stub mode the file is not
   required.
@@ -41,25 +67,27 @@ following environment variables before starting the backend:
 
 ### Running the stack
 
-1. Install backend dependencies (FastAPI, Pydantic, httpx, etc.) and start the
-   API server:
-   ```bash
-   uvicorn server.main:app --reload
-   ```
-2. Install Expo dependencies inside `app/` and launch the client:
-   ```bash
-   cd app
-   npm install
-   npm run start
-   ```
-3. The client sends captured photos and metadata to `/api/analyze` as
-   multipart form-data. Results include predictions, machine-aware suggestions,
-   and slicer diffs that can be exported via the provided buttons.
+The provided scripts take care of environment variables and cache clearing, but you can still launch
+everything manually:
 
-To replace the stub model, train your detector and export the checkpoint to the
-path specified by `MODEL_PATH`, then set `INFERENCE_MODE=torch`. Uploaded files
-will continue to be written to `UPLOAD_DIR`, which you can mount elsewhere for
-long-term storage if desired.
+```bash
+# Backend (from repo root)
+export UPLOAD_DIR=$(mktemp -d)/uploads  # or choose a persistent path
+python -m uvicorn server.main:app --host 0.0.0.0 --port 8000 --reload
+
+# Expo client (from app/)
+export EXPO_PUBLIC_API_URL="http://<LAN-IP>:8000"
+npm install
+npx expo start --lan -c
+```
+
+The client sends captured photos and metadata to `/api/analyze` as multipart form-data. Results include
+predictions, machine-aware suggestions, and slicer diffs that can be exported via the provided
+buttons.
+
+To replace the stub model, train your detector and export the checkpoint to the path specified by
+`MODEL_PATH`, then set `INFERENCE_MODE=torch`. Uploaded files will continue to be written to
+`UPLOAD_DIR`, which you can mount elsewhere for long-term storage if desired.
 
 Safety clamps in the rules engine ensure nozzle temperatures, bed temperatures,
 travel speeds, acceleration, and CNC spindle/feed parameters never exceed the

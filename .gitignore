@@ -6,3 +6,5 @@ __pycache__/
 app/.expo/
 app/.expo-shared/
 server/.venv/
+**/package-lock.json
+**/package.lock.json

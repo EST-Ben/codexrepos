@@ -1,8 +1,31 @@
 // app/src/components/AnalyzeFromPhoto.tsx
 import React, { useState } from "react";
-import { View, Text, Button, Image, ActivityIndicator, TextInput, Platform, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  Image,
+  ActivityIndicator,
+  TextInput,
+  Platform,
+  ScrollView,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { analyzeImage, AnalyzeImageResponse, Experience } from "../api/analyzeImage";
+
+function renderKeyValueList(
+  record: Record<string, unknown> | null | undefined
+): React.ReactNode {
+  const entries = record ? Object.entries(record) : [];
+  if (!entries.length) {
+    return <Text>None</Text>;
+  }
+  return entries.map(([key, value]) => (
+    <Text key={key}>
+      {key}: {String(value)}
+    </Text>
+  ));
+}
 
 export default function AnalyzeFromPhoto() {
   const [uri, setUri] = useState<string | null>(null);
@@ -140,29 +163,45 @@ export default function AnalyzeFromPhoto() {
       {result ? (
         <View style={{ marginTop: 12, gap: 8 }}>
           <Text style={{ fontWeight: "600" }}>Prediction</Text>
-          <Text>Machine: {result.machine?.brand} {result.machine?.model} ({result.machine?.id})</Text>
-          <Text>Issue: {result.issue}</Text>
-          <Text>Confidence: {(result.confidence * 100).toFixed(1)}%</Text>
+          <Text>
+            Machine:
+            {" "}
+            {[
+              result.machine?.brand,
+              result.machine?.model,
+              result.machine?.id ? `(${result.machine.id})` : null,
+            ]
+              .filter(Boolean)
+              .join(" ") || "Unknown"}
+          </Text>
+          <Text>Issue: {result.issue ?? "Unknown"}</Text>
+          <Text>
+            Confidence:
+            {" "}
+            {typeof result.confidence === "number"
+              ? `${(result.confidence * 100).toFixed(1)}%`
+              : "N/A"}
+          </Text>
 
           <Text style={{ fontWeight: "600", marginTop: 8 }}>Recommendations</Text>
-          {result.recommendations?.length
-            ? result.recommendations.map((r, i) => <Text key={i}>• {r}</Text>)
-            : <Text>None</Text>}
+          {result.recommendations?.length ? (
+            result.recommendations.map((r, i) => <Text key={i}>• {r}</Text>)
+          ) : (
+            <Text>None</Text>
+          )}
 
           <Text style={{ fontWeight: "600", marginTop: 8 }}>Parameter Targets</Text>
-          {Object.entries(result.parameter_targets || {}).map(([k, v]) => (
-            <Text key={k}>{k}: {v}</Text>
-          ))}
+          {renderKeyValueList(result.parameter_targets)}
 
           <Text style={{ fontWeight: "600", marginTop: 8 }}>Applied (clamped)</Text>
-          {Object.entries(result.applied || {}).map(([k, v]) => (
-            <Text key={k}>{k}: {v}</Text>
-          ))}
+          {renderKeyValueList(result.applied)}
 
           {result.capability_notes?.length ? (
             <>
               <Text style={{ fontWeight: "600", marginTop: 8 }}>Notes</Text>
-              {result.capability_notes.map((n, i) => <Text key={i}>• {n}</Text>)}
+              {result.capability_notes.map((n, i) => (
+                <Text key={i}>• {n}</Text>
+              ))}
             </>
           ) : null}
         </View>

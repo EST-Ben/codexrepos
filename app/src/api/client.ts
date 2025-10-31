@@ -15,12 +15,15 @@ import type {
  * NOTE: All endpoints below append "/api/...".
  */
 function resolveApiRoot(): string {
+  const env = ((globalThis as any)?.process?.env ?? {}) as Record<string, string | undefined>;
+  const envFromExpo = env.EXPO_PUBLIC_API_URL ?? env.EXPO_PUBLIC_API_BASE;
+
   const extraFromExpo =
     (Constants?.expoConfig as any)?.extra?.API_URL ??
     // Legacy SDK fallback (older manifests):
     (Constants as any)?.manifest?.extra?.API_URL;
 
-  const base = (extraFromExpo ?? "http://localhost:8000").toString();
+  const base = (envFromExpo ?? extraFromExpo ?? "http://localhost:8000").toString();
   return base.replace(/\/+$/, ""); // strip trailing slash
 }
 

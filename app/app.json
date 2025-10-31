@@ -11,8 +11,8 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "Allow access to choose a failed print photo.",
-        "NSCameraUsageDescription": "Allow camera to capture failed print photos."
+        "NSPhotoLibraryUsageDescription": "Allow access to choose a failed print photo for analysis.",
+        "NSCameraUsageDescription": "Allow camera access to capture failed print photos for analysis."
       }
     },
 
@@ -22,10 +22,7 @@
     },
 
     "extra": {
-      "API_URL": "http://192.168.0.35:8000",
-
-      "EXPO_PUBLIC_API_BASE": "http://192.168.0.35:8000/api",
-
+      "API_URL": "http://<LAN-IP>:8000",
       "eas": { "projectId": "local" }
     }
   }
