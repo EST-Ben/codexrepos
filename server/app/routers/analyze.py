@@ -1,13 +1,13 @@
 # server/app/routers/analyze.py
 """Diagnostics analyze endpoints (legacy shim + JSON-only route).
 
-- Multipart /api/analyze lives in server.main.
+- Multipart /api/analyze lives in :mod:`server.app.routers.analyze_image`.
 - This module keeps a 410 GONE shim for the old /analyze path.
 - It also exposes a JSON-only /analyze-json route for internal/testing use.
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Literal
+from typing import Any, Dict, List, Literal, Type
 import importlib
 
 from fastapi import APIRouter, HTTPException
@@ -17,56 +17,58 @@ from server.machines import MachineProfile, resolve_machine
 
 router = APIRouter(tags=["analyze"])
 
+_PIPELINE_CANDIDATES = (
+    "server.inference.pipeline",
+    "server.ml.pipeline",
+    "server.app.ml.pipeline",
+)
+_pipeline_cls: Type[Any] | None = None
+_rules_engine_cls: Type[Any] | None = None
 
-def _load_pipeline_cls():
-    try:
-        from server.inference.pipeline import DiagnosticPipeline  # type: ignore
-        return DiagnosticPipeline
-    except Exception as e_infer:
+
+def load_pipeline_cls() -> Type[Any]:
+    """Dynamically resolve the diagnostics pipeline implementation."""
+    global _pipeline_cls
+    if _pipeline_cls is not None:
+        return _pipeline_cls
+
+    errors: List[str] = []
+    for path in _PIPELINE_CANDIDATES:
         try:
-            from server.ml.pipeline import DiagnosticPipeline  # type: ignore
-            return DiagnosticPipeline
-        except Exception as e_ml:
-            msg = (
-                "Could not import DiagnosticPipeline. "
-                "Tried 'server.inference.pipeline' and 'server.ml.pipeline'.\n"
-                f"inference error: {type(e_infer).__name__}: {e_infer}\n"
-                f"ml error: {type(e_ml).__name__}: {e_ml}\n"
-                "Ensure the file exists and __init__.py marks packages."
-            )
-            raise HTTPException(status_code=500, detail=msg)
+            module = importlib.import_module(path)
+            pipeline_cls = getattr(module, "DiagnosticPipeline")
+            _pipeline_cls = pipeline_cls
+            return pipeline_cls
+        except Exception as exc:  # pragma: no cover - defensive reporting
+            errors.append(f"{path}: {type(exc).__name__}: {exc}")
 
-
-def _load_rules_engine():
-    e_pkg = e_mod = None
-    try:
-        mod = importlib.import_module("server.rules")
-        if hasattr(mod, "RulesEngine"):
-            return getattr(mod, "RulesEngine")
-    except Exception as exc:
-        e_pkg = exc
-
-    try:
-        mod = importlib.import_module("server.rules.engine")
-        if hasattr(mod, "RulesEngine"):
-            return getattr(mod, "RulesEngine")
-    except Exception as exc:
-        e_mod = exc
-
-    msg = (
-        "Could not import RulesEngine.\n"
-        "Tried 'server.rules' and 'server.rules.engine'.\n"
-        f"package error: {type(e_pkg).__name__ if e_pkg else 'None'}: {e_pkg}\n"
-        f"module error: {type(e_mod).__name__ if e_mod else 'None'}: {e_mod}\n"
-        "Ensure server/rules/__init__.py re-exports RulesEngine or server/rules/engine.py defines it."
+    detail = (
+        "Could not import DiagnosticPipeline. Tried: "
+        + ", ".join(_PIPELINE_CANDIDATES)
+        + (".\n" + "\n".join(errors) if errors else "")
     )
-    raise HTTPException(status_code=500, detail=msg)
+    raise HTTPException(status_code=500, detail=detail)
+
+
+def load_rules_engine() -> Type[Any]:
+    """Import the rules engine with a helpful failure message."""
+    global _rules_engine_cls
+    if _rules_engine_cls is not None:
+        return _rules_engine_cls
+
+    try:
+        from server.app.rules import RulesEngine
+    except Exception as exc:  # pragma: no cover - defensive
+        raise HTTPException(status_code=500, detail=f"Could not import RulesEngine: {exc}") from exc
+
+    _rules_engine_cls = RulesEngine
+    return RulesEngine
 
 
 @router.post("/analyze")
 def deprecated_analyze() -> None:  # pragma: no cover
-    """Historical location for analyze. Multipart moved to server.main."""
-    raise HTTPException(status_code=410, detail="/api/analyze moved to server.main")
+    """Historical location for analyze. Multipart now lives in analyze_image router."""
+    raise HTTPException(status_code=410, detail="Use POST /api/analyze (multipart) via analyze-image router")
 
 
 class AnalyzeRequest(BaseModel):
@@ -95,8 +97,8 @@ def analyze_json(payload: AnalyzeRequest):
         **payload.payload,
     }
 
-    DiagnosticPipeline = _load_pipeline_cls()
-    RulesEngine = _load_rules_engine()
+    DiagnosticPipeline = load_pipeline_cls()
+    RulesEngine = load_rules_engine()
 
     pipeline = DiagnosticPipeline()
     prediction = pipeline.predict(request_payload, machine)

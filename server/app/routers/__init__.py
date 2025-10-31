@@ -1,7 +1,6 @@
 """API routers."""
 from __future__ import annotations
 
-from . import analyze, export, machines
-from . import analyze_image
+from . import analyze, analyze_image, export, machines
 
-__all__ = ["analyze", "export", "machines"]
+__all__ = ["analyze", "analyze_image", "export", "machines"]
