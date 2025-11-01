@@ -13,6 +13,9 @@ if not exist "%UPLOAD_DIR%" (
 if not defined INFERENCE_MODE (
     set "INFERENCE_MODE=stub"
 )
+if not defined ENVIRONMENT (
+    set "ENVIRONMENT=development"
+)
 set "PYTHONPATH=%REPO_ROOT%;%PYTHONPATH%"
 
 python -m uvicorn server.main:app --host 0.0.0.0 --port 8000 --reload

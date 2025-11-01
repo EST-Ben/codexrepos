@@ -2,14 +2,19 @@
 
 ## Unreleased
 
-- Mounted all FastAPI routers under `/api`, added the `/health` endpoint, and enabled development
-  CORS so LAN clients can reach the backend.
-- Defaulted `UPLOAD_DIR` to a Windows-friendly path (with automatic directory creation) and wired the
-  diagnostics endpoints to the stub pipeline and rules engine shims.
-- Unified the Expo client’s API base resolution, ensured multipart uploads send JSON metadata, and
-  hardened the Analyze From Photo screen.
-- Added Windows launcher scripts (`serve_api.*`, `serve_app.*`) that clear caches, set environment
-  variables, and start the dev servers in LAN mode.
-- Documented the local development workflow in `LOCAL_DEV.md`, refreshed the README quick start, and
-  ignored Node lockfiles across the repo.
+- Hardened Expo launch scripts to catch placeholder API URLs before Metro starts, eliminating the
+  common "Failed to parse URL" startup error on Windows.
+- Documented high-frequency setup issues in `LOCAL_DEV.md`, including `/api` router checks, CORS
+  guidance, Expo dependency alignment, and `PYTHONPATH` fixes for manual Uvicorn runs.
+
+## v1.1.0 - 2025-11-01
+
+- Added environment-aware CORS configuration with production origin allowlists and committed a default
+  `.env` template for local overrides.
+- Introduced containerized API deployment via a new Dockerfile and GitHub Actions workflows that build
+  Docker images, export the Expo web bundle, and push artifacts on tagged releases.
+- Documented production hosting paths (VM, managed container, static web hosting, and EAS builds) in
+  `DEPLOYMENT.md` and linked the checklist from the README and Windows setup guide.
+- Extended Expo configuration for production: explicit camera/storage permissions, a reusable web export
+  script, and guidance on environment configuration across app targets.
 
