@@ -31,6 +31,7 @@ interface PrinterTabsProps {
     response: AnalyzeResponse;
     material?: string;
     summary?: MachineSummary;
+    image?: { uri: string; width: number; height: number };
   }): void;
   onUpdateMaterial(machineId: string, material: string | undefined): void | Promise<void>;
   onOpenHistory(machine?: MachineRef): void;
@@ -58,6 +59,7 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
     material?: string;
     imageUri?: string;
     summary?: MachineSummary;
+    image?: { uri: string; width: number; height: number };
   } | null>(null);
 
   const handleQueueSuccess = useCallback(
@@ -108,6 +110,7 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
         response: data,
         material: lastRequest.material,
         summary: lastRequest.summary ?? machineSummary,
+        image: lastRequest.image,
       });
       reset();
       setLastRequest(null);
@@ -152,9 +155,17 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
       app_version: 'app-ai-alpha',
     };
     const summary = lookup.get(activeMachine.id);
-    setLastRequest({ machine: activeMachine, material: materialValue, imageUri: image.uri, summary });
+    setLastRequest({
+      machine: activeMachine,
+      material: materialValue,
+      imageUri: image.uri,
+      summary,
+      image: { uri: image.uri, width: image.width, height: image.height },
+    });
+    const filePayload: Blob | { uri: string; name: string; type: string } =
+      image.blob ?? { uri: image.uri, name: image.name, type: image.type };
     mutate({
-      file: { uri: image.uri, name: image.name, type: image.type },
+      file: filePayload,
       meta,
       machine: activeMachine,
       material: materialValue,

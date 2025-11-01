@@ -1,6 +1,7 @@
 // app/src/api/client.ts
 import Constants from "expo-constants";
 import type {
+  AnalyzeRequestMeta,
   AnalyzeResponse,
   ExperienceLevel,
   ExportDiff,
@@ -106,17 +107,11 @@ export const analyzeMachine = analyzeMachineJSON;
  * - RN/Expo: pass { uri, name?, type? }
  * - Web: pass Blob | File
  * ----------------------------------------------------------- */
-type RNFileLike = { uri: string; name?: string; type?: string };
+export type RNFileLike = { uri: string; name?: string; type?: string };
 
 export async function analyzeImage(
   fileArg: Blob | File | RNFileLike,
-  meta: {
-    machine_id: string;
-    experience: ExperienceLevel;
-    material?: string;
-    base_profile?: Record<string, any>;
-    app_version?: string;
-  }
+  meta: AnalyzeRequestMeta
 ): Promise<AnalyzeResponse> {
   const form = new FormData();
 
@@ -138,7 +133,10 @@ export async function analyzeImage(
     form.append("image", rnFormFile);
   } else {
     // Web: Blob/File is fine
-    form.append("image", fileArg as Blob);
+    const blob = fileArg as Blob;
+    const blobAny = blob as any;
+    const filename = typeof blobAny?.name === "string" ? blobAny.name : "upload.jpg";
+    form.append("image", blob, filename);
   }
 
   form.append("meta", JSON.stringify(meta));
@@ -150,6 +148,17 @@ export async function analyzeImage(
   });
 
   return handleResponse<AnalyzeResponse>(res);
+}
+
+export async function analyze(
+  fileArg: Blob | File | RNFileLike,
+  meta: AnalyzeRequestMeta,
+  onProgress?: (value: number) => void
+): Promise<AnalyzeResponse> {
+  onProgress?.(0.05);
+  const result = await analyzeImage(fileArg, meta);
+  onProgress?.(1);
+  return result;
 }
 
 /* -------------------------------------------------------------

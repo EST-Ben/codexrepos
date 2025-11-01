@@ -57,12 +57,13 @@ def load_rules_engine() -> Type[Any]:
         return _rules_engine_cls
 
     try:
-        from server.app.rules import RulesEngine
+        module = importlib.import_module("server.rules")
+        rules_engine = getattr(module, "RulesEngine")
     except Exception as exc:  # pragma: no cover - defensive
         raise HTTPException(status_code=500, detail=f"Could not import RulesEngine: {exc}") from exc
 
-    _rules_engine_cls = RulesEngine
-    return RulesEngine
+    _rules_engine_cls = rules_engine
+    return rules_engine
 
 
 @router.post("/analyze")
