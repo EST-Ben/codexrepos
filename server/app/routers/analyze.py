@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Literal, Type
 import importlib
+import uuid
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
@@ -105,20 +106,35 @@ def analyze_json(payload: AnalyzeRequest):
     prediction = pipeline.predict(request_payload, machine)
 
     engine = RulesEngine()
-    applied = engine.clamp_to_machine(
+    clamp_summary = engine.clamp_to_machine(
         machine, prediction.parameter_targets, payload.experience
     )
 
+    applied_parameters = (
+        clamp_summary.get("parameters", {}) if isinstance(clamp_summary, dict) else clamp_summary
+    )
+    clamp_explanations = (
+        clamp_summary.get("explanations", []) if isinstance(clamp_summary, dict) else []
+    )
+    hidden_parameters = (
+        clamp_summary.get("hidden_parameters", []) if isinstance(clamp_summary, dict) else []
+    )
+
     return {
+        "image_id": f"json-{uuid.uuid4().hex}",
         "machine": {
             "id": machine.get("id"),
             "brand": machine.get("brand"),
             "model": machine.get("model"),
         },
-        "issue": prediction.issue,
-        "confidence": prediction.confidence,
-        "recommendations": prediction.recommendations,
+        "issue_list": [{"id": prediction.issue, "confidence": prediction.confidence}],
+        "top_issue": prediction.issue,
+        "boxes": [],
+        "heatmap": None,
         "parameter_targets": prediction.parameter_targets,
-        "applied": applied,
+        "applied": applied_parameters,
+        "recommendations": prediction.recommendations,
         "capability_notes": getattr(prediction, "capability_notes", []),
+        "clamp_explanations": clamp_explanations,
+        "hidden_parameters": hidden_parameters,
     }

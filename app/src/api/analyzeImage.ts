@@ -19,17 +19,18 @@ export interface AnalyzeImageRequest {
 }
 
 export interface AnalyzeImageResponse {
+  image_id: string;
   machine: { id?: string; brand?: string; model?: string };
-  issue?: string;
-  confidence?: number;
-  recommendations?: string[];
-  suggestions?: any;                 // server may return "suggestions"
-  parameter_targets?: Record<string, number>;
-  slicer_profile_diff?: Record<string, any>;
-  applied?: Record<string, number> | any;
-  capability_notes?: string[];
-  predictions?: any[];
-  version?: string;
+  issue_list: Array<{ id: string; confidence: number }>;
+  top_issue?: string | null;
+  boxes?: Array<{ issue_id?: string; x: number; y: number; w: number; h: number; score?: number }>;
+  heatmap?: string | null;
+  parameter_targets: Record<string, number>;
+  applied: Record<string, number>;
+  recommendations: string[];
+  capability_notes: string[];
+  clamp_explanations?: string[];
+  hidden_parameters?: string[];
 }
 
 // Some Android/iOS URIs come without file extension; default a stable name

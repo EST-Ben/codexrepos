@@ -12,7 +12,7 @@ jest.mock('@react-native-community/slider', () => {
 });
 
 jest.mock('../api/client', () => ({
-  exportProfile: jest.fn(async () => ({ slicer: 'cura', diff: {}, source_keys: [] })),
+  exportProfile: jest.fn(async () => ({ slicer: 'cura', diff: {}, markdown: '# Diff' })),
 }));
 
 const response: AnalyzeResponse = {
@@ -68,11 +68,10 @@ const summary = {
   brand: 'Bambu Lab',
   model: 'P1P',
   safe_speed_ranges: { print: [40, 300] },
-  max_nozzle_temp_c: 300,
 };
 
 describe('AnalysisResult', () => {
-  it('constrains sliders within machine ranges', () => {
+  it('renders issues, parameters, and heatmap slider', () => {
     render(
       <AnalysisResult
         machine={{ id: 'bambu_p1p', brand: 'Bambu Lab', model: 'P1P' }}

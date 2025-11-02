@@ -9,8 +9,8 @@ import {
   Text,
   View,
 } from 'react-native';
-import * as Clipboard from 'expo-clipboard';
 import Slider from '@react-native-community/slider';
+import * as Clipboard from 'expo-clipboard';
 
 import { exportProfile } from '../api/client';
 import type {
@@ -18,23 +18,15 @@ import type {
   ExperienceLevel,
   MachineRef,
   MachineSummary,
-  Suggestion,
-  SuggestionChange,
   SlicerId,
 } from '../types';
 
 const SLICERS: Array<{ id: SlicerId; label: string }> = [
-  { id: 'cura', label: 'Copy for Cura' },
-  { id: 'prusaslicer', label: 'Copy for PrusaSlicer' },
-  { id: 'bambu', label: 'Copy for Bambu Studio' },
-  { id: 'orca', label: 'Copy for OrcaSlicer' },
+  { id: 'cura', label: 'Export for Cura' },
+  { id: 'prusaslicer', label: 'Export for PrusaSlicer' },
+  { id: 'bambu', label: 'Export for Bambu Studio' },
+  { id: 'orca', label: 'Export for OrcaSlicer' },
 ];
-
-interface AdjustmentValue {
-  type: 'delta' | 'target';
-  value: number;
-  change: SuggestionChange;
-}
 
 interface AnalysisResultProps {
   machine: MachineRef;
@@ -47,71 +39,15 @@ interface AnalysisResultProps {
   image?: { uri: string; width: number; height: number };
 }
 
-function deriveBounds(param: string, summary?: MachineSummary): { min: number; max: number } {
-  const fallback = { min: 0, max: 100 };
-  if (!summary) {
-    if (param.includes('temp')) {
-      return { min: 0, max: 320 };
-    }
-    if (param.includes('speed')) {
-      return { min: 0, max: 350 };
-    }
-    return fallback;
-  }
-
-  if (param.includes('nozzle')) {
-    return { min: 0, max: summary.max_nozzle_temp_c ?? 320 };
-  }
-  if (param.includes('bed')) {
-    return { min: 0, max: summary.max_bed_temp_c ?? 140 };
-  }
-  if (param.includes('print_speed') && summary.safe_speed_ranges?.print) {
-    return { min: summary.safe_speed_ranges.print[0], max: summary.safe_speed_ranges.print[1] };
-  }
-  if (param.includes('travel') && summary.safe_speed_ranges?.travel) {
-    return { min: summary.safe_speed_ranges.travel[0], max: summary.safe_speed_ranges.travel[1] };
-  }
-  if (param.includes('accel') && summary.safe_speed_ranges?.accel) {
-    return { min: summary.safe_speed_ranges.accel[0], max: summary.safe_speed_ranges.accel[1] };
-  }
-  if (param.includes('jerk') && summary.safe_speed_ranges?.jerk) {
-    return { min: summary.safe_speed_ranges.jerk[0], max: summary.safe_speed_ranges.jerk[1] };
-  }
-  if (param.includes('spindle') && summary.spindle_rpm_range) {
-    return { min: summary.spindle_rpm_range[0], max: summary.spindle_rpm_range[1] };
-  }
-  if (param.includes('feed') && summary.max_feed_mm_min) {
-    return { min: 0, max: summary.max_feed_mm_min };
-  }
-  if (param.includes('fan')) {
-    return { min: 0, max: 100 };
-  }
-  if (param.includes('flow')) {
-    return { min: 80, max: 140 };
-  }
-  if (param.includes('retraction')) {
-    return { min: 0, max: 3 };
-  }
-  return fallback;
+function formatConfidence(value: number): string {
+  return `${Math.round(Math.max(0, Math.min(1, value)) * 100)}%`;
 }
 
-function initialiseAdjustments(suggestions: Suggestion[]): Record<string, AdjustmentValue> {
-  const entries: Array<[string, AdjustmentValue]> = [];
-  suggestions.forEach((suggestion) => {
-    suggestion.changes.forEach((change) => {
-      const key = `${suggestion.issue_id}:${change.param}`;
-      const value = change.new_target ?? change.delta ?? 0;
-      entries.push([
-        key,
-        {
-          type: change.new_target === undefined ? 'delta' : 'target',
-          value,
-          change,
-        },
-      ]);
-    });
-  });
-  return Object.fromEntries(entries);
+function clamp01(value: number | undefined | null): number {
+  if (typeof value !== 'number') {
+    return 0;
+  }
+  return Math.max(0, Math.min(1, value));
 }
 
 export const AnalysisResult: React.FC<AnalysisResultProps> = ({
@@ -131,18 +67,16 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
   const [exportMessage, setExportMessage] = useState<string | null>(null);
   const [overlayOpacity, setOverlayOpacity] = useState<number>(0.6);
 
-  useEffect(() => {
-    setAdjustments(initialiseAdjustments(response.suggestions));
-  }, [response]);
+  const sortedIssues = useMemo(() => {
+    return [...(response.issue_list ?? [])].sort((a, b) => b.confidence - a.confidence);
+  }, [response.issue_list]);
 
-  const aggregatedChanges = useMemo(() => {
-    const result: Record<string, number> = {};
-    Object.entries(adjustments).forEach(([key, entry]) => {
-      const param = entry.change.param;
-      result[param] = entry.value;
-    });
-    return result;
-  }, [adjustments]);
+  const parameterKeys = useMemo(() => {
+    const keys = new Set<string>();
+    Object.keys(response.parameter_targets ?? {}).forEach((key) => keys.add(key));
+    Object.keys(response.applied ?? {}).forEach((key) => keys.add(key));
+    return Array.from(keys).sort();
+  }, [response.parameter_targets, response.applied]);
 
   const aspectRatio = useMemo(() => {
     if (image?.width && image?.height) {
@@ -307,31 +241,69 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
     </View>
   );
 
+  useEffect(() => {
+    if (!exportMessage) {
+      return;
+    }
+    const timer = setTimeout(() => setExportMessage(null), 2600);
+    return () => clearTimeout(timer);
+  }, [exportMessage]);
+
+  const topIssue = response.top_issue ?? sortedIssues[0]?.id ?? 'general_tuning';
+  const boxes = response.boxes ?? [];
+  const clampNotes = response.clamp_explanations ?? [];
+  const hiddenParameters = response.hidden_parameters ?? [];
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>{machine.brand} {machine.model}</Text>
-          <Text style={styles.subtitle}>Experience: {experience} · Material: {material ?? 'Not set'}</Text>
+          <Text style={styles.title}>Analysis complete</Text>
+          <Text style={styles.subtitle}>
+            {machine.brand} {machine.model} • Experience: {experience}
+            {material ? ` • Material: ${material}` : ''}
+          </Text>
+          <Text style={styles.topIssue}>Top issue: {topIssue}</Text>
         </View>
-        <View style={styles.headerButtons}>
-          <Pressable onPress={onRetake} style={styles.secondaryButton}>
+        <View style={styles.headerActions}>
+          <Pressable onPress={onRetake} style={[styles.secondaryButton, styles.smallButton]}>
             <Text style={styles.secondaryLabel}>Retake</Text>
           </Pressable>
-          <Pressable onPress={onClose} style={styles.secondaryButton}>
-            <Text style={styles.secondaryLabel}>New photo</Text>
+          <Pressable onPress={onClose} style={[styles.primaryButton, styles.smallButton]}>
+            <Text style={styles.primaryLabel}>Close</Text>
           </Pressable>
         </View>
       </View>
 
-      {response.low_confidence && (
-        <View style={styles.lowConfidenceBanner}>
-          <Text style={styles.lowConfidenceTitle}>Low confidence result</Text>
-          <Text style={styles.lowConfidenceText}>
-            We could not confidently detect issues. Review the generic checklist and try another photo.
-          </Text>
-        </View>
-      )}
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+        {image ? (
+          <View style={[styles.preview, { aspectRatio }]}>
+            <Image source={{ uri: image.uri }} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
+            {response.heatmap ? (
+              <Image
+                source={{ uri: response.heatmap }}
+                style={[StyleSheet.absoluteFillObject, { opacity: overlayOpacity }]}
+                resizeMode="cover"
+              />
+            ) : null}
+            {boxes.map((box, index) => {
+              const left = `${clamp01(box.x) * 100}%`;
+              const top = `${clamp01(box.y) * 100}%`;
+              const width = `${clamp01(box.w) * 100}%`;
+              const height = `${clamp01(box.h) * 100}%`;
+              return (
+                <View
+                  key={`${box.issue_id ?? 'box'}-${index}`}
+                  style={[styles.boundingBox, { left, top, width, height }]}
+                >
+                  <Text style={styles.boundingLabel}>
+                    {box.issue_id ?? 'region'} {box.score ? `(${formatConfidence(clamp01(box.score))})` : ''}
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
+        ) : null}
 
       <ScrollView style={styles.scroll}>
         <View style={styles.section}>
@@ -442,12 +414,12 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
           <Text style={styles.sectionTitle}>Copy for slicer</Text>
           <View style={styles.exportButtons}>
             {SLICERS.map((item) => (
-              <Pressable key={item.id} style={styles.exportButton} onPress={() => handleExport(item.id)}>
+              <Pressable key={item.id} onPress={() => handleExport(item.id)} style={styles.exportButton}>
                 <Text style={styles.exportLabel}>{item.label}</Text>
               </Pressable>
             ))}
           </View>
-          {copied && <Text style={styles.copied}>Copied diff for {copied}</Text>}
+          {exportMessage ? <Text style={styles.exportMessage}>{exportMessage}</Text> : null}
         </View>
       </ScrollView>
     </View>
@@ -458,50 +430,58 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0f172a',
-    padding: 16,
   },
   header: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1f2937',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 16,
+    alignItems: 'center',
+    gap: 12,
   },
-  headerButtons: {
+  headerActions: {
     flexDirection: 'row',
     gap: 8,
   },
   title: {
-    color: '#f8fafc',
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '700',
+    color: '#f8fafc',
   },
   subtitle: {
     color: '#cbd5f5',
+    marginTop: 4,
   },
-  secondaryButton: {
-    borderWidth: 1,
-    borderColor: '#334155',
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+  topIssue: {
+    marginTop: 6,
+    color: '#facc15',
+    fontWeight: '600',
   },
-  secondaryLabel: {
-    color: '#e2e8f0',
-    fontWeight: '500',
+  primaryButton: {
+    backgroundColor: '#38bdf8',
+    borderRadius: 999,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
-  lowConfidenceBanner: {
-    backgroundColor: '#7c2d12',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-    gap: 8,
-  },
-  lowConfidenceTitle: {
-    color: '#fed7aa',
+  primaryLabel: {
+    color: '#0f172a',
     fontWeight: '700',
   },
-  lowConfidenceText: {
-    color: '#fed7aa',
+  secondaryButton: {
+    borderColor: '#38bdf8',
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  secondaryLabel: {
+    color: '#e0f2fe',
+    fontWeight: '600',
+  },
+  smallButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
   scroll: {
     flex: 1,
@@ -564,95 +544,73 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: '#111c2c',
     borderRadius: 12,
-    padding: 12,
+    overflow: 'hidden',
+    backgroundColor: '#111827',
+    position: 'relative',
   },
-  predictionLabel: {
-    color: '#e2e8f0',
-    fontWeight: '500',
+  boundingBox: {
+    position: 'absolute',
+    borderWidth: 2,
+    borderColor: '#f97316',
+    borderStyle: 'solid',
+    justifyContent: 'flex-start',
   },
-  predictionConfidence: {
-    color: '#38bdf8',
+  boundingLabel: {
+    backgroundColor: 'rgba(249, 115, 22, 0.85)',
+    color: '#0f172a',
+    fontSize: 12,
     fontWeight: '600',
+    paddingHorizontal: 4,
+    paddingVertical: 2,
   },
   suggestionCard: {
     backgroundColor: '#111c2c',
     borderRadius: 16,
     padding: 16,
+    gap: 8,
+  },
+  sectionTitle: {
+    color: '#f8fafc',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  emptyText: {
+    color: '#94a3b8',
+  },
+  issueRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  issueName: {
+    color: '#e2e8f0',
+    fontWeight: '600',
+  },
+  issueConfidence: {
+    color: '#38bdf8',
+    fontVariant: ['tabular-nums'],
+  },
+  parameterRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     gap: 12,
   },
-  suggestionTitle: {
-    color: '#f8fafc',
-    fontSize: 16,
-    fontWeight: '600',
+  parameterName: {
+    flex: 2,
+    color: '#f1f5f9',
   },
-  suggestionWhy: {
-    color: '#cbd5f5',
-  },
-  changesList: {
-    gap: 16,
-  },
-  changeRow: {
-    gap: 8,
-  },
-  changeLabel: {
-    color: '#f8fafc',
-    fontWeight: '600',
-  },
-  sliderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  slider: {
+  parameterValue: {
     flex: 1,
-  },
-  bumpButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#1f2937',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bumpLabel: {
-    color: '#e2e8f0',
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  valueDisplay: {
-    flex: 1,
-    backgroundColor: '#0f172a',
-    borderRadius: 12,
-    padding: 12,
-  },
-  valueText: {
-    color: '#f8fafc',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  rangeText: {
-    color: '#94a3b8',
-    fontSize: 12,
-  },
-  deltaNote: {
-    color: '#f97316',
-    fontSize: 12,
-  },
-  note: {
+    textAlign: 'right',
     color: '#cbd5f5',
-    fontSize: 12,
+    fontVariant: ['tabular-nums'],
   },
-  riskLabel: {
-    color: '#fbbf24',
-    fontSize: 12,
-  },
-  confidenceLabel: {
+  parameterApplied: {
+    flex: 1,
+    textAlign: 'right',
     color: '#38bdf8',
-    fontSize: 12,
-  },
-  clampedNote: {
-    color: '#f97316',
-    fontSize: 12,
+    fontVariant: ['tabular-nums'],
   },
   exportPrimaryButton: {
     backgroundColor: '#38bdf8',
@@ -668,23 +626,23 @@ const styles = StyleSheet.create({
   exportStatus: {
     color: '#38bdf8',
   },
-  exportButtons: {
+  buttonRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 12,
   },
   exportButton: {
-    flexBasis: '48%',
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: '#38bdf8',
-    alignItems: 'center',
+    backgroundColor: '#1f2937',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
   },
   exportLabel: {
-    color: '#0f172a',
-    fontWeight: '700',
+    color: '#38bdf8',
+    fontWeight: '600',
   },
-  copied: {
-    color: '#22d3ee',
+  exportMessage: {
+    color: '#22c55e',
+    marginTop: 8,
   },
 });

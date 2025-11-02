@@ -59,10 +59,13 @@ export const ResultsScreen: React.FC<ResultsProps> = ({ selectedMachines, experi
     if (!analysis) {
       return {} as Record<string, number>;
     }
-    return filterParametersForExperience(analysis.applied.parameters, experience);
+    return filterParametersForExperience(analysis.applied, experience);
   }, [analysis, experience]);
 
-  const parameterRanges = useMemo(() => deriveParameterRanges(filteredParameters, experience), [filteredParameters, experience]);
+  const parameterRanges = useMemo(
+    () => deriveParameterRanges(filteredParameters, experience),
+    [filteredParameters, experience],
+  );
 
   const copyForSlicer = async (slicer: 'cura' | 'prusaslicer' | 'bambu' | 'orca') => {
     if (!analysis) {
@@ -133,18 +136,34 @@ export const ResultsScreen: React.FC<ResultsProps> = ({ selectedMachines, experi
               );
             })}
           </View>
+          <Text style={styles.title}>Detected issues</Text>
+          {(analysis.issue_list ?? []).slice(0, 3).map((item) => (
+            <Text key={item.id} style={styles.note}>
+              • {item.id} ({Math.round(item.confidence * 100)}%)
+            </Text>
+          ))}
+          <Text style={styles.title}>Recommendations</Text>
+          {analysis.recommendations.map((note) => (
+            <Text key={note} style={styles.note}>
+              • {note}
+            </Text>
+          ))}
           <Text style={styles.title}>Capability notes</Text>
           {analysis.capability_notes.map((note) => (
             <Text key={note} style={styles.note}>
               • {note}
             </Text>
           ))}
-          <Text style={styles.title}>Rules engine explanations</Text>
-          {analysis.applied.explanations.map((note, index) => (
-            <Text key={`${note}-${index}`} style={styles.note}>
-              • {note}
-            </Text>
-          ))}
+          {analysis.clamp_explanations?.length ? (
+            <>
+              <Text style={styles.title}>Clamp explanations</Text>
+              {analysis.clamp_explanations.map((note, index) => (
+                <Text key={`${note}-${index}`} style={styles.note}>
+                  • {note}
+                </Text>
+              ))}
+            </>
+          ) : null}
         </ScrollView>
       )}
 
