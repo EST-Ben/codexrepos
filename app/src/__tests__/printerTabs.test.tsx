@@ -4,8 +4,25 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react-nativ
 import type { MachineSummary } from '../types';
 import { PrinterTabs } from '../screens/PrinterTabs';
 
-const mutate = jest.fn();
-const retryQueued = jest.fn();
+const analyzeImageApi = jest.fn();
+
+jest.mock('../api/client', () => ({
+  analyzeImage: jest.fn(),
+  exportProfile: jest.fn().mockResolvedValue({ slicer: 'cura', diff: {} }),
+}));
+
+jest.mock('../hooks/useAnalyze', () => ({
+  useAnalyze: () => ({
+    mutate: ({ file, meta }: any) => analyzeImageApi(file, meta),
+    isPending: false,
+    isSuccess: false,
+    data: null,
+    reset: jest.fn(),
+    progress: 0,
+    queuedCount: 0,
+    retryQueued: jest.fn(),
+  }),
+}));
 
 const summary: MachineSummary = {
   id: 'bambu_p1s',
@@ -18,25 +35,11 @@ const summary: MachineSummary = {
 jest.mock('../hooks/useMachineRegistry', () => ({
   useMachineRegistry: () => ({
     machines: [summary],
-    lookup: new Map([[summary.id, summary]]),
     loading: false,
     error: null,
     refresh: jest.fn(),
   }),
   filterMachines: (machines: MachineSummary[]) => machines,
-}));
-
-jest.mock('../hooks/useAnalyze', () => ({
-  useAnalyze: () => ({
-    mutate,
-    isPending: false,
-    isSuccess: false,
-    data: null,
-    reset: jest.fn(),
-    progress: 0,
-    queuedCount: 0,
-    retryQueued,
-  }),
 }));
 
 jest.mock('../state/privacy', () => ({
@@ -51,33 +54,33 @@ jest.mock('../components/CameraButton', () => {
   const React = require('react');
   const { Pressable, Text } = require('react-native');
   return {
-    CameraButton: ({ disabled, onImageReady }: any) => (
-      <Pressable
-        accessibilityRole="button"
-        testID="camera-button"
-        disabled={disabled}
-        onPress={() =>
-          onImageReady({
-            blob: new Blob(),
-            uri: 'file:///stringing.jpg',
-            name: 'stringing.jpg',
-            type: 'image/jpeg',
-            size: 1024,
-            width: 1024,
-            height: 768,
-          })
-        }
-      >
-        <Text>Camera</Text>
-      </Pressable>
-    ),
+    CameraButton: ({ disabled, onImageReady }: any) =>
+      React.createElement(
+        Pressable,
+        {
+          accessibilityRole: 'button',
+          testID: 'camera-button',
+          disabled,
+          onPress: () =>
+            onImageReady({
+              blob: new Blob(),
+              uri: 'file:///stringing.jpg',
+              name: 'stringing.jpg',
+              type: 'image/jpeg',
+              width: 1024,
+              height: 768,
+            }),
+        },
+        React.createElement(Text, null, 'Camera'),
+      ),
   };
 });
 
 describe('PrinterTabs', () => {
   beforeEach(() => {
-    mutate.mockClear();
-    retryQueued.mockClear();
+    jest.clearAllMocks();
+    analyzeImageApi.mockReset();
+    (jest.requireMock('../api/client').analyzeImage as jest.Mock).mockImplementation(analyzeImageApi);
   });
 
   const profile = {
@@ -103,6 +106,13 @@ describe('PrinterTabs', () => {
   });
 
   it('submits uploads with machine meta and experience', async () => {
+    analyzeImageApi.mockResolvedValue({
+      image_id: 'test-image',
+      predictions: [],
+      recommendations: [],
+      capability_notes: [],
+    });
+
     render(
       <PrinterTabs
         profile={profile}
@@ -117,9 +127,12 @@ describe('PrinterTabs', () => {
 
     fireEvent.press(screen.getByTestId('camera-button'));
 
-    await waitFor(() => expect(mutate).toHaveBeenCalled());
-    const payload = mutate.mock.calls[0][0];
-    expect(payload.meta.machine_id).toBe('bambu_p1s');
-    expect(payload.meta.experience).toBe('Intermediate');
+    await waitFor(() => expect(analyzeImageApi).toHaveBeenCalled());
+    const [fileArg, meta] = analyzeImageApi.mock.calls[0];
+    expect(meta.machine_id).toBe('bambu_p1s');
+    expect(meta.experience).toBe('Intermediate');
+    expect(meta.material).toBe('PLA');
+    expect(meta.app_version).toBe('printer-page');
+    expect(fileArg).toEqual({ uri: 'file:///stringing.jpg', name: 'stringing.jpg', type: 'image/jpeg' });
   });
 });

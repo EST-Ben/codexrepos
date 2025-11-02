@@ -16,7 +16,7 @@ SLICER_KEY_MAP: Mapping[str, Mapping[str, str]] = {
         "travel_speed": "speed_travel",
         "accel": "acceleration_print",
         "jerk": "jerk_print",
-        "flow_rate": "material_flow",  # percentage
+        "flow_rate": "material_flow",
         "fan_speed": "cool_fan_speed",
         "retraction_distance": "retraction_amount",
     },
@@ -64,8 +64,28 @@ class ExportProfileRequest(BaseModel):
 router = APIRouter(tags=["export"])
 
 
+def _render_markdown(slicer: str, diff: Dict[str, float | int | str], base_profile: Dict[str, float | int | str] | None) -> str:
+    lines = [f"# {slicer.title()} profile diff", ""]
+    if not diff:
+        lines.append("No parameter changes were required.")
+        return "\n".join(lines)
+
+    for key in sorted(diff.keys()):
+        value = diff[key]
+        base_value = None
+        if base_profile:
+            base_value = base_profile.get(key)
+
+        if base_value is None:
+            lines.append(f"- **{key}** → {value}")
+        else:
+            lines.append(f"- **{key}**: {base_value} → {value}")
+
+    return "\n".join(lines)
+
+
 @router.post("/export-profile")
-def export_profile(payload: ExportProfileRequest):
+def export_profile(payload: ExportProfileRequest) -> Dict[str, object]:
     mapping = SLICER_KEY_MAP.get(payload.slicer)
     if not mapping:
         raise HTTPException(status_code=400, detail=f"Unsupported slicer '{payload.slicer}'")
@@ -73,14 +93,14 @@ def export_profile(payload: ExportProfileRequest):
     diff: Dict[str, float | int | str] = {}
     for key, value in payload.changes.items():
         target_key = mapping.get(key, key)
-        base_value = None
-        if payload.base_profile:
-            base_value = payload.base_profile.get(target_key)
+        base_value = payload.base_profile.get(target_key) if payload.base_profile else None
         if base_value != value:
             diff[target_key] = value
+
+    markdown = _render_markdown(payload.slicer, diff, payload.base_profile)
 
     return {
         "slicer": payload.slicer,
         "diff": diff,
-        "source_keys": sorted(payload.changes.keys()),
+        "markdown": markdown,
     }

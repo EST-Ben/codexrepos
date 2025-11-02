@@ -1,167 +1,154 @@
-# server/app/routers/analyze_image.py
+"""Multipart /api/analyze endpoint."""
 from __future__ import annotations
-
-"""Multipart analyze endpoint implementation."""
 
 import json
 import shutil
-import tempfile
+import uuid
 from pathlib import Path
-from typing import Any, Dict, Iterable, Mapping, MutableMapping
+from typing import TYPE_CHECKING, Dict, List, Optional
 
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 from server import settings
+from server.app.routers.analyze import load_pipeline_cls
 from server.machines import resolve_machine
-from .analyze import load_pipeline_cls, load_rules_engine
+from server.models.api import AnalyzeRequestMeta
+from server.rules import RulesEngine
+
+if TYPE_CHECKING:  # pragma: no cover - hints only
+    from server.app.ml.pipeline import DiagnosticPipeline, ImageAnalysisResult
 
 router = APIRouter(tags=["analyze-image"])
 
 
-def _extract(prediction: Any, key: str, default: Any) -> Any:
-    if isinstance(prediction, Mapping):
-        return prediction.get(key, default)
-    return getattr(prediction, key, default)
+_PIPELINE: "DiagnosticPipeline" | None = None
 
 
-def _coerce_dict(value: Any) -> Dict[str, Any]:
-    if isinstance(value, MutableMapping):
-        return dict(value)
-    if isinstance(value, Mapping):
-        return dict(value)
-    return {}
+def _get_pipeline() -> "DiagnosticPipeline":
+    global _PIPELINE
+    if _PIPELINE is None:
+        PipelineCls = load_pipeline_cls()
+        _PIPELINE = PipelineCls()
+    return _PIPELINE
 
 
-def _coerce_list(value: Any) -> Iterable[Any]:
-    if isinstance(value, (list, tuple)):
-        return list(value)
-    if value is None:
-        return []
-    return [value]
+def _summarise_predictions(analysis: "ImageAnalysisResult") -> List[Dict[str, object]]:
+    return [
+        {"issue_id": prediction.issue_id, "confidence": float(prediction.confidence)}
+        for prediction in analysis.predictions
+    ]
 
 
-def _run_image_pipeline(
-    pipeline: Any,
-    image_path: Path,
-    machine: Dict[str, Any],
-    meta: Dict[str, Any],
-) -> Any:
-    errors: list[str] = []
+def _build_localization(
+    analysis: "ImageAnalysisResult",
+) -> Optional[Dict[str, object]]:
+    payload: Dict[str, object] = {}
 
-    if hasattr(pipeline, "predict_image"):
-        try:
-            return pipeline.predict_image(str(image_path), meta)
-        except TypeError:
-            try:
-                return pipeline.predict_image(str(image_path))
-            except Exception as exc:  # pragma: no cover - defensive path
-                errors.append(f"predict_image: {exc}")
-        except Exception as exc:  # pragma: no cover - defensive path
-            errors.append(f"predict_image: {exc}")
+    if analysis.boxes:
+        payload["boxes"] = [
+            {
+                "issue_id": box.issue_id,
+                "x": float(box.x),
+                "y": float(box.y),
+                "width": float(box.width),
+                "height": float(box.height),
+                "confidence": float(box.confidence),
+            }
+            for box in analysis.boxes
+        ]
 
-    if hasattr(pipeline, "predict_from_image"):
-        data = image_path.read_bytes()
-        material = str(meta.get("material") or "PLA")
-        try:
-            return pipeline.predict_from_image(data, machine, material)
-        except TypeError:
-            try:
-                return pipeline.predict_from_image(data, meta)
-            except Exception as exc:  # pragma: no cover - defensive path
-                errors.append(f"predict_from_image: {exc}")
-        except Exception as exc:  # pragma: no cover - defensive path
-            errors.append(f"predict_from_image: {exc}")
+    if analysis.heatmap:
+        payload["heatmap"] = {"data_url": analysis.heatmap}
 
-    detail = "Image pipeline is not compatible with the expected interface."
-    if errors:
-        detail += " Attempts: " + "; ".join(errors)
-    raise HTTPException(status_code=500, detail=detail)
+    return payload or None
 
 
 @router.post("/analyze")
 async def analyze_image_route(
     image: UploadFile = File(...),
-    meta: str = Form(..., description="JSON string with machine_id, material, experience, etc."),
-):
+    meta: str = Form(..., description="JSON metadata: machine_id, material, experience, base_profile"),
+) -> Dict[str, object]:
     try:
-        meta_obj: Dict[str, Any] = json.loads(meta or "{}")
-    except json.JSONDecodeError as exc:
+        meta_payload = json.loads(meta or "{}")
+    except json.JSONDecodeError as exc:  # pragma: no cover - client error
         raise HTTPException(status_code=400, detail=f"Invalid meta JSON: {exc}") from exc
 
-    machine_id = str(
-        meta_obj.get("machine_id")
-        or meta_obj.get("machine")
-        or ""
-    ).strip()
-    if not machine_id:
-        raise HTTPException(status_code=400, detail="meta.machine_id is required")
-
-    experience = str(meta_obj.get("experience") or "Intermediate")
-    material = str(meta_obj.get("material") or "PLA")
-    app_version = str(meta_obj.get("app_version") or "dev")
+    try:
+        meta_model = AnalyzeRequestMeta.model_validate(meta_payload)
+    except Exception as exc:  # pragma: no cover - delegated to validation
+        raise HTTPException(status_code=400, detail=f"Invalid meta payload: {exc}") from exc
 
     try:
-        machine = resolve_machine(machine_id)
+        machine = resolve_machine(meta_model.machine_id)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
     suffix = Path(image.filename or "upload.jpg").suffix or ".jpg"
-    tmp_path: Path | None = None
-    try:
-        with tempfile.NamedTemporaryFile(
-            "wb", suffix=suffix, dir=settings.UPLOAD_DIR, delete=False
-        ) as tmp_file:
-            tmp_path = Path(tmp_file.name)
-            image.file.seek(0)
-            shutil.copyfileobj(image.file, tmp_file)
+    image_id = uuid.uuid4().hex
+    temp_path = settings.UPLOAD_DIR / f"{image_id}{suffix}"
 
-        PipelineCls = load_pipeline_cls()
-        pipeline = PipelineCls()
-        meta_payload = {
-            **meta_obj,
-            "machine": machine,
-            "material": material,
-            "experience": experience,
+    try:
+        with temp_path.open("wb") as buffer:
+            image.file.seek(0)
+            shutil.copyfileobj(image.file, buffer)
+
+        if temp_path.stat().st_size > settings.MAX_UPLOAD_BYTES:
+            raise HTTPException(status_code=413, detail="Uploaded file exceeds size limit")
+
+        pipeline = _get_pipeline()
+        analysis = pipeline.predict_image(temp_path, machine, meta_model.material)
+
+        predictions = _summarise_predictions(analysis)
+
+        rules_engine = RulesEngine()
+        clamp_summary = rules_engine.clamp_to_machine(
+            machine, analysis.parameter_targets, meta_model.experience
+        )
+        if isinstance(clamp_summary, dict):
+            applied_parameters = clamp_summary.get("parameters", {})
+            explanations = clamp_summary.get("explanations", [])
+        else:  # pragma: no cover - defensive guard
+            applied_parameters = {}
+            explanations = []
+
+        localization = _build_localization(analysis)
+
+        slicer_diff = {
+            "diff": {key: float(value) for key, value in analysis.parameter_targets.items()}
         }
-        prediction = _run_image_pipeline(pipeline, tmp_path, machine, meta_payload)
+
+        response: Dict[str, object] = {
+            "image_id": image_id,
+            "predictions": predictions,
+            "recommendations": analysis.recommendations,
+            "capability_notes": analysis.capability_notes,
+            "slicer_profile_diff": slicer_diff,
+            "explanations": explanations,
+            "applied": {key: float(value) for key, value in applied_parameters.items()},
+            "meta": {
+                "machine": {
+                    "id": machine.get("id"),
+                    "brand": machine.get("brand"),
+                    "model": machine.get("model"),
+                },
+                "experience": meta_model.experience,
+                "material": meta_model.material,
+            },
+        }
+
+        if localization:
+            response["localization"] = localization
+
+        return response
     except HTTPException:
         raise
-    except Exception as exc:
+    except Exception as exc:  # pragma: no cover - defensive
         raise HTTPException(status_code=500, detail=f"Failed to process image: {exc}") from exc
     finally:
-        if tmp_path is not None:
-            try:
-                tmp_path.unlink()
-            except FileNotFoundError:
-                pass
-            except OSError:
-                pass
-
-    RulesEngine = load_rules_engine()
-    engine = RulesEngine()
-    parameter_targets = _coerce_dict(_extract(prediction, "parameter_targets", {}))
-    applied = engine.clamp_to_machine(machine, parameter_targets, experience)
-
-    recommendations = list(_coerce_list(_extract(prediction, "recommendations", [])))
-    capability_notes = list(_coerce_list(_extract(prediction, "capability_notes", [])))
-    predictions = _extract(prediction, "predictions", None)
-    confidence = _extract(prediction, "confidence", None)
-    issue = _extract(prediction, "issue", None)
-
-    return {
-        "machine": {
-            "id": machine.get("id"),
-            "brand": machine.get("brand"),
-            "model": machine.get("model"),
-        },
-        "issue": issue,
-        "confidence": confidence,
-        "recommendations": recommendations,
-        "parameter_targets": parameter_targets,
-        "applied": applied,
-        "capability_notes": capability_notes,
-        "predictions": predictions,
-        "material": material,
-        "experience": experience,
-        "version": app_version,
-    }
+        try:
+            if temp_path.exists():
+                temp_path.unlink()
+        except FileNotFoundError:
+            pass
+        except OSError:
+            pass

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Literal, Type
 import importlib
+import uuid
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
@@ -57,12 +58,13 @@ def load_rules_engine() -> Type[Any]:
         return _rules_engine_cls
 
     try:
-        from server.app.rules import RulesEngine
+        module = importlib.import_module("server.rules")
+        rules_engine = getattr(module, "RulesEngine")
     except Exception as exc:  # pragma: no cover - defensive
         raise HTTPException(status_code=500, detail=f"Could not import RulesEngine: {exc}") from exc
 
-    _rules_engine_cls = RulesEngine
-    return RulesEngine
+    _rules_engine_cls = rules_engine
+    return rules_engine
 
 
 @router.post("/analyze")
@@ -104,20 +106,36 @@ def analyze_json(payload: AnalyzeRequest):
     prediction = pipeline.predict(request_payload, machine)
 
     engine = RulesEngine()
-    applied = engine.clamp_to_machine(
+    clamp_summary = engine.clamp_to_machine(
         machine, prediction.parameter_targets, payload.experience
     )
 
+    if isinstance(clamp_summary, dict):
+        applied_parameters = clamp_summary.get("parameters", {})
+        explanations = clamp_summary.get("explanations", [])
+    else:  # pragma: no cover - defensive
+        applied_parameters = {}
+        explanations = []
+
     return {
-        "machine": {
-            "id": machine.get("id"),
-            "brand": machine.get("brand"),
-            "model": machine.get("model"),
-        },
-        "issue": prediction.issue,
-        "confidence": prediction.confidence,
+        "image_id": f"json-{uuid.uuid4().hex}",
+        "predictions": [
+            {"issue_id": prediction.issue, "confidence": float(prediction.confidence)}
+        ],
         "recommendations": prediction.recommendations,
-        "parameter_targets": prediction.parameter_targets,
-        "applied": applied,
         "capability_notes": getattr(prediction, "capability_notes", []),
+        "slicer_profile_diff": {
+            "diff": {key: float(value) for key, value in prediction.parameter_targets.items()}
+        },
+        "applied": {key: float(value) for key, value in applied_parameters.items()},
+        "explanations": explanations,
+        "meta": {
+            "machine": {
+                "id": machine.get("id"),
+                "brand": machine.get("brand"),
+                "model": machine.get("model"),
+            },
+            "experience": payload.experience,
+            "material": payload.material,
+        },
     }

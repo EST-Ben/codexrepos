@@ -21,7 +21,11 @@ the pipeline can be demoed without a trained model.
    #   or
    serve_api.bat        # Command Prompt
    ```
-3. **Start the Expo client in LAN mode**
+3. **Configure environment variables**
+   - Copy `.env` to `.env.local` (or export variables in your shell) and update values as needed.
+   - For production builds set `ENVIRONMENT=production` and provide a comma-separated `ALLOWED_ORIGINS` list.
+
+4. **Start the Expo client in LAN mode**
    ```powershell
    # Replace <LAN-IP> with your computer's LAN address
    ./serve_app.ps1 -ApiUrl "http://<LAN-IP>:8000"
@@ -29,11 +33,21 @@ the pipeline can be demoed without a trained model.
    set API_URL=http://<LAN-IP>:8000
    serve_app.bat
    ```
-4. Scan the QR code with the Expo Go app, ensure `/api/machines` loads in the UI, then capture or pick
+   Pass `-DevClient` (or `--dev-client` on Windows CMD) if you're targeting an EAS development build
+   instead of Expo Go. The launchers now refuse to run if the placeholder `<LAN-IP>` string is left in
+   place, preventing the "Failed to parse URL" Expo error – swap in your actual LAN IP or
+   `http://localhost:8000` for local web testing.
+5. Scan the QR code with the Expo Go app, ensure `/api/machines` loads in the UI, then capture or pick
    a photo to test `/api/analyze`.
 
 See [`LOCAL_DEV.md`](LOCAL_DEV.md) for the full Windows + Miniforge walkthrough, including curl smoke
 tests and firewall notes.
+
+## Production deployment
+
+When you are ready to ship, follow the detailed checklist in [`DEPLOYMENT.md`](DEPLOYMENT.md). It covers
+containerizing the FastAPI service, exporting the Expo web bundle, publishing mobile binaries with EAS,
+and wiring up the GitHub Actions workflows that automate releases from version tags.
 
 ## Generating machine profiles
 

@@ -26,13 +26,15 @@ function normalizeMap(raw: unknown): HistoryMap {
       entries.push({
         imageId: normalized.imageId,
         machineId: normalized.machineId,
-        machine: normalized.machine,
+        machine: normalized.machine as AnalysisHistoryRecord['machine'],
         timestamp: typeof normalized.timestamp === 'number' ? normalized.timestamp : Date.now(),
-        predictions: Array.isArray(normalized.predictions) ? normalized.predictions : [],
-        response: normalized.response,
+        response: normalized.response as AnalysisHistoryRecord['response'],
         material: normalized.material,
         localUri: typeof normalized.localUri === 'string' ? normalized.localUri : undefined,
         summary: normalized.summary,
+        predictions: Array.isArray((normalized as any).predictions)
+          ? ((normalized as any).predictions as AnalysisHistoryRecord['predictions'])
+          : undefined,
       });
     }
     if (entries.length) {

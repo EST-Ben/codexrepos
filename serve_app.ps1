@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
-  [string]$ApiUrl
+  [string]$ApiUrl,
+  [switch]$DevClient
 )
 
 $ErrorActionPreference = "Stop"
@@ -21,6 +22,10 @@ try {
     $env:EXPO_PUBLIC_API_URL = $ApiUrl
   }
 
+  if ($env:EXPO_PUBLIC_API_URL -match "<.+>") {
+    throw "API URL still contains a <LAN-IP> placeholder. Replace it with your actual LAN address or http://localhost:8000."
+  }
+
   Write-Host "`n=== Expo mobile app ==="
   Write-Host "Using API URL: $($env:EXPO_PUBLIC_API_URL)" -ForegroundColor Cyan
   Write-Host
@@ -30,7 +35,16 @@ try {
     exit $LASTEXITCODE
   }
 
-  npx expo start --lan -c
+  $argsList = @('expo', 'start', '--lan', '-c')
+  if ($DevClient.IsPresent -or $env:EXPO_USE_DEV_CLIENT) {
+    $argsList = @('expo', 'start', '--dev-client', '--lan', '-c')
+  }
+
+  if ($DevClient.IsPresent) {
+    $env:EXPO_USE_DEV_CLIENT = '1'
+  }
+
+  npx --yes @argsList
   exit $LASTEXITCODE
 }
 finally {

@@ -1,10 +1,12 @@
 // app/src/api/client.ts
 import Constants from "expo-constants";
 import type {
+  AnalyzeRequestMeta,
   AnalyzeResponse,
   ExperienceLevel,
-  ExportDiff,
+  MachineRef,
   MachineSummary,
+  SlicerId,
 } from "../types";
 
 /**
@@ -40,7 +42,7 @@ export function getApiRoot(): string {
 }
 
 function apiBase(): string {
-  return `${API_ROOT}/api`;
+  return `${getApiRoot()}/api`;
 }
 
 /** Shared JSON response handler */
@@ -74,21 +76,21 @@ export async function fetchMachines(): Promise<MachineSummary[]> {
  * Analyze (JSON)
  * POST /api/analyze-json
  * ----------------------------------------------------------- */
-export interface AnalyzePayload {
-  machine: string;
+export async function analyzeMachineJSON(payload: {
+  machine: MachineRef;
   experience: ExperienceLevel;
-  material: string;
-  issues: string[];
-  // You can extend with: payload?: Record<string, unknown>;
-}
-
-export async function analyzeMachineJSON(
-  payload: AnalyzePayload
-): Promise<AnalyzeResponse> {
+  material?: string;
+  issues?: string[];
+}): Promise<AnalyzeResponse> {
   const res = await fetch(`${apiBase()}/analyze-json`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      machine: payload.machine.id,
+      experience: payload.experience,
+      material: payload.material ?? "PLA",
+      issues: payload.issues ?? [],
+    }),
   });
   return handleResponse<AnalyzeResponse>(res);
 }
@@ -106,17 +108,11 @@ export const analyzeMachine = analyzeMachineJSON;
  * - RN/Expo: pass { uri, name?, type? }
  * - Web: pass Blob | File
  * ----------------------------------------------------------- */
-type RNFileLike = { uri: string; name?: string; type?: string };
+export type RNFileLike = { uri: string; name?: string; type?: string };
 
 export async function analyzeImage(
   fileArg: Blob | File | RNFileLike,
-  meta: {
-    machine_id: string;
-    experience: ExperienceLevel;
-    material?: string;
-    base_profile?: Record<string, any>;
-    app_version?: string;
-  }
+  meta: AnalyzeRequestMeta
 ): Promise<AnalyzeResponse> {
   const form = new FormData();
 
@@ -138,7 +134,10 @@ export async function analyzeImage(
     form.append("image", rnFormFile);
   } else {
     // Web: Blob/File is fine
-    form.append("image", fileArg as Blob);
+    const blob = fileArg as Blob;
+    const blobAny = blob as any;
+    const filename = typeof blobAny?.name === "string" ? blobAny.name : "upload.jpg";
+    form.append("image", blob, filename);
   }
 
   form.append("meta", JSON.stringify(meta));
@@ -152,27 +151,35 @@ export async function analyzeImage(
   return handleResponse<AnalyzeResponse>(res);
 }
 
+export async function analyze(
+  fileArg: Blob | File | RNFileLike,
+  meta: AnalyzeRequestMeta,
+  onProgress?: (value: number) => void
+): Promise<AnalyzeResponse> {
+  onProgress?.(0.05);
+  const result = await analyzeImage(fileArg, meta);
+  onProgress?.(1);
+  return result;
+}
+
 /* -------------------------------------------------------------
  * Export profile
  * POST /api/export-profile
  * ----------------------------------------------------------- */
-export interface ExportPayload {
-  slicer: ExportDiff["slicer"];
-  changes: Record<string, number | string>;
-  baseProfile?: Record<string, number | string>;
-}
-
-export async function exportProfile(
-  payload: ExportPayload
-): Promise<ExportDiff> {
+export async function exportProfile(payload: {
+  slicer: SlicerId;
+  changes: Record<string, string | number | boolean>;
+}): Promise<{ diff: Record<string, string | number | boolean> }> {
   const res = await fetch(`${apiBase()}/export-profile`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       slicer: payload.slicer,
       changes: payload.changes,
-      base_profile: payload.baseProfile ?? null,
     }),
   });
-  return handleResponse<ExportDiff>(res);
+  const data = await handleResponse<{
+    diff: Record<string, string | number | boolean>;
+  }>(res);
+  return { diff: data.diff };
 }

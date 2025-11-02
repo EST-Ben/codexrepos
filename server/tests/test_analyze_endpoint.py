@@ -1,96 +1,89 @@
-from __future__ import annotations
-
+"""Tests for the analyze API endpoints."""
+import base64
 import json
+from typing import Dict, Tuple
 
 import pytest
 from fastapi.testclient import TestClient
 
-from server.models.api import AnalyzeResponse, Prediction
+from server import settings
+from server.models.api import BoundingBox, Prediction
 
 
-def _multipart_payload(meta: dict) -> tuple[dict, dict]:
-    files = {"image": ("test.jpg", b"data", "image/jpeg")}
+def _multipart_payload(meta: Dict[str, object]) -> Tuple[Dict[str, object], Dict[str, Tuple[str, bytes, str]]]:
+    png_stub = base64.b64decode(
+        "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAFElEQVR4nGNsaGhgwAaYsIoOWgkAMBcBkGHHl6YAAAAASUVORK5CYII="
+    )
+    files = {"image": ("test.png", png_stub, "image/png")}
     data = {"meta": json.dumps(meta)}
     return data, files
 
 
-def test_analyze_endpoint_returns_capability_notes(client: TestClient) -> None:
+def test_analyze_endpoint_returns_expected_shape(client: TestClient) -> None:
     data, files = _multipart_payload(
-        {
-            "machine_id": "bambu_p1p",
-            "experience": "Intermediate",
-            "material": "PLA",
-        }
+        {"machine_id": "bambu_p1p", "experience": "Intermediate", "material": "PLA"}
     )
     response = client.post("/api/analyze", data=data, files=files)
     assert response.status_code == 200
     payload = response.json()
-    assert payload["image_id"]
-    assert isinstance(payload["suggestions"], list)
-    assert payload["suggestions"][0]["changes"]
-    assert payload["slicer_profile_diff"]["slicer"] == "generic"
+
+    assert payload["meta"]["machine"]["id"] == "bambu_p1p"
+    assert isinstance(payload["predictions"], list)
+    assert "slicer_profile_diff" in payload
+    assert isinstance(payload["applied"], dict)
+    assert isinstance(payload.get("explanations"), list)
+    assert isinstance(payload.get("recommendations"), list)
+    assert isinstance(payload.get("capability_notes"), list)
 
 
-def test_analyze_low_confidence_triggers_generic(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
-    from server import main
+def test_analyze_uses_pipeline_targets(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from server.app.ml.pipeline import ImageAnalysisResult
+    from server.app.routers import analyze_image as analyze_image_router
 
-    def fake_predict(_path):
-        return ([Prediction(issue_id="stringing", confidence=0.3)], [{"issue_id": "stringing", "cues": []}])
+    class DummyPipeline:
+        def predict_image(self, *_args, **_kwargs) -> ImageAnalysisResult:
+            return ImageAnalysisResult(
+                predictions=[Prediction(issue_id="stringing", confidence=0.91)],
+                boxes=[
+                    BoundingBox(
+                        issue_id="stringing",
+                        confidence=0.91,
+                        x=0.1,
+                        y=0.2,
+                        width=0.3,
+                        height=0.4,
+                    )
+                ],
+                heatmap="data:image/svg+xml;base64,ZmFrZQ==",
+                parameter_targets={
+                    "nozzle_temp": 205.0,
+                    "bed_temp": 60.0,
+                    "fan_speed": 80.0,
+                },
+                recommendations=["Test recommendation"],
+                capability_notes=["Test capability"],
+            )
 
-    monkeypatch.setattr(main.INFERENCE_ENGINE, "predict", fake_predict)
-    data, files = _multipart_payload(
-        {
-            "machine_id": "bambu_p1p",
-            "experience": "Beginner",
-        }
-    )
+    monkeypatch.setattr(analyze_image_router, "_PIPELINE", DummyPipeline())
+
+    data, files = _multipart_payload({"machine_id": "bambu_p1p", "experience": "Intermediate"})
     response = client.post("/api/analyze", data=data, files=files)
     assert response.status_code == 200
     payload = response.json()
-    assert payload["low_confidence"] is True
-    assert payload["suggestions"][0]["issue_id"] == "general_tuning"
-    assert len(payload["suggestions"]) == 1
-    assert all(change["param"] in {"nozzle_temp", "bed_temp"} for change in payload["suggestions"][0]["changes"])
 
-
-def test_analyze_response_matches_contract(client: TestClient) -> None:
-    data, files = _multipart_payload(
-        {
-            "machine_id": "bambu_p1p",
-            "experience": "Intermediate",
-            "material": "PLA",
-        }
+    assert payload["slicer_profile_diff"]["diff"]["nozzle_temp"] == 205.0
+    assert payload["applied"]["nozzle_temp"] == pytest.approx(205.0)
+    assert payload["recommendations"][0] == "Test recommendation"
+    assert (
+        payload["localization"]["heatmap"]["data_url"].startswith("data:image/svg+xml;base64,")
     )
-    response = client.post("/api/analyze", data=data, files=files)
-    assert response.status_code == 200
-    payload = response.json()
-    model = AnalyzeResponse.model_validate(payload)
-    assert model.image_id
-    assert model.version
-    assert model.suggestions
 
 
 def test_analyze_rejects_large_images(client: TestClient) -> None:
-    big_content = b"x" * (12 * 1024 * 1024 + 1)
+    big_content = b"x" * (settings.MAX_UPLOAD_BYTES + 1)
     data = {"meta": json.dumps({"machine_id": "bambu_p1p", "experience": "Advanced"})}
     files = {"image": ("large.jpg", big_content, "image/jpeg")}
     response = client.post("/api/analyze", data=data, files=files)
     assert response.status_code == 413
-from fastapi.testclient import TestClient
-
-
-def test_analyze_endpoint_returns_capability_notes(client: TestClient) -> None:
-    response = client.post(
-        '/api/analyze',
-        json={
-            'machine': 'bambu_p1p',
-            'experience': 'Intermediate',
-            'material': 'PLA',
-            'issues': ['ringing'],
-        },
-    )
-    assert response.status_code == 200
-    payload = response.json()
-    assert payload['machine']['id'] == 'bambu_p1p'
-    assert any('Motion system' in note for note in payload['capability_notes'])
-    assert payload['applied']['experience_level'] == 'Intermediate'

@@ -1,11 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import type { AnalysisHistoryRecord, HistoryMap, MachineRef } from '../types';
 
@@ -37,14 +31,12 @@ function formatTimestamp(timestamp: number): string {
   return `${days} day${days === 1 ? '' : 's'} ago`;
 }
 
-function formatPredictions(predictions: AnalysisHistoryRecord['predictions']): string {
-  if (!predictions?.length) {
-    return 'No predictions logged';
+function formatPrediction(entry: AnalysisHistoryRecord): string {
+  const prediction = entry.predictions?.[0] ?? entry.response.predictions?.[0];
+  if (!prediction) {
+    return 'No predictions recorded';
   }
-  const top = predictions.slice(0, 3);
-  return top
-    .map((item) => `${item.issue_id} (${Math.round(item.confidence * 100)}%)`)
-    .join(' • ');
+  return `${prediction.issue_id} (${Math.round(prediction.confidence * 100)}%)`;
 }
 
 export const HistoryScreen: React.FC<HistoryScreenProps> = ({
@@ -56,9 +48,7 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
 }) => {
   const machineIds = useMemo(() => {
     const ids = new Set<string>();
-    for (const key of Object.keys(history)) {
-      ids.add(key);
-    }
+    Object.keys(history).forEach((id) => ids.add(id));
     machines.forEach((machine) => ids.add(machine.id));
     return Array.from(ids);
   }, [history, machines]);
@@ -109,11 +99,11 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
       ) : null}
 
       <View style={styles.details}>
-        {activeMachine && (
+        {activeMachine ? (
           <Text style={styles.machineHeading}>
             {activeMachine.brand} {activeMachine.model}
           </Text>
-        )}
+        ) : null}
         {entries.length === 0 ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyTitle}>No analyses yet.</Text>
@@ -129,7 +119,7 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
                   <Text style={styles.cardTitle}>{formatTimestamp(entry.timestamp)}</Text>
                   <Text style={styles.cardMeta}>{entry.material ?? 'Material unknown'}</Text>
                 </View>
-                <Text style={styles.cardSummary}>{formatPredictions(entry.predictions)}</Text>
+                <Text style={styles.cardSummary}>{formatPrediction(entry)}</Text>
                 <Text style={styles.cardFooter}>Image ID: {entry.imageId}</Text>
               </Pressable>
             ))}
@@ -200,13 +190,12 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     backgroundColor: '#111c2c',
+    padding: 20,
     borderRadius: 12,
-    padding: 24,
     gap: 8,
-    marginTop: 24,
   },
   emptyTitle: {
-    color: '#f8fafc',
+    color: '#e2e8f0',
     fontSize: 18,
     fontWeight: '600',
   },
@@ -221,12 +210,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    gap: 8,
+    gap: 6,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
   },
   cardTitle: {
     color: '#f8fafc',
@@ -234,15 +222,14 @@ const styles = StyleSheet.create({
   },
   cardMeta: {
     color: '#94a3b8',
-    fontSize: 12,
   },
   cardSummary: {
-    color: '#e2e8f0',
-    fontSize: 14,
-    lineHeight: 20,
+    color: '#cbd5f5',
   },
   cardFooter: {
     color: '#64748b',
     fontSize: 12,
   },
 });
+
+export default HistoryScreen;
