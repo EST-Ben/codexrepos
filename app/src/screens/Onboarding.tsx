@@ -1,288 +1,139 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+// app/src/types.ts
 
-import type { ExperienceLevel, OnboardingState } from '../types';
-import { filterMachines, useMachineRegistry } from '../hooks/useMachineRegistry';
-import { saveOnboardingState } from '../storage/onboarding';
+// ---------- Core domain types ----------
 
-interface OnboardingProps {
-  initialSelection: string[];
-  initialExperience: ExperienceLevel;
-  onComplete(state: OnboardingState): void;
+export type ExperienceLevel = 'Beginner' | 'Intermediate' | 'Advanced';
+
+export interface MachineRef {
+  id: string;
+  brand: string;
+  model: string;
 }
 
-const EXPERIENCE_OPTIONS: ExperienceLevel[] = ['Beginner', 'Intermediate', 'Advanced'];
+export interface MachineSummary {
+  id: string;
+  brand: string;
+  model: string;
+  capabilities?: string[];
+  // e.g. { speed: [80, 200], accel: [2000, 7000] }
+  safe_speed_ranges?: Record<string, number[]>;
+  max_nozzle_temp_c?: number;
+  max_bed_temp_c?: number;
+  spindle_rpm_range?: [number, number];
+  max_feed_mm_min?: number;
+}
 
-export const OnboardingScreen: React.FC<OnboardingProps> = ({
-  initialSelection,
-  initialExperience,
-  onComplete,
-}) => {
-  const { machines, loading, error, refresh } = useMachineRegistry();
-  const [step, setStep] = useState<number>(0);
-  const [selected, setSelected] = useState<string[]>(initialSelection);
-  const [experience, setExperience] = useState<ExperienceLevel>(initialExperience);
-  const [query, setQuery] = useState<string>('');
-  const [saving, setSaving] = useState<boolean>(false);
+export interface ProfileState {
+  machines: MachineRef[];
+  experience: ExperienceLevel;
+  material?: string;
+}
 
-  useEffect(() => {
-    setSelected(initialSelection);
-    setExperience(initialExperience);
-  }, [initialExperience, initialSelection]);
+// ---------- Analyze: request/response ----------
 
-  const filtered = useMemo(() => filterMachines(machines, query), [machines, query]);
+export interface AnalyzeRequestMeta {
+  machine_id: string;
+  experience: ExperienceLevel;
+  material?: string;
+  app_version?: string;
+}
 
-  const toggleMachine = (id: string) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((machine) => machine !== id) : [...prev, id],
-    );
+export interface Prediction {
+  issue_id: string;
+  confidence: number; // 0..1
+}
+
+export interface BoundingBox {
+  // support both legacy (x,y,w,h in 0..1) and new (x,y,width,height) shapes
+  x: number;
+  y: number;
+  w?: number;
+  h?: number;
+  width?: number;
+  height?: number;
+  issue_id?: string;
+  confidence?: number; // some payloads call this score/confidence
+  score?: number;      // legacy alias
+}
+
+export interface SlicerProfileDiff {
+  // Minimal structure used by UI: a normalized diff map and optional markdown
+  diff: Record<string, string | number>;
+  markdown?: string;
+}
+
+export interface AnalyzeResponse {
+  image_id: string;
+  machine: MachineRef;
+
+  // New canonical fields
+  predictions: Prediction[];                // ← replaces legacy issue_list
+  recommendations: string[];
+  capability_notes: string[];
+
+  // Parameter guidance
+  parameter_targets?: Record<string, string | number>;
+  /**
+   * Servers may return either:
+   *   - a plain param map (legacy), or
+   *   - an object with richer details.
+   * Support both.
+   */
+  applied?:
+    | Record<string, string | number>
+    | {
+        parameters?: Record<string, string | number>;
+        hidden_parameters?: string[];
+        experience_level?: ExperienceLevel | string;
+        clamped_to_machine_limits?: boolean;
+        explanations?: string[];
+      };
+
+  // General explanations / clamp notes (canonical)
+  explanations?: string[];
+
+  // Optional localization block (canonical)
+  localization?: {
+    // Some responses send a bare data URL string; others wrap it.
+    heatmap?: string | { data_url: string };
+    boxes?: BoundingBox[];
   };
 
-  const handleNext = async () => {
-    if (step < 2) {
-      setStep((prev) => prev + 1);
-      return;
-    }
-    setSaving(true);
-    const payload: OnboardingState = {
-      selectedMachines: selected,
-      experience,
-    };
-    await saveOnboardingState(payload);
-    setSaving(false);
-    onComplete(payload);
-  };
+  // Optional slicer export diff
+  slicer_profile_diff?: SlicerProfileDiff;
 
-  return (
-    <View style={styles.container}>
-      {step === 0 && (
-        <View style={styles.card}>
-          <Text style={styles.title}>Welcome to the diagnostics assistant</Text>
-          <Text style={styles.paragraph}>
-            Choose the machines you own so we can tailor recommendations and export settings to
-            your slicer or CAM tool. You can adjust everything later in settings.
-          </Text>
-        </View>
-      )}
+  // ---------- Backward-compat aliases (do not rely on these long-term) ----------
+  // Old top-level names some screens/hooks might still touch
+  top_issue?: string;                       // prefer deriving from predictions[0]
+  heatmap?: string;                         // prefer localization.heatmap
+  boxes?: BoundingBox[];                    // prefer localization.boxes
+  hidden_parameters?: string[];             // prefer applied.hidden_parameters
+  clamp_explanations?: string[];            // prefer explanations
+  issue_list?: Prediction[];                // prefer predictions
+  parameters?: Record<string, string | number>; // prefer parameter_targets
+}
 
-      {step === 1 && (
-        <View style={styles.card}>
-          <Text style={styles.title}>Pick your machines</Text>
-          <TextInput
-            accessibilityLabel="Search machines"
-            placeholder="Search by brand, model, or alias"
-            value={query}
-            onChangeText={setQuery}
-            style={styles.input}
-          />
-          {loading && <ActivityIndicator />}
-          {error && (
-            <Pressable onPress={refresh} style={styles.errorBox}>
-              <Text style={styles.errorText}>Failed to load machines. Tap to retry.</Text>
-            </Pressable>
-          )}
-          {!loading && !error && (
-            <FlatList
-              data={filtered}
-              keyExtractor={(item) => item.id}
-              style={styles.list}
-              renderItem={({ item }) => {
-                const isSelected = selected.includes(item.id);
-                return (
-                  <Pressable
-                    onPress={() => toggleMachine(item.id)}
-                    style={[styles.machineRow, isSelected && styles.machineRowSelected]}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected: isSelected }}
-                  >
-                    <Text style={styles.machineTitle}>
-                      {item.brand ? `${item.brand} ${item.model ?? ''}`.trim() : item.model ?? item.id}
-                    </Text>
-                    <Text style={styles.machineSubtitle}>{item.id}</Text>
-                  </Pressable>
-                );
-              }}
-              ListEmptyComponent={!loading ? <Text style={styles.paragraph}>No machines found.</Text> : null}
-            />
-          )}
-        </View>
-      )}
+// ---------- History & UI contracts ----------
 
-      {step === 2 && (
-        <View style={styles.card}>
-          <Text style={styles.title}>Choose your experience level</Text>
-          <Text style={styles.paragraph}>
-            Your experience determines how many controls we expose and how wide the suggested range
-            of adjustments will be.
-          </Text>
-          <View style={styles.experienceRow}>
-            {EXPERIENCE_OPTIONS.map((option) => {
-              const active = experience === option;
-              return (
-                <Pressable
-                  key={option}
-                  onPress={() => setExperience(option)}
-                  style={[styles.experienceButton, active && styles.experienceButtonActive]}
-                >
-                  <Text style={[styles.experienceLabel, active && styles.experienceLabelActive]}>
-                    {option}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-          <View style={styles.summaryBox}>
-            <Text style={styles.summaryTitle}>Summary</Text>
-            <Text style={styles.paragraph}>Machines selected: {selected.length || 'None yet'}.</Text>
-            <Text style={styles.paragraph}>Experience: {experience}</Text>
-          </View>
-        </View>
-      )}
+export interface AnalysisHistoryRecord {
+  imageId: string;
+  machineId: string;
+  machine: MachineRef;
+  timestamp: number;
+  response: AnalyzeResponse;
+  material?: string;
+  localUri?: string;
+  summary?: MachineSummary;
 
-      <View style={styles.footer}>
-        {step > 0 && (
-          <Pressable onPress={() => setStep((prev) => Math.max(prev - 1, 0))} style={styles.secondaryButton}>
-            <Text style={styles.secondaryLabel}>Back</Text>
-          </Pressable>
-        )}
-        <Pressable
-          disabled={saving || (step === 1 && selected.length === 0)}
-          onPress={handleNext}
-          style={[styles.primaryButton, (saving || (step === 1 && selected.length === 0)) && styles.primaryButtonDisabled]}
-        >
-          <Text style={styles.primaryLabel}>
-            {step < 2 ? 'Next' : saving ? 'Saving…' : 'Finish onboarding'}
-          </Text>
-        </Pressable>
-      </View>
-    </View>
-  );
-};
+  // Backward-compat for legacy code that expected issues on the record:
+  issues?: Prediction[];       // deprecated — prefer response.predictions
+  // Convenience (optional) for quick display/search without digging into response:
+  predictions?: Prediction[];  // optional mirror of response.predictions
+}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#101418',
-    paddingHorizontal: 16,
-    paddingVertical: 24,
-  },
-  card: {
-    flex: 1,
-    backgroundColor: '#1c2229',
-    borderRadius: 12,
-    padding: 16,
-    gap: 12,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '600',
-    color: '#f8fafc',
-  },
-  paragraph: {
-    color: '#cbd5f5',
-    fontSize: 15,
-  },
-  input: {
-    backgroundColor: '#0f1720',
-    padding: 12,
-    borderRadius: 8,
-    color: '#f1f5f9',
-    borderColor: '#334155',
-    borderWidth: 1,
-  },
-  list: {
-    flex: 1,
-  },
-  machineRow: {
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#233040',
-  },
-  machineRowSelected: {
-    backgroundColor: '#243447',
-  },
-  machineTitle: {
-    color: '#e2e8f0',
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  machineSubtitle: {
-    color: '#94a3b8',
-    fontSize: 13,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 12,
-    gap: 12,
-  },
-  primaryButton: {
-    flex: 1,
-    backgroundColor: '#38bdf8',
-    padding: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  primaryButtonDisabled: {
-    opacity: 0.5,
-  },
-  primaryLabel: {
-    color: '#0f172a',
-    fontWeight: '700',
-    fontSize: 16,
-  },
-  secondaryButton: {
-    padding: 14,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#334155',
-    flex: 1,
-    alignItems: 'center',
-  },
-  secondaryLabel: {
-    color: '#e2e8f0',
-    fontSize: 16,
-  },
-  experienceRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  experienceButton: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#334155',
-    alignItems: 'center',
-  },
-  experienceButtonActive: {
-    backgroundColor: '#38bdf8',
-    borderColor: '#38bdf8',
-  },
-  experienceLabel: {
-    color: '#e2e8f0',
-    fontWeight: '500',
-  },
-  experienceLabelActive: {
-    color: '#0f172a',
-    fontWeight: '700',
-  },
-  summaryBox: {
-    backgroundColor: '#111827',
-    borderRadius: 8,
-    padding: 12,
-    gap: 4,
-  },
-  summaryTitle: {
-    color: '#94a3b8',
-    fontWeight: '600',
-  },
-  errorBox: {
-    backgroundColor: '#7f1d1d',
-    padding: 12,
-    borderRadius: 8,
-  },
-  errorText: {
-    color: '#fecaca',
-  },
-});
+// ---------- Slicer export ----------
+
+export type SlicerId = 'cura' | 'prusaslicer' | 'bambu' | 'orca';
+
+// Optional: small helper type some components import
+export type Experience = ExperienceLevel;

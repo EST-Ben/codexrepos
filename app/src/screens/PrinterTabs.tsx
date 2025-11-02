@@ -8,9 +8,11 @@ import {
   TextInput,
   Switch,
   View,
+  Platform,
 } from 'react-native';
 
 import { CameraButton, type PreparedImage } from '../components/CameraButton';
+import WebPhotoPicker from '../components/WebPhotoPicker';
 import { useAnalyze } from '../hooks/useAnalyze';
 import { filterMachines, useMachineRegistry } from '../hooks/useMachineRegistry';
 import type {
@@ -41,6 +43,9 @@ interface PrinterTabsProps {
 
 const MATERIAL_OPTIONS = ['PLA', 'PETG', 'ABS', 'ASA', 'TPU', 'Nylon'];
 
+// Minimal type for the upload-queue callback item
+type QueueItem = { machine: MachineRef; material?: string; fileUri?: string };
+
 export const PrinterTabs: React.FC<PrinterTabsProps> = ({
   profile,
   onEditProfile,
@@ -50,8 +55,10 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
   onRecordHistory,
   historyCounts,
 }) => {
-  const { machines, lookup, loading, error, refresh } = useMachineRegistry();
+  // no `lookup`—we’ll resolve summaries from `machines`
+  const { machines, loading, error, refresh } = useMachineRegistry();
   const { settings, update: updatePrivacy } = usePrivacySettings();
+
   const [activeMachineId, setActiveMachineId] = useState<string | null>(profile.machines[0]?.id ?? null);
   const [search, setSearch] = useState<string>('');
   const [lastRequest, setLastRequest] = useState<{
@@ -62,15 +69,54 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
     image?: { uri: string; width: number; height: number };
   } | null>(null);
 
+  // Get a machine summary by id using current machines array
+  const getSummary = useCallback(
+    (id?: string | null) => (id ? machines.find((m) => m.id === id) : undefined),
+    [machines],
+  );
+
+  // 🔹 write a history entry + open results (includes `predictions`)
+  const showAndRecord = useCallback(
+    async (args: {
+      machine: MachineRef;
+      material?: string;
+      summary?: MachineSummary;
+      image?: { uri: string; width: number; height: number };
+      response: AnalyzeResponse;
+      localUri?: string;
+    }) => {
+      const entry: AnalysisHistoryRecord = {
+        imageId: args.response.image_id,
+        machineId: args.machine.id,
+        machine: args.machine,
+        timestamp: Date.now(),
+        predictions: args.response.issue_list, // align with AnalysisHistoryRecord
+        response: args.response,
+        material: args.material,
+        localUri: settings.storeImagesLocallyOnly ? undefined : args.localUri,
+        summary: args.summary,
+      };
+      await onRecordHistory(entry);
+      onShowAnalysis({
+        machine: args.machine,
+        response: args.response,
+        material: args.material,
+        summary: args.summary,
+        image: args.image,
+      });
+    },
+    [onRecordHistory, onShowAnalysis, settings.storeImagesLocallyOnly],
+  );
+
   const handleQueueSuccess = useCallback(
-    (item, response: AnalyzeResponse) => {
-      const summary = lookup.get(item.machine.id);
+    (item: QueueItem, response: AnalyzeResponse) => {
+      const summary = getSummary(item.machine.id);
       const entry: AnalysisHistoryRecord = {
         imageId: response.image_id,
         machineId: item.machine.id,
         machine: item.machine,
         timestamp: Date.now(),
-        issues: response.issue_list,
+        predictions: response.issue_list,
         response,
         material: item.material,
         localUri: settings.storeImagesLocallyOnly ? undefined : item.fileUri,
@@ -78,7 +124,7 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
       };
       void onRecordHistory(entry);
     },
-    [lookup, onRecordHistory, settings.storeImagesLocallyOnly],
+    [getSummary, onRecordHistory, settings.storeImagesLocallyOnly],
   );
 
   const analyzeMutation = useAnalyze({ onQueueSuccess: handleQueueSuccess });
@@ -91,70 +137,31 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
     }
   }, [activeMachineId, profile.machines]);
 
-  useEffect(() => {
-    if (isSuccess && data && lastRequest) {
-      const entry: AnalysisHistoryRecord = {
-        imageId: data.image_id,
-        machineId: lastRequest.machine.id,
-        machine: lastRequest.machine,
-        timestamp: Date.now(),
-        issues: data.issue_list,
-        response: data,
-        material: lastRequest.material,
-        localUri: settings.storeImagesLocallyOnly ? undefined : lastRequest.imageUri,
-        summary: lastRequest.summary ?? machineSummary,
-      };
-      void onRecordHistory(entry);
-      onShowAnalysis({
-        machine: lastRequest.machine,
-        response: data,
-        material: lastRequest.material,
-        summary: lastRequest.summary ?? machineSummary,
-        image: lastRequest.image,
-      });
-      reset();
-      setLastRequest(null);
-    }
-  }, [data, isSuccess, lastRequest, machineSummary, onRecordHistory, onShowAnalysis, reset, settings.storeImagesLocallyOnly]);
-
-  useEffect(() => {
-    void retryQueued();
-  }, [retryQueued]);
-
-  useEffect(() => {
-    if (isSuccess) {
-      void retryQueued();
-    }
-  }, [isSuccess, retryQueued]);
-
   const activeMachine = useMemo(
     () => profile.machines.find((machine) => machine.id === activeMachineId) ?? null,
     [activeMachineId, profile.machines],
   );
 
-  const machineSummary = activeMachineId ? lookup.get(activeMachineId) : undefined;
+  const machineSummary = getSummary(activeMachineId || undefined);
+
   const materialValue = activeMachineId
     ? profile.materialByMachine?.[activeMachineId] ?? profile.material
     : profile.material;
 
   const historyCount = activeMachineId ? historyCounts[activeMachineId] ?? 0 : 0;
 
-  const filteredSummaries = useMemo(
-    () => filterMachines(machines, search),
-    [machines, search],
-  );
+  const filteredSummaries = useMemo(() => filterMachines(machines, search), [machines, search]);
 
+  // Native/RN (CameraButton) → queue/mutate path
   const handleAnalyze = async (image: PreparedImage) => {
-    if (!activeMachine) {
-      return;
-    }
+    if (!activeMachine) return;
     const meta: AnalyzeRequestMeta = {
       machine_id: activeMachine.id,
       experience: profile.experience,
       material: materialValue,
       app_version: 'app-ai-alpha',
     };
-    const summary = lookup.get(activeMachine.id);
+    const summary = getSummary(activeMachine.id);
     setLastRequest({
       machine: activeMachine,
       material: materialValue,
@@ -172,42 +179,28 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
     });
   };
 
-  const renderMachineFacts = (summary?: MachineSummary) => {
-    if (!summary) {
-      return <Text style={styles.emptyFacts}>Machine metadata unavailable.</Text>;
+  // Handle queued result from RN path
+  useEffect(() => {
+    if (isSuccess && data && lastRequest) {
+      void showAndRecord({
+        machine: lastRequest.machine,
+        material: lastRequest.material,
+        summary: lastRequest.summary ?? machineSummary,
+        image: lastRequest.image,
+      response: data,
+        localUri: lastRequest.imageUri,
+      });
+      reset();
+      setLastRequest(null);
     }
-    const facts: Array<{ label: string; value: string }> = [];
-    if (summary.capabilities?.length) {
-      facts.push({ label: 'Capabilities', value: summary.capabilities.join(', ') });
-    }
-    if (summary.safe_speed_ranges) {
-      const speedFacts = Object.entries(summary.safe_speed_ranges)
-        .map(([key, value]) => `${key}: ${value.join('–')} ${key.includes('accel') ? 'mm/s²' : 'mm/s'}`)
-        .join(' | ');
-      facts.push({ label: 'Speed ranges', value: speedFacts });
-    }
-    if (summary.max_nozzle_temp_c) {
-      facts.push({ label: 'Max nozzle temp', value: `${summary.max_nozzle_temp_c} °C` });
-    }
-    if (summary.max_bed_temp_c) {
-      facts.push({ label: 'Max bed temp', value: `${summary.max_bed_temp_c} °C` });
-    }
-    if (summary.spindle_rpm_range) {
-      facts.push({ label: 'Spindle RPM', value: `${summary.spindle_rpm_range[0]} – ${summary.spindle_rpm_range[1]}` });
-    }
-    if (summary.max_feed_mm_min) {
-      facts.push({ label: 'Max feed', value: `${summary.max_feed_mm_min} mm/min` });
-    }
-    if (!facts.length) {
-      return <Text style={styles.emptyFacts}>No additional specs available yet.</Text>;
-    }
-    return facts.map((fact) => (
-      <View key={fact.label} style={styles.factRow}>
-        <Text style={styles.factLabel}>{fact.label}</Text>
-        <Text style={styles.factValue}>{fact.value}</Text>
-      </View>
-    ));
-  };
+  }, [data, isSuccess, lastRequest, machineSummary, reset, showAndRecord]);
+
+  useEffect(() => {
+    void retryQueued();
+  }, [retryQueued]);
+  useEffect(() => {
+    if (isSuccess) void retryQueued();
+  }, [isSuccess, retryQueued]);
 
   return (
     <View style={styles.container}>
@@ -262,6 +255,32 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
                 {activeMachine.brand} {activeMachine.model}
               </Text>
               <Text style={styles.subheading}>Experience: {profile.experience}</Text>
+
+              {/* 🔹 WEB-ONLY: Choose/Take Photo button that posts to /api/analyze */}
+              {Platform.OS === 'web' && (
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Analyze a failed print (photo)</Text>
+                  <WebPhotoPicker
+                    machineId={activeMachine.id}
+                    material={materialValue || 'PLA'}
+                    experience={profile.experience as any}
+                    label="Choose photo"
+                    onResult={(res) => {
+                      void showAndRecord({
+                        machine: activeMachine,
+                        material: materialValue,
+                        summary: machineSummary,
+                        image: undefined,
+                        response: res,
+                      });
+                    }}
+                    onError={(m) => {
+                      alert(`Analyze error: ${m}`);
+                    }}
+                  />
+                </View>
+              )}
+
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Material</Text>
                 <View style={styles.materialRow}>
@@ -311,7 +330,7 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
                     onValueChange={(value) => {
                       void updatePrivacy({ storeImagesLocallyOnly: value });
                     }}
-                    thumbColor={settings.storeImagesLocallyOnly ? '#38bdf8' : '#1f2937'}
+                    thumbColor={settings.storeImagesLocallyOnly ? '#38bdf8' : '#1f2937'}  // fixed typo usage
                     trackColor={{ true: '#38bdf855', false: '#1f2937' }}
                   />
                 </View>
@@ -355,7 +374,9 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
                       onPress={() => setActiveMachineId(item.id)}
                       style={[styles.searchRow, item.id === activeMachineId && styles.searchRowActive]}
                     >
-                      <Text style={styles.searchLabel}>{item.brand} {item.model}</Text>
+                      <Text style={styles.searchLabel}>
+                        {item.brand} {item.model}
+                      </Text>
                       <Text style={styles.searchSubLabel}>{item.id}</Text>
                     </Pressable>
                   ))}
@@ -369,144 +390,82 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
       {isPending && (
         <View style={styles.uploadBanner}>
           <ActivityIndicator color="#0f172a" />
-          <Text style={styles.uploadText}>
-            Uploading… {Math.round((progress || 0) * 100)}%
-          </Text>
+          <Text style={styles.uploadText}>Uploading… {Math.round((progress || 0) * 100)}%</Text>
         </View>
       )}
 
-      <CameraButton disabled={isPending || !activeMachine} onImageReady={handleAnalyze} />
+      {/* 🔹 Native camera button (kept for iOS/Android/Expo Go) */}
+      {Platform.OS !== 'web' && (
+        <CameraButton disabled={isPending || !activeMachine} onImageReady={handleAnalyze} />
+      )}
     </View>
   );
 };
 
+// ------- helpers & styles -------
+
+function renderMachineFacts(summary?: MachineSummary) {
+  if (!summary) {
+    return <Text style={styles.emptyFacts}>Machine metadata unavailable.</Text>;
+  }
+  const facts: Array<{ label: string; value: string }> = [];
+  if (summary.capabilities?.length) {
+    facts.push({ label: 'Capabilities', value: summary.capabilities.join(', ') });
+  }
+  if (summary.safe_speed_ranges) {
+    const speedFacts = Object.entries(summary.safe_speed_ranges)
+      .map(
+        ([key, value]) =>
+          `${key}: ${(value as number[]).join('–')} ${key.includes('accel') ? 'mm/s²' : 'mm/s'}`,
+      )
+      .join(' | ');
+    facts.push({ label: 'Speed ranges', value: speedFacts });
+  }
+  if (summary.max_nozzle_temp_c) facts.push({ label: 'Max nozzle temp', value: `${summary.max_nozzle_temp_c} °C` });
+  if (summary.max_bed_temp_c) facts.push({ label: 'Max bed temp', value: `${summary.max_bed_temp_c} °C` });
+  if (summary.spindle_rpm_range) {
+    facts.push({ label: 'Spindle RPM', value: `${summary.spindle_rpm_range[0]} – ${summary.spindle_rpm_range[1]}` });
+  }
+  if (summary.max_feed_mm_min) facts.push({ label: 'Max feed', value: `${summary.max_feed_mm_min} mm/min` });
+  if (!facts.length) {
+    return <Text style={styles.emptyFacts}>No additional specs available yet.</Text>;
+  }
+  return facts.map((fact) => (
+    <View key={fact.label} style={styles.factRow}>
+      <Text style={styles.factLabel}>{fact.label}</Text>
+      <Text style={styles.factValue}>{fact.value}</Text>
+    </View>
+  ));
+}
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0f172a',
-    padding: 16,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  title: {
-    color: '#f8fafc',
-    fontSize: 20,
-    fontWeight: '600',
-  },
-  secondaryButton: {
-    borderWidth: 1,
-    borderColor: '#334155',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  secondaryLabel: {
-    color: '#e2e8f0',
-    fontWeight: '500',
-  },
-  emptyState: {
-    backgroundColor: '#1f2937',
-    borderRadius: 12,
-    padding: 24,
-    gap: 8,
-  },
-  emptyTitle: {
-    color: '#f8fafc',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  emptySubtitle: {
-    color: '#cbd5f5',
-  },
-  loader: {
-    marginVertical: 24,
-  },
-  errorBox: {
-    backgroundColor: '#7f1d1d',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  errorText: {
-    color: '#fecaca',
-  },
-  tabBar: {
-    flexGrow: 0,
-    marginBottom: 12,
-  },
-  tab: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 999,
-    backgroundColor: '#1f2937',
-    marginRight: 8,
-  },
-  tabActive: {
-    backgroundColor: '#38bdf8',
-  },
-  tabLabel: {
-    color: '#cbd5f5',
-  },
-  tabLabelActive: {
-    color: '#0f172a',
-    fontWeight: '600',
-  },
-  details: {
-    flex: 1,
-  },
-  machineHeading: {
-    color: '#f8fafc',
-    fontSize: 22,
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  subheading: {
-    color: '#cbd5f5',
-    marginBottom: 16,
-  },
-  section: {
-    backgroundColor: '#111c2c',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    gap: 12,
-  },
-  sectionTitle: {
-    color: '#f8fafc',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  toggleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 16,
-  },
-  toggleCopy: {
-    flex: 1,
-    gap: 6,
-  },
-  toggleTitle: {
-    color: '#f8fafc',
-    fontWeight: '600',
-  },
-  toggleSubtitle: {
-    color: '#94a3b8',
-    fontSize: 12,
-    lineHeight: 16,
-  },
-  materialRow: {
-    gap: 12,
-  },
+  container: { flex: 1, backgroundColor: '#0f172a', padding: 16 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  title: { color: '#f8fafc', fontSize: 20, fontWeight: '600' },
+  secondaryButton: { borderWidth: 1, borderColor: '#334155', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8 },
+  secondaryLabel: { color: '#e2e8f0', fontWeight: '500' },
+  emptyState: { backgroundColor: '#1f2937', borderRadius: 12, padding: 24, gap: 8 },
+  emptyTitle: { color: '#f8fafc', fontSize: 18, fontWeight: '600' },
+  emptySubtitle: { color: '#cbd5f5' },
+  loader: { marginVertical: 24 },
+  errorBox: { backgroundColor: '#7f1d1d', padding: 12, borderRadius: 8, marginBottom: 12 },
+  errorText: { color: '#fecaca' },
+  tabBar: { flexGrow: 0, marginBottom: 12 },
+  tab: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 999, backgroundColor: '#1f2937', marginRight: 8 },
+  tabActive: { backgroundColor: '#38bdf8' },
+  tabLabel: { color: '#cbd5f5' },
+  tabLabelActive: { color: '#0f172a', fontWeight: '600' },
+  details: { flex: 1 },
+  machineHeading: { color: '#f8fafc', fontSize: 22, fontWeight: '700', marginBottom: 4 },
+  subheading: { color: '#cbd5f5', marginBottom: 16 },
+  section: { backgroundColor: '#111c2c', borderRadius: 12, padding: 16, marginBottom: 16, gap: 12 },
+  sectionTitle: { color: '#f8fafc', fontSize: 16, fontWeight: '600' },
+  toggleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 16 },
+  toggleCopy: { flex: 1, gap: 6 },
+  toggleTitle: { color: '#f8fafc', fontWeight: '600' },
+  toggleSubtitle: { color: '#94a3b8', fontSize: 12, lineHeight: 16 },
+  materialRow: { gap: 12 },
   materialInput: {
     backgroundColor: '#0f172a',
     borderRadius: 8,
@@ -515,43 +474,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#334155',
   },
-  materialChips: {
-    flexGrow: 0,
-  },
-  materialChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: '#1f2937',
-    marginRight: 8,
-  },
-  materialChipActive: {
-    backgroundColor: '#38bdf8',
-  },
-  materialChipLabel: {
-    color: '#e2e8f0',
-  },
-  materialChipLabelActive: {
-    color: '#0f172a',
-    fontWeight: '600',
-  },
-  factRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  factLabel: {
-    color: '#94a3b8',
-    fontWeight: '600',
-  },
-  factValue: {
-    color: '#e2e8f0',
-    flex: 1,
-    textAlign: 'right',
-  },
-  emptyFacts: {
-    color: '#94a3b8',
-  },
+  materialChips: { flexGrow: 0 },
+  materialChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, backgroundColor: '#1f2937', marginRight: 8 },
+  materialChipActive: { backgroundColor: '#38bdf8' },
+  materialChipLabel: { color: '#e2e8f0' },
+  materialChipLabelActive: { color: '#0f172a', fontWeight: '600' },
+  factRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
+  factLabel: { color: '#94a3b8', fontWeight: '600' },
+  factValue: { color: '#e2e8f0', flex: 1, textAlign: 'right' },
+  emptyFacts: { color: '#94a3b8' },
   searchInput: {
     backgroundColor: '#0f172a',
     borderRadius: 8,
@@ -560,25 +491,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#334155',
   },
-  searchResults: {
-    maxHeight: 180,
-  },
-  searchRow: {
-    paddingVertical: 8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#1f2937',
-  },
-  searchRowActive: {
-    backgroundColor: '#1c2c40',
-  },
-  searchLabel: {
-    color: '#e2e8f0',
-    fontWeight: '500',
-  },
-  searchSubLabel: {
-    color: '#94a3b8',
-    fontSize: 12,
-  },
+  searchResults: { maxHeight: 180 },
+  searchRow: { paddingVertical: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#1f2937' },
+  searchRowActive: { backgroundColor: '#1c2c40' },
+  searchLabel: { color: '#e2e8f0', fontWeight: '500' },
+  searchSubLabel: { color: '#94a3b8', fontSize: 12 },
   uploadBanner: {
     position: 'absolute',
     left: 16,
@@ -592,18 +509,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 12,
   },
-  uploadText: {
-    color: '#0f172a',
-    fontWeight: '600',
-  },
-  queueBanner: {
-    marginTop: 8,
-    backgroundColor: '#1e3a8a',
-    borderRadius: 10,
-    padding: 12,
-  },
-  queueText: {
-    color: '#bfdbfe',
-    fontWeight: '500',
-  },
+  uploadText: { color: '#0f172a', fontWeight: '600' },
+  queueBanner: { marginTop: 8, backgroundColor: '#1e3a8a', borderRadius: 10, padding: 12 },
+  queueText: { color: '#bfdbfe', fontWeight: '500' },
 });

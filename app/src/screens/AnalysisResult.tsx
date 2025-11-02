@@ -8,8 +8,8 @@ import {
   StyleSheet,
   Text,
   View,
+  LayoutChangeEvent,
 } from 'react-native';
-import Slider from '@react-native-community/slider';
 import * as Clipboard from 'expo-clipboard';
 
 import { exportProfile } from '../api/client';
@@ -21,6 +21,9 @@ import type {
   SlicerId,
 } from '../types';
 
+// ---------------------------------------------
+// Utilities
+// ---------------------------------------------
 const SLICERS: Array<{ id: SlicerId; label: string }> = [
   { id: 'cura', label: 'Export for Cura' },
   { id: 'prusaslicer', label: 'Export for PrusaSlicer' },
@@ -28,6 +31,81 @@ const SLICERS: Array<{ id: SlicerId; label: string }> = [
   { id: 'orca', label: 'Export for OrcaSlicer' },
 ];
 
+function pct(n: number) {
+  return Math.max(0, Math.min(1, n));
+}
+
+function formatPct01(n: number) {
+  return `${Math.round(pct(n) * 100)}%`;
+}
+
+function normalizeHeatmap(resp: AnalyzeResponse): string | null {
+  if (resp.localization?.heatmap) {
+    const h = resp.localization.heatmap;
+    if (typeof h === 'string') return h;
+    if (h && typeof h === 'object' && 'data_url' in h) return (h as any).data_url as string;
+  }
+  if (resp.heatmap) return resp.heatmap;
+  return null;
+}
+
+type NormBox = { left: number; top: number; width: number; height: number; label: string };
+
+function normalizeBoxes(resp: AnalyzeResponse): NormBox[] {
+  const src = resp.localization?.boxes ?? resp.boxes ?? [];
+  return (src ?? []).map((b) => {
+    const width = typeof b.width === 'number' ? b.width : (b.w ?? 0);
+    const height = typeof b.height === 'number' ? b.height : (b.h ?? 0);
+    const label = b.issue_id ? `${b.issue_id}${b.confidence ? ` · ${formatPct01(b.confidence)}` : ''}` : 'region';
+    return {
+      left: pct(b.x),
+      top: pct(b.y),
+      width: pct(width),
+      height: pct(height),
+      label,
+    };
+  });
+}
+
+function getParamTargets(resp: AnalyzeResponse): Record<string, string | number> {
+  const targets = resp.parameter_targets ?? {};
+  // applied can be either a flat params object or { parameters, ... }
+  if (resp.applied && typeof resp.applied === 'object' && !Array.isArray(resp.applied)) {
+    const maybe = (resp.applied as any).parameters ?? resp.applied;
+    // Avoid copying non-param metadata keys if applied is the richer object
+    if ((resp.applied as any).parameters) {
+      return { ...targets, ...(maybe as Record<string, string | number>) };
+    }
+    // If it's a flat map and seems like params, merge
+    const flat = { ...(maybe as Record<string, string | number>) };
+    // Strip likely metadata keys if present
+    delete (flat as any).hidden_parameters;
+    delete (flat as any).experience_level;
+    delete (flat as any).clamped_to_machine_limits;
+    delete (flat as any).explanations;
+    return { ...targets, ...flat };
+  }
+  return { ...targets };
+}
+
+function getAppliedHidden(resp: AnalyzeResponse): string[] {
+  if (resp.hidden_parameters) return resp.hidden_parameters;
+  if (resp.applied && typeof resp.applied === 'object') {
+    const hp = (resp.applied as any).hidden_parameters;
+    if (Array.isArray(hp)) return hp as string[];
+  }
+  return [];
+}
+
+function getExplanations(resp: AnalyzeResponse): string[] {
+  if (Array.isArray(resp.explanations)) return resp.explanations;
+  if (Array.isArray(resp.clamp_explanations)) return resp.clamp_explanations;
+  return [];
+}
+
+// ---------------------------------------------
+// Component
+// ---------------------------------------------
 interface AnalysisResultProps {
   machine: MachineRef;
   response: AnalyzeResponse;
@@ -39,223 +117,116 @@ interface AnalysisResultProps {
   image?: { uri: string; width: number; height: number };
 }
 
-function formatConfidence(value: number): string {
-  return `${Math.round(Math.max(0, Math.min(1, value)) * 100)}%`;
-}
-
-function clamp01(value: number | undefined | null): number {
-  if (typeof value !== 'number') {
-    return 0;
-  }
-  return Math.max(0, Math.min(1, value));
-}
-
 export const AnalysisResult: React.FC<AnalysisResultProps> = ({
   machine,
   response,
   experience,
   material,
-  machineSummary,
   onClose,
   onRetake,
   image,
 }) => {
-  const [adjustments, setAdjustments] = useState<Record<string, AdjustmentValue>>(() =>
-    initialiseAdjustments(response.suggestions),
+  // Derived fields
+  const predictions = useMemo(
+    () => (response.predictions ?? response.issue_list ?? []),
+    [response.predictions, (response as any).issue_list]
   );
-  const [copied, setCopied] = useState<SlicerId | null>(null);
-  const [exportMessage, setExportMessage] = useState<string | null>(null);
+  const topIssue =
+    response.top_issue ??
+    (predictions.length ? predictions[0].issue_id : 'general_tuning');
+
+  const heatmapUrl = normalizeHeatmap(response);
+  const normBoxes = useMemo(() => normalizeBoxes(response), [response]);
+
+  const parameterTargets = useMemo(() => getParamTargets(response), [response]);
+  const explanations = useMemo(() => getExplanations(response), [response]);
+  const hiddenParameters = useMemo(() => getAppliedHidden(response), [response]);
+
   const [overlayOpacity, setOverlayOpacity] = useState<number>(0.6);
+  const [exportMessage, setExportMessage] = useState<string | null>(null);
+  const [copiedSlicer, setCopiedSlicer] = useState<string | null>(null);
 
-  const sortedIssues = useMemo(() => {
-    return [...(response.issue_list ?? [])].sort((a, b) => b.confidence - a.confidence);
-  }, [response.issue_list]);
+  // size of preview container to place boxes with pixels (avoids % style errors in RN)
+  const [previewSize, setPreviewSize] = useState<{ w: number; h: number }>({ w: 0, h: 0 });
+  const onPreviewLayout = useCallback((e: LayoutChangeEvent) => {
+    const { width, height } = e.nativeEvent.layout;
+    setPreviewSize({ w: width, h: height });
+  }, []);
 
-  const parameterKeys = useMemo(() => {
-    const keys = new Set<string>();
-    Object.keys(response.parameter_targets ?? {}).forEach((key) => keys.add(key));
-    Object.keys(response.applied ?? {}).forEach((key) => keys.add(key));
-    return Array.from(keys).sort();
-  }, [response.parameter_targets, response.applied]);
+  useEffect(() => {
+    if (!exportMessage) return;
+    const t = setTimeout(() => setExportMessage(null), 2500);
+    return () => clearTimeout(t);
+  }, [exportMessage]);
 
-  const aspectRatio = useMemo(() => {
-    if (image?.width && image?.height) {
-      return image.width / image.height;
-    }
-    return 4 / 3;
-  }, [image]);
+  // Clean up blob URLs on web
+  useEffect(() => {
+    if (Platform.OS !== 'web' || !image?.uri || !image.uri.startsWith('blob:')) return;
+    return () => URL.revokeObjectURL(image.uri);
+  }, [image?.uri]);
 
-  const heatmap = response.localization?.heatmap;
-  const boundingBoxes = response.localization?.boxes ?? [];
-
+  // Download helper (web)
   const downloadBlob = useCallback((content: string, filename: string, mime: string) => {
-    if (Platform.OS !== 'web') {
-      return;
-    }
+    if (Platform.OS !== 'web') return;
     const blob = new Blob([content], { type: mime });
     const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = filename;
-    document.body.appendChild(anchor);
-    anchor.click();
-    document.body.removeChild(anchor);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }, []);
 
-  const handleDownloadDiff = useCallback(async () => {
+  // Export slicer diff (web: download; native: copy)
+  const handleExportSlicerDiff = useCallback(() => {
     const diff = response.slicer_profile_diff;
+    if (!diff) {
+      Alert.alert('No diff available', 'The server did not provide a slicer profile diff.');
+      return;
+    }
     const baseName = `${machine.id}-slicer-diff`;
     const jsonPayload = JSON.stringify(diff, null, 2);
+
     if (Platform.OS === 'web') {
       downloadBlob(jsonPayload, `${baseName}.json`, 'application/json');
       if (diff.markdown) {
         downloadBlob(diff.markdown, `${baseName}.md`, 'text/markdown');
-        setExportMessage('Downloaded JSON + Markdown diff');
+        setExportMessage('Downloaded JSON + Markdown diff.');
       } else {
-        setExportMessage('Downloaded JSON diff');
+        setExportMessage('Downloaded JSON diff.');
       }
       return;
     }
 
     const text = diff.markdown ?? jsonPayload;
-    await Clipboard.setStringAsync(text);
-    Alert.alert('Export ready', diff.markdown ? 'Markdown copied to clipboard.' : 'JSON copied to clipboard.');
-    setExportMessage('Export copied to clipboard');
-  }, [response.slicer_profile_diff, machine.id, downloadBlob]);
+    Clipboard.setStringAsync(text).then(() => {
+      Alert.alert('Export ready', diff.markdown ? 'Markdown copied to clipboard.' : 'JSON copied to clipboard.');
+      setExportMessage('Export copied to clipboard.');
+    });
+  }, [downloadBlob, machine.id, response.slicer_profile_diff]);
 
-  useEffect(() => {
-    if (!exportMessage) {
-      return;
+  // Copy “changes for slicer” via API
+  const aggregatedChanges: Record<string, string | number> = useMemo(() => {
+    // We expose parameter_targets as the recommended “target” changes
+    return { ...parameterTargets };
+  }, [parameterTargets]);
+
+  const handleExportToSlicer = useCallback(async (slicer: SlicerId) => {
+    try {
+      const res = await exportProfile({ slicer, changes: aggregatedChanges });
+      await Clipboard.setStringAsync(JSON.stringify(res.diff ?? res, null, 2));
+      setCopiedSlicer(slicer);
+      setTimeout(() => setCopiedSlicer(null), 2500);
+    } catch (e) {
+      Alert.alert('Export failed', String(e));
     }
-    const timer = setTimeout(() => setExportMessage(null), 2500);
-    return () => clearTimeout(timer);
-  }, [exportMessage]);
-
-  useEffect(() => {
-    if (Platform.OS !== 'web' || !image?.uri || !image.uri.startsWith('blob:')) {
-      return;
-    }
-    return () => {
-      URL.revokeObjectURL(image.uri);
-    };
-  }, [image?.uri]);
-
-  const handleExport = async (slicer: SlicerId) => {
-    const diff = await exportProfile({ slicer, changes: aggregatedChanges });
-    await Clipboard.setStringAsync(JSON.stringify(diff.diff, null, 2));
-    setCopied(slicer);
-    setTimeout(() => setCopied(null), 2500);
-  };
-
-  const renderSuggestion = (suggestion: Suggestion) => (
-    <View key={suggestion.issue_id} style={styles.suggestionCard}>
-      <Text style={styles.suggestionTitle}>Fix {suggestion.issue_id}</Text>
-      <Text style={styles.suggestionWhy}>{suggestion.why}</Text>
-      <View style={styles.changesList}>
-        {suggestion.changes.map((change) => {
-          const key = `${suggestion.issue_id}:${change.param}`;
-          const state = adjustments[key];
-          const bounds = change.range_hint
-            ? { min: change.range_hint[0], max: change.range_hint[1] }
-            : deriveBounds(change.param, machineSummary);
-          const unit = change.unit ? ` ${change.unit}` : '';
-          return (
-            <View key={key} style={styles.changeRow}>
-              <Text style={styles.changeLabel}>{change.param}</Text>
-              <View style={styles.sliderRow}>
-                <Pressable
-                  accessibilityHint="Decrease value"
-                  onPress={() =>
-                    setAdjustments((prev) => ({
-                      ...prev,
-                      [key]: {
-                        ...state,
-                        value: Math.max(bounds.min, state.value - Math.max(1, (bounds.max - bounds.min) / 20)),
-                      },
-                    }))
-                  }
-                  style={styles.bumpButton}
-                >
-                  <Text style={styles.bumpLabel}>-</Text>
-                </Pressable>
-                <Slider
-                  style={styles.slider}
-                  minimumValue={bounds.min}
-                  maximumValue={bounds.max}
-                  value={state?.value ?? bounds.min}
-                  minimumTrackTintColor="#38bdf8"
-                  maximumTrackTintColor="#1f2937"
-                  thumbTintColor="#38bdf8"
-                  step={Math.max((bounds.max - bounds.min) / 100, 0.1)}
-                  onValueChange={(value) =>
-                    setAdjustments((prev) => ({
-                      ...prev,
-                      [key]: {
-                        ...state,
-                        value,
-                      },
-                    }))
-                  }
-                />
-                <Pressable
-                  accessibilityHint="Increase value"
-                  onPress={() =>
-                    setAdjustments((prev) => ({
-                      ...prev,
-                      [key]: {
-                        ...state,
-                        value: Math.min(bounds.max, state.value + Math.max(1, (bounds.max - bounds.min) / 20)),
-                      },
-                    }))
-                  }
-                  style={styles.bumpButton}
-                >
-                  <Text style={styles.bumpLabel}>+</Text>
-                </Pressable>
-              </View>
-              <View style={styles.valueDisplay}>
-                <Text style={styles.valueText}>{state?.value.toFixed(2)}{unit}</Text>
-                <Text style={styles.rangeText}>
-                  Range {bounds.min.toFixed(1)} – {bounds.max.toFixed(1)}{unit}
-                </Text>
-              </View>
-              {state?.type === 'delta' && change.delta !== undefined && (
-                <Text style={styles.deltaNote}>Recommended change: {change.delta > 0 ? '+' : ''}{change.delta}{unit}</Text>
-              )}
-            </View>
-          );
-        })}
-      </View>
-      <Text style={styles.riskLabel}>Risk: {suggestion.risk}</Text>
-      <Text style={styles.confidenceLabel}>Confidence: {(suggestion.confidence * 100).toFixed(0)}%</Text>
-      {suggestion.clamped_to_machine_limits && (
-        <Text style={styles.clampedNote}>Some values were clamped to your machine limits.</Text>
-      )}
-      {suggestion.beginner_note && (
-        <Text style={styles.note}>Beginner tip: {suggestion.beginner_note}</Text>
-      )}
-      {suggestion.advanced_note && (
-        <Text style={styles.note}>Advanced tip: {suggestion.advanced_note}</Text>
-      )}
-    </View>
-  );
-
-  useEffect(() => {
-    if (!exportMessage) {
-      return;
-    }
-    const timer = setTimeout(() => setExportMessage(null), 2600);
-    return () => clearTimeout(timer);
-  }, [exportMessage]);
-
-  const topIssue = response.top_issue ?? sortedIssues[0]?.id ?? 'general_tuning';
-  const boxes = response.boxes ?? [];
-  const clampNotes = response.clamp_explanations ?? [];
-  const hiddenParameters = response.hidden_parameters ?? [];
+  }, [aggregatedChanges]);
 
   return (
     <View style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>Analysis complete</Text>
@@ -276,94 +247,70 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        {image ? (
-          <View style={[styles.preview, { aspectRatio }]}>
-            <Image source={{ uri: image.uri }} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
-            {response.heatmap ? (
-              <Image
-                source={{ uri: response.heatmap }}
-                style={[StyleSheet.absoluteFillObject, { opacity: overlayOpacity }]}
-                resizeMode="cover"
-              />
-            ) : null}
-            {boxes.map((box, index) => {
-              const left = `${clamp01(box.x) * 100}%`;
-              const top = `${clamp01(box.y) * 100}%`;
-              const width = `${clamp01(box.w) * 100}%`;
-              const height = `${clamp01(box.h) * 100}%`;
-              return (
-                <View
-                  key={`${box.issue_id ?? 'box'}-${index}`}
-                  style={[styles.boundingBox, { left, top, width, height }]}
-                >
-                  <Text style={styles.boundingLabel}>
-                    {box.issue_id ?? 'region'} {box.score ? `(${formatConfidence(clamp01(box.score))})` : ''}
-                  </Text>
-                </View>
-              );
-            })}
-          </View>
-        ) : null}
-
-      <ScrollView style={styles.scroll}>
+        {/* Photo + overlays */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Photo localization</Text>
           {image ? (
-            <View style={[styles.previewContainer, { aspectRatio }]}>
+            <View style={styles.previewContainer} onLayout={onPreviewLayout}>
               <Image source={{ uri: image.uri }} style={styles.previewImage} />
-              {heatmap ? (
+              {heatmapUrl ? (
                 <Image
-                  source={{ uri: heatmap.data_url }}
-                  style={[styles.previewImage, styles.heatmapOverlay, { opacity: overlayOpacity }]}
+                  source={{ uri: heatmapUrl }}
+                  style={[styles.previewImage, { opacity: overlayOpacity }]}
                 />
               ) : null}
-              {boundingBoxes.map((box, index) => (
-                <View
-                  key={`${box.issue_id}-${index}`}
-                  style={[
-                    styles.boundingBox,
-                    {
-                      left: `${(box.x * 100).toFixed(1)}%`,
-                      top: `${(box.y * 100).toFixed(1)}%`,
-                      width: `${(box.width * 100).toFixed(1)}%`,
-                      height: `${(box.height * 100).toFixed(1)}%`,
-                    },
-                  ]}
-                >
-                  <Text style={styles.boundingLabel}>
-                    {box.issue_id} · {(box.confidence * 100).toFixed(0)}%
-                  </Text>
-                </View>
-              ))}
+
+              {/* Bounding boxes in pixels */}
+              {previewSize.w > 0 && previewSize.h > 0 && normBoxes.map((b, idx) => {
+                const left = b.left * previewSize.w;
+                const top = b.top * previewSize.h;
+                const width = b.width * previewSize.w;
+                const height = b.height * previewSize.h;
+                return (
+                  <View
+                    key={`box-${idx}`}
+                    style={[styles.boundingBox, { left, top, width, height }]}
+                  >
+                    <Text style={styles.boundingLabel}>{b.label}</Text>
+                  </View>
+                );
+              })}
             </View>
           ) : (
             <Text style={styles.emptyFacts}>Photo preview unavailable.</Text>
           )}
-          {heatmap ? (
-            <View style={styles.overlayControls}>
+
+          {/* Opacity buttons (no slider dependency) */}
+          {heatmapUrl ? (
+            <View style={styles.opacityRow}>
               <Text style={styles.overlayLabel}>Heatmap opacity</Text>
-              <Slider
-                style={styles.overlaySlider}
-                minimumValue={0}
-                maximumValue={1}
-                value={overlayOpacity}
-                minimumTrackTintColor="#38bdf8"
-                maximumTrackTintColor="#1f2937"
-                thumbTintColor="#38bdf8"
-                step={0.05}
-                onValueChange={setOverlayOpacity}
-              />
+              <View style={styles.opacityButtons}>
+                <Pressable
+                  onPress={() => setOverlayOpacity((v) => Math.max(0, Math.round((v - 0.05) * 100) / 100))}
+                  style={styles.bumpButton}
+                >
+                  <Text style={styles.bumpLabel}>-</Text>
+                </Pressable>
+                <Text style={styles.opacityValue}>{Math.round(overlayOpacity * 100)}%</Text>
+                <Pressable
+                  onPress={() => setOverlayOpacity((v) => Math.min(1, Math.round((v + 0.05) * 100) / 100))}
+                  style={styles.bumpButton}
+                >
+                  <Text style={styles.bumpLabel}>+</Text>
+                </Pressable>
+              </View>
             </View>
           ) : null}
         </View>
 
+        {/* Predictions */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Predicted issues</Text>
-          {response.predictions.length ? (
-            response.predictions.map((prediction) => (
-              <View key={prediction.issue_id} style={styles.predictionCard}>
-                <Text style={styles.predictionLabel}>{prediction.issue_id}</Text>
-                <Text style={styles.predictionConfidence}>{(prediction.confidence * 100).toFixed(0)}%</Text>
+          {predictions.length ? (
+            predictions.map((p, i) => (
+              <View key={`${p.issue_id}-${i}`} style={styles.predictionRow}>
+                <Text style={styles.predictionLabel}>{p.issue_id}</Text>
+                <Text style={styles.predictionConfidence}>{formatPct01(p.confidence)}</Text>
               </View>
             ))
           ) : (
@@ -371,66 +318,87 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
           )}
         </View>
 
+        {/* Recommendations */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Recommendations</Text>
-          {response.recommendations.length ? (
-            response.recommendations.map((rec, index) => (
-              <Text key={`${rec}-${index}`} style={styles.note}>
-                • {rec}
-              </Text>
+          {response.recommendations?.length ? (
+            response.recommendations.map((rec, idx) => (
+              <Text key={`${idx}-${rec}`} style={styles.note}>• {rec}</Text>
             ))
           ) : (
             <Text style={styles.emptyFacts}>No recommendations generated.</Text>
           )}
         </View>
 
+        {/* Capability notes */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Capability notes</Text>
-          {response.capability_notes.length ? (
-            response.capability_notes.map((note, index) => (
-              <Text key={`${note}-${index}`} style={styles.note}>
-                • {note}
-              </Text>
+          {response.capability_notes?.length ? (
+            response.capability_notes.map((n, idx) => (
+              <Text key={`${idx}-${n}`} style={styles.note}>• {n}</Text>
             ))
           ) : (
             <Text style={styles.emptyFacts}>No capability notes available.</Text>
           )}
         </View>
 
+        {/* Parameter targets (merged view) */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Suggestions</Text>
-          {response.suggestions.map(renderSuggestion)}
+          <Text style={styles.sectionTitle}>Suggested parameter targets</Text>
+          {Object.keys(parameterTargets).length ? (
+            Object.entries(parameterTargets).map(([k, v]) => (
+              <View key={k} style={styles.paramRow}>
+                <Text style={styles.paramName}>{k}</Text>
+                <Text style={styles.paramValue}>{String(v)}</Text>
+              </View>
+            ))
+          ) : (
+            <Text style={styles.emptyFacts}>No parameter guidance.</Text>
+          )}
+          {!!hiddenParameters.length && (
+            <Text style={styles.note}>
+              Hidden parameters: {hiddenParameters.join(', ')}
+            </Text>
+          )}
+          {!!explanations.length && (
+            <Text style={styles.note}>
+              Notes: {explanations.join(' · ')}
+            </Text>
+          )}
         </View>
 
+        {/* Export slicer diff */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Export slicer diff</Text>
-          <Pressable style={styles.exportPrimaryButton} onPress={handleDownloadDiff}>
-            <Text style={styles.exportPrimaryLabel}>Export slicer diff</Text>
+          <Pressable style={styles.primaryWide} onPress={handleExportSlicerDiff}>
+            <Text style={styles.primaryWideLabel}>Export slicer diff</Text>
           </Pressable>
           {exportMessage ? <Text style={styles.exportStatus}>{exportMessage}</Text> : null}
         </View>
 
+        {/* Quick copy for slicers */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Copy for slicer</Text>
-          <View style={styles.exportButtons}>
-            {SLICERS.map((item) => (
-              <Pressable key={item.id} onPress={() => handleExport(item.id)} style={styles.exportButton}>
-                <Text style={styles.exportLabel}>{item.label}</Text>
+          <View style={styles.buttonRow}>
+            {SLICERS.map((s) => (
+              <Pressable key={s.id} style={styles.exportButton} onPress={() => handleExportToSlicer(s.id)}>
+                <Text style={styles.exportLabel}>
+                  {copiedSlicer === s.id ? 'Copied!' : s.label}
+                </Text>
               </Pressable>
             ))}
           </View>
-          {exportMessage ? <Text style={styles.exportMessage}>{exportMessage}</Text> : null}
         </View>
       </ScrollView>
     </View>
   );
 };
 
+// ---------------------------------------------
+// Styles
+// ---------------------------------------------
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0f172a',
-  },
+  container: { flex: 1, backgroundColor: '#0f172a' },
   header: {
     padding: 16,
     borderBottomWidth: 1,
@@ -440,209 +408,84 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  headerActions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#f8fafc',
-  },
-  subtitle: {
-    color: '#cbd5f5',
-    marginTop: 4,
-  },
-  topIssue: {
-    marginTop: 6,
-    color: '#facc15',
-    fontWeight: '600',
-  },
-  primaryButton: {
-    backgroundColor: '#38bdf8',
-    borderRadius: 999,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-  },
-  primaryLabel: {
-    color: '#0f172a',
-    fontWeight: '700',
-  },
-  secondaryButton: {
-    borderColor: '#38bdf8',
-    borderWidth: 1,
-    borderRadius: 999,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-  },
-  secondaryLabel: {
-    color: '#e0f2fe',
-    fontWeight: '600',
-  },
-  smallButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  scroll: {
-    flex: 1,
-  },
-  section: {
-    marginBottom: 24,
-    gap: 12,
-  },
-  emptyFacts: {
-    color: '#94a3b8',
-    fontStyle: 'italic',
-  },
-  sectionTitle: {
-    color: '#f8fafc',
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 12,
-  },
+  headerActions: { flexDirection: 'row', gap: 8 },
+  title: { fontSize: 20, fontWeight: '700', color: '#f8fafc' },
+  subtitle: { color: '#cbd5f5', marginTop: 4 },
+  topIssue: { marginTop: 6, color: '#facc15', fontWeight: '600' },
+
+  primaryButton: { backgroundColor: '#38bdf8', borderRadius: 999, paddingHorizontal: 20, paddingVertical: 10 },
+  primaryLabel: { color: '#0f172a', fontWeight: '700' },
+  secondaryButton: { borderColor: '#38bdf8', borderWidth: 1, borderRadius: 999, paddingHorizontal: 20, paddingVertical: 10 },
+  secondaryLabel: { color: '#e0f2fe', fontWeight: '600' },
+  smallButton: { paddingHorizontal: 16, paddingVertical: 8 },
+
+  scroll: { flex: 1 },
+  scrollContent: { padding: 16, gap: 20 },
+
+  section: { gap: 12 },
+  sectionTitle: { color: '#f8fafc', fontSize: 18, fontWeight: '600' },
+  emptyFacts: { color: '#94a3b8', fontStyle: 'italic' },
+
   previewContainer: {
     width: '100%',
+    aspectRatio: 4 / 3,
     borderRadius: 16,
     overflow: 'hidden',
     backgroundColor: '#111c2c',
     position: 'relative',
   },
-  previewImage: {
-    ...StyleSheet.absoluteFillObject,
-    resizeMode: 'cover',
-  },
-  heatmapOverlay: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  boundingBox: {
-    position: 'absolute',
-    borderWidth: 2,
-    borderColor: '#38bdf8',
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  boundingLabel: {
-    backgroundColor: 'rgba(56, 189, 248, 0.85)',
-    color: '#0f172a',
-    fontWeight: '700',
-    fontSize: 12,
-    paddingHorizontal: 6,
-    paddingVertical: 4,
-  },
-  overlayControls: {
-    gap: 8,
-  },
-  overlayLabel: {
-    color: '#cbd5f5',
-    fontSize: 12,
-  },
-  overlaySlider: {
-    width: '100%',
-  },
-  predictionCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#111c2c',
-    borderRadius: 12,
-    overflow: 'hidden',
-    backgroundColor: '#111827',
-    position: 'relative',
-  },
+  previewImage: { ...StyleSheet.absoluteFillObject, resizeMode: 'cover' },
+
   boundingBox: {
     position: 'absolute',
     borderWidth: 2,
     borderColor: '#f97316',
     borderStyle: 'solid',
-    justifyContent: 'flex-start',
+    borderRadius: 6,
   },
   boundingLabel: {
-    backgroundColor: 'rgba(249, 115, 22, 0.85)',
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    backgroundColor: 'rgba(249, 115, 22, 0.9)',
     color: '#0f172a',
     fontSize: 12,
-    fontWeight: '600',
-    paddingHorizontal: 4,
+    fontWeight: '700',
+    paddingHorizontal: 6,
     paddingVertical: 2,
   },
-  suggestionCard: {
+
+  opacityRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  overlayLabel: { color: '#cbd5f5', fontSize: 12 },
+  opacityButtons: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  bumpButton: { backgroundColor: '#1f2937', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 },
+  bumpLabel: { color: '#e2e8f0', fontWeight: '700', fontSize: 16 },
+  opacityValue: { color: '#f8fafc', fontVariant: ['tabular-nums'] },
+
+  predictionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     backgroundColor: '#111c2c',
-    borderRadius: 16,
-    padding: 16,
-    gap: 8,
-  },
-  sectionTitle: {
-    color: '#f8fafc',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  emptyText: {
-    color: '#94a3b8',
-  },
-  issueRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  issueName: {
-    color: '#e2e8f0',
-    fontWeight: '600',
-  },
-  issueConfidence: {
-    color: '#38bdf8',
-    fontVariant: ['tabular-nums'],
-  },
-  parameterRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 12,
-  },
-  parameterName: {
-    flex: 2,
-    color: '#f1f5f9',
-  },
-  parameterValue: {
-    flex: 1,
-    textAlign: 'right',
-    color: '#cbd5f5',
-    fontVariant: ['tabular-nums'],
-  },
-  parameterApplied: {
-    flex: 1,
-    textAlign: 'right',
-    color: '#38bdf8',
-    fontVariant: ['tabular-nums'],
-  },
-  exportPrimaryButton: {
-    backgroundColor: '#38bdf8',
     borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
+    padding: 12,
   },
-  exportPrimaryLabel: {
-    color: '#0f172a',
-    fontWeight: '700',
-    fontSize: 16,
-  },
-  exportStatus: {
-    color: '#38bdf8',
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  exportButton: {
-    backgroundColor: '#1f2937',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  exportLabel: {
-    color: '#38bdf8',
-    fontWeight: '600',
-  },
-  exportMessage: {
-    color: '#22c55e',
-    marginTop: 8,
-  },
+  predictionLabel: { color: '#e2e8f0', fontWeight: '600' },
+  predictionConfidence: { color: '#38bdf8', fontVariant: ['tabular-nums'] },
+
+  // Parameters
+  paramRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  paramName: { color: '#f1f5f9' },
+  paramValue: { color: '#cbd5f5', fontVariant: ['tabular-nums'] },
+
+  note: { color: '#94a3b8' },
+
+  // Export diff primary button
+  primaryWide: { backgroundColor: '#38bdf8', borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
+  primaryWideLabel: { color: '#0f172a', fontWeight: '700', fontSize: 16 },
+  exportStatus: { color: '#38bdf8' },
+
+  // Export buttons row
+  buttonRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  exportButton: { backgroundColor: '#1f2937', paddingVertical: 10, paddingHorizontal: 16, borderRadius: 8 },
+  exportLabel: { color: '#38bdf8', fontWeight: '600' },
 });
