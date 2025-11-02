@@ -5,7 +5,7 @@ import json
 import shutil
 import uuid
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, List
+from typing import Dict, List, TYPE_CHECKING
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
@@ -17,7 +17,6 @@ from server.rules import RulesEngine
 
 if TYPE_CHECKING:  # pragma: no cover - hints only
     from server.app.ml.pipeline import DiagnosticPipeline, ImageAnalysisResult
-    from server.models.api import BoundingBox
 
 router = APIRouter(tags=["analyze-image"])
 
@@ -76,29 +75,14 @@ async def analyze_image_route(
         analysis = pipeline.predict_image(temp_path, machine, meta_model.material)
 
         issue_list = _summarise_predictions(analysis)
-        top_issue = analysis.top_issue or (issue_list[0]["id"] if issue_list else None)
+        top_issue = analysis.top_issue
 
         rules_engine = RulesEngine()
-        clamp_summary = rules_engine.clamp_to_machine(
+        applied = rules_engine.clamp_to_machine(
             machine, analysis.parameter_targets, meta_model.experience
         )
-        applied_parameters = clamp_summary.get("parameters", {})
-
-        def _convert_box(box: "BoundingBox") -> Dict[str, object]:
-            data = box.model_dump()
-            return {
-                "issue_id": data.get("issue_id"),
-                "x": data.get("x"),
-                "y": data.get("y"),
-                "w": data.get("width"),
-                "h": data.get("height"),
-                "score": data.get("confidence"),
-            }
-
-        boxes = [_convert_box(box) for box in analysis.boxes]
 
         return {
-            "image_id": image_id,
             "machine": {
                 "id": machine.get("id"),
                 "brand": machine.get("brand"),
@@ -106,14 +90,12 @@ async def analyze_image_route(
             },
             "issue_list": issue_list,
             "top_issue": top_issue,
-            "boxes": boxes,
+            "boxes": [box.model_dump() for box in analysis.boxes],
             "heatmap": analysis.heatmap,
             "parameter_targets": analysis.parameter_targets,
-            "applied": applied_parameters,
+            "applied": applied,
             "recommendations": analysis.recommendations,
             "capability_notes": analysis.capability_notes,
-            "clamp_explanations": clamp_summary.get("explanations", []),
-            "hidden_parameters": clamp_summary.get("hidden_parameters", []),
         }
     except HTTPException:
         raise

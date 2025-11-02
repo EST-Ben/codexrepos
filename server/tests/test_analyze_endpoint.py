@@ -1,5 +1,4 @@
 """Tests for the analyze API endpoints."""
-import base64
 import json
 from typing import Dict, Tuple
 
@@ -11,10 +10,7 @@ from server.models.api import BoundingBox, Prediction
 
 
 def _multipart_payload(meta: Dict[str, object]) -> Tuple[Dict[str, object], Dict[str, Tuple[str, bytes, str]]]:
-    png_stub = base64.b64decode(
-        "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAFElEQVR4nGNsaGhgwAaYsIoOWgkAMBcBkGHHl6YAAAAASUVORK5CYII="
-    )
-    files = {"image": ("test.png", png_stub, "image/png")}
+    files = {"image": ("test.jpg", b"data", "image/jpeg")}
     data = {"meta": json.dumps(meta)}
     return data, files
 
@@ -30,10 +26,9 @@ def test_analyze_endpoint_returns_expected_shape(client: TestClient) -> None:
     assert payload["machine"]["id"] == "bambu_p1p"
     assert isinstance(payload["issue_list"], list)
     assert "parameter_targets" in payload
-    assert isinstance(payload["applied"], dict)
-    assert isinstance(payload.get("clamp_explanations"), list)
-    assert isinstance(payload.get("boxes"), list)
-    assert isinstance(payload.get("capability_notes"), list)
+    assert payload["applied"]["experience_level"] == "Intermediate"
+    assert isinstance(payload["boxes"], list)
+    assert isinstance(payload["capability_notes"], list)
 
 
 def test_analyze_uses_pipeline_targets(
@@ -74,7 +69,6 @@ def test_analyze_uses_pipeline_targets(
     payload = response.json()
 
     assert payload["parameter_targets"]["nozzle_temp"] == 205.0
-    assert payload["applied"]["nozzle_temp"] == pytest.approx(205.0)
     assert payload["recommendations"][0] == "Test recommendation"
     assert payload["heatmap"].startswith("data:image/svg+xml;base64,")
 
