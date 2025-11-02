@@ -194,7 +194,7 @@ export const CameraButton: React.FC<CameraButtonProps> = ({
         onPress={handlePress}
         disabled={disabled}
       >
-        <Text style={styles.label}>{disabled ? 'Uploading…' : label}</Text>
+        <Text style={styles.label}>{disabled ? 'Uploading…' : 'Take Photo'}</Text>
       </Pressable>
       {Platform.OS === 'web' ? (
         <input

@@ -21,9 +21,6 @@ export interface MachineSummary extends MachineRef {
   spindle_rpm_range?: [number, number];
   max_feed_mm_min?: number;
   material_presets?: Record<string, unknown>;
-  motion_system?: string;
-  enclosed?: boolean;
-  supports?: Record<string, unknown>;
 }
 
 export interface ProfileState {
@@ -37,50 +34,83 @@ export interface AnalyzeRequestMeta {
   machine_id: string;
   experience: ExperienceLevel;
   material?: string;
-  base_profile?: Record<string, number | string>;
+  base_profile?: Record<string, number>;
   app_version?: string;
 }
 
-export interface IssueConfidence {
-  id: string;
-  confidence: number;
-}
-
 export interface BoundingBox {
-  issue_id?: string | null;
+  issue_id: string;
+  confidence: number;
   x: number;
   y: number;
-  w: number;
-  h: number;
-  score?: number;
+  width: number;
+  height: number;
 }
 
-export interface AppliedParametersDetails {
-  parameters?: Record<string, number | string>;
-  hidden_parameters?: string[];
-  experience_level?: string;
-  clamped_to_machine_limits?: boolean;
-  explanations?: string[];
+export interface HeatmapPayload {
+  encoding: 'svg';
+  width: number;
+  height: number;
+  data_url: string;
 }
 
-export type AppliedParameters = AppliedParametersDetails | Record<string, number | string>;
+export interface LocalizationPayload {
+  boxes: BoundingBox[];
+  heatmap?: HeatmapPayload | null;
+}
+
+export interface SuggestionChange {
+  param: string;
+  delta?: number | null;
+  unit?: string | null;
+  new_target?: number | null;
+  range_hint?: [number, number] | null;
+}
+
+export interface Suggestion {
+  issue_id: string;
+  changes: SuggestionChange[];
+  why: string;
+  risk: string;
+  confidence: number;
+  beginner_note?: string | null;
+  advanced_note?: string | null;
+  clamped_to_machine_limits?: boolean | null;
+}
+
+export interface AppliedClamp {
+  parameters: Record<string, number>;
+  hidden_parameters: string[];
+  experience_level: ExperienceLevel;
+  clamped_to_machine_limits: boolean;
+  explanations: string[];
+}
 
 export interface AnalyzeResponse {
-  image_id?: string;
-  machine?: Partial<MachineRef> & { id?: string };
-  /** Legacy single-issue fields (kept for backwards compatibility). */
-  issue?: string;
-  confidence?: number;
-  issue_list?: IssueConfidence[];
-  top_issue?: string | null;
-  boxes?: BoundingBox[];
-  heatmap?: string | null;
-  parameter_targets?: Record<string, number | string>;
-  applied?: AppliedParameters;
-  recommendations?: string[];
-  capability_notes?: string[];
-  clamp_explanations?: string[];
-  hidden_parameters?: string[];
+  image_id: string;
+  version: string;
+  machine: { id?: string; brand?: string; model?: string };
+  experience: ExperienceLevel;
+  material?: string;
+  predictions: { issue_id: string; confidence: number }[];
+  explanations: Array<Record<string, unknown>>;
+  localization: LocalizationPayload;
+  capability_notes: string[];
+  recommendations: string[];
+  suggestions: Suggestion[];
+  slicer_profile_diff: {
+    slicer: string;
+    parameters: Record<string, {
+      value?: number;
+      delta?: number;
+      unit?: string;
+      range_hint?: [number, number];
+      clamped?: boolean;
+    }>;
+    markdown?: string;
+  };
+  applied: AppliedClamp;
+  low_confidence: boolean;
 }
 
 export interface AnalysisHistoryRecord {
@@ -88,7 +118,7 @@ export interface AnalysisHistoryRecord {
   machineId: string;
   machine: MachineRef;
   timestamp: number;
-  issues: IssueConfidence[];
+  predictions: AnalyzeResponse['predictions'];
   response: AnalyzeResponse;
   material?: string;
   localUri?: string;
@@ -101,8 +131,8 @@ export type SlicerId = 'cura' | 'prusaslicer' | 'bambu' | 'orca';
 
 export interface ExportDiff {
   slicer: SlicerId;
-  diff: Record<string, number | string>;
-  markdown?: string;
+  diff: Record<string, number | string | boolean>;
+  source_keys: string[];
 }
 
 export interface OnboardingState {

@@ -17,12 +17,12 @@
     },
 
     "android": {
-      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE"],
+      "permissions": ["READ_MEDIA_IMAGES", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "CAMERA"],
       "package": "com.example.diagnostics"
     },
 
     "extra": {
-      "API_URL": "http://localhost:8000",
+      "API_URL": "http://192.168.0.35:8000",
       "eas": { "projectId": "local" }
     }
   }

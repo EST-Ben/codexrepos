@@ -19,7 +19,20 @@ export interface AnalyzeImageRequest {
   mimeType?: string; // optional override (default: "image/jpeg")
 }
 
-export type AnalyzeImageResponse = AnalyzeResponse;
+export interface AnalyzeImageResponse {
+  image_id: string;
+  machine: { id?: string; brand?: string; model?: string };
+  issue_list: Array<{ id: string; confidence: number }>;
+  top_issue?: string | null;
+  boxes?: Array<{ issue_id?: string; x: number; y: number; w: number; h: number; score?: number }>;
+  heatmap?: string | null;
+  parameter_targets: Record<string, number>;
+  applied: Record<string, number>;
+  recommendations: string[];
+  capability_notes: string[];
+  clamp_explanations?: string[];
+  hidden_parameters?: string[];
+}
 
 // Some Android/iOS URIs come without file extension; default a stable name
 function inferName(uri: string, fallback = "print.jpg"): string {
