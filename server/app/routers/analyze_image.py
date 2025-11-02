@@ -5,7 +5,7 @@ import json
 import shutil
 import uuid
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, List, Optional
+from typing import Dict, List, TYPE_CHECKING
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
@@ -34,33 +34,9 @@ def _get_pipeline() -> "DiagnosticPipeline":
 
 def _summarise_predictions(analysis: "ImageAnalysisResult") -> List[Dict[str, object]]:
     return [
-        {"issue_id": prediction.issue_id, "confidence": float(prediction.confidence)}
+        {"id": prediction.issue_id, "confidence": float(prediction.confidence)}
         for prediction in analysis.predictions
     ]
-
-
-def _build_localization(
-    analysis: "ImageAnalysisResult",
-) -> Optional[Dict[str, object]]:
-    payload: Dict[str, object] = {}
-
-    if analysis.boxes:
-        payload["boxes"] = [
-            {
-                "issue_id": box.issue_id,
-                "x": float(box.x),
-                "y": float(box.y),
-                "width": float(box.width),
-                "height": float(box.height),
-                "confidence": float(box.confidence),
-            }
-            for box in analysis.boxes
-        ]
-
-    if analysis.heatmap:
-        payload["heatmap"] = {"data_url": analysis.heatmap}
-
-    return payload or None
 
 
 @router.post("/analyze")
@@ -98,48 +74,29 @@ async def analyze_image_route(
         pipeline = _get_pipeline()
         analysis = pipeline.predict_image(temp_path, machine, meta_model.material)
 
-        predictions = _summarise_predictions(analysis)
+        issue_list = _summarise_predictions(analysis)
+        top_issue = analysis.top_issue
 
         rules_engine = RulesEngine()
-        clamp_summary = rules_engine.clamp_to_machine(
+        applied = rules_engine.clamp_to_machine(
             machine, analysis.parameter_targets, meta_model.experience
         )
-        if isinstance(clamp_summary, dict):
-            applied_parameters = clamp_summary.get("parameters", {})
-            explanations = clamp_summary.get("explanations", [])
-        else:  # pragma: no cover - defensive guard
-            applied_parameters = {}
-            explanations = []
 
-        localization = _build_localization(analysis)
-
-        slicer_diff = {
-            "diff": {key: float(value) for key, value in analysis.parameter_targets.items()}
-        }
-
-        response: Dict[str, object] = {
-            "image_id": image_id,
-            "predictions": predictions,
+        return {
+            "machine": {
+                "id": machine.get("id"),
+                "brand": machine.get("brand"),
+                "model": machine.get("model"),
+            },
+            "issue_list": issue_list,
+            "top_issue": top_issue,
+            "boxes": [box.model_dump() for box in analysis.boxes],
+            "heatmap": analysis.heatmap,
+            "parameter_targets": analysis.parameter_targets,
+            "applied": applied,
             "recommendations": analysis.recommendations,
             "capability_notes": analysis.capability_notes,
-            "slicer_profile_diff": slicer_diff,
-            "explanations": explanations,
-            "applied": {key: float(value) for key, value in applied_parameters.items()},
-            "meta": {
-                "machine": {
-                    "id": machine.get("id"),
-                    "brand": machine.get("brand"),
-                    "model": machine.get("model"),
-                },
-                "experience": meta_model.experience,
-                "material": meta_model.material,
-            },
         }
-
-        if localization:
-            response["localization"] = localization
-
-        return response
     except HTTPException:
         raise
     except Exception as exc:  # pragma: no cover - defensive

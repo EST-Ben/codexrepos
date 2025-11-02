@@ -85,7 +85,7 @@ export const ResultsScreen: React.FC<ResultsProps> = ({ selectedMachines, experi
     if (!analysis) {
       return {} as Record<string, number>;
     }
-    return filterParametersForExperience(coerceNumericParameters(analysis.applied ?? {}), experience);
+    return filterParametersForExperience(analysis.applied, experience);
   }, [analysis, experience]);
 
   const parameterRanges = useMemo(
@@ -170,45 +170,33 @@ export const ResultsScreen: React.FC<ResultsProps> = ({ selectedMachines, experi
               );
             })}
           </View>
-
-          <Text style={styles.title}>Top predictions</Text>
-          {predictions.length ? (
-            predictions.slice(0, 5).map((item) => (
-              <Text key={item.issue_id} style={styles.note}>
-                • {item.issue_id} ({Math.round(item.confidence * 100)}%)
-              </Text>
-            ))
-          ) : (
-            <Text style={styles.note}>No predictions available.</Text>
-          )}
-
+          <Text style={styles.title}>Detected issues</Text>
+          {(analysis.issue_list ?? []).slice(0, 3).map((item) => (
+            <Text key={item.id} style={styles.note}>
+              • {item.id} ({Math.round(item.confidence * 100)}%)
+            </Text>
+          ))}
           <Text style={styles.title}>Recommendations</Text>
-          {analysis.recommendations.length ? (
-            analysis.recommendations.map((note) => (
-              <Text key={note} style={styles.note}>
-                • {note}
-              </Text>
-            ))
-          ) : (
-            <Text style={styles.note}>No recommendations provided.</Text>
-          )}
-
+          {analysis.recommendations.map((note) => (
+            <Text key={note} style={styles.note}>
+              • {note}
+            </Text>
+          ))}
           <Text style={styles.title}>Capability notes</Text>
-          {analysis.capability_notes.length ? (
-            analysis.capability_notes.map((note) => (
-              <Text key={note} style={styles.note}>
-                • {note}
-              </Text>
-            ))
-          ) : (
-            <Text style={styles.note}>No additional capability notes.</Text>
-          )}
-
-          {analysis.slicer_profile_diff?.markdown ? (
-            <View style={styles.diffBox}>
-              <Text style={styles.title}>Profile diff (preview)</Text>
-              <Text style={styles.diffPreview}>{analysis.slicer_profile_diff.markdown.slice(0, 240)}…</Text>
-            </View>
+          {analysis.capability_notes.map((note) => (
+            <Text key={note} style={styles.note}>
+              • {note}
+            </Text>
+          ))}
+          {analysis.clamp_explanations?.length ? (
+            <>
+              <Text style={styles.title}>Clamp explanations</Text>
+              {analysis.clamp_explanations.map((note, index) => (
+                <Text key={`${note}-${index}`} style={styles.note}>
+                  • {note}
+                </Text>
+              ))}
+            </>
           ) : null}
         </ScrollView>
       ) : null}

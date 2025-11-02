@@ -1,7 +1,7 @@
 """Pydantic models shared between the API layers and inference utilities."""
 from __future__ import annotations
 
-from typing import Dict, List, Literal, Optional, Tuple, Union
+from typing import Dict, List, Literal, Optional, Tuple
 
 from pydantic import BaseModel, Field
 
@@ -39,9 +39,10 @@ class BoundingBox(BaseModel):
 class HeatmapPayload(BaseModel):
     """Serializable heatmap overlay rendered on the client."""
 
+    encoding: Literal["svg"] = "svg"
+    width: int = 256
+    height: int = 256
     data_url: str
-    width: Optional[int] = None
-    height: Optional[int] = None
 
 
 class LocalizationPayload(BaseModel):
@@ -74,35 +75,43 @@ class Suggestion(BaseModel):
     clamped_to_machine_limits: Optional[bool] = False
 
 
-class SlicerProfileDiff(BaseModel):
-    """Structured slicer profile diff payload."""
+class AppliedClamp(BaseModel):
+    """Result of clamping rule outputs to machine-safe values."""
 
-    diff: Dict[str, Union[str, float, int, bool]]
-    markdown: Optional[str] = None
+    parameters: Dict[str, float]
+    hidden_parameters: List[str]
+    experience_level: str
+    clamped_to_machine_limits: bool
+    explanations: List[str]
 
 
 class AnalyzeResponse(BaseModel):
     """Primary payload returned from POST /api/analyze."""
 
     image_id: str
-    predictions: List[Prediction] = Field(default_factory=list)
-    recommendations: List[str] = Field(default_factory=list)
+    version: str
+    machine: Dict[str, Optional[str]]
+    experience: str
+    material: Optional[str] = None
+    predictions: List[Prediction]
+    explanations: List[Dict[str, object]]
+    localization: LocalizationPayload
     capability_notes: List[str] = Field(default_factory=list)
-    localization: Optional[LocalizationPayload] = None
-    slicer_profile_diff: Optional[SlicerProfileDiff] = None
-    explanations: List[str] = Field(default_factory=list)
-    applied: Dict[str, Union[str, float, int]] = Field(default_factory=dict)
-    meta: Optional[Dict[str, object]] = None
+    recommendations: List[str] = Field(default_factory=list)
+    suggestions: List[Suggestion]
+    slicer_profile_diff: Dict[str, object]
+    applied: AppliedClamp
+    low_confidence: bool = False
 
 
 __all__ = [
     "AnalyzeRequestMeta",
     "AnalyzeResponse",
+    "AppliedClamp",
     "BoundingBox",
     "HeatmapPayload",
     "LocalizationPayload",
     "Prediction",
-    "SlicerProfileDiff",
     "Suggestion",
     "SuggestionChange",
 ]

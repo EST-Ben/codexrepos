@@ -67,6 +67,7 @@ jest.mock('../components/CameraButton', () => {
               uri: 'file:///stringing.jpg',
               name: 'stringing.jpg',
               type: 'image/jpeg',
+              size: 1024,
               width: 1024,
               height: 768,
             }),

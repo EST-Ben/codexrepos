@@ -8,7 +8,7 @@ jest.mock('@react-native-community/slider', () => {
   const React = require('react');
   const { Text } = require('react-native');
   return ({ minimumValue, maximumValue }: any) =>
-    React.createElement(Text, { testID: 'heatmap-slider' }, `${minimumValue}:${maximumValue}`);
+    React.createElement(Text, { testID: 'adjustment-slider' }, `${minimumValue}:${maximumValue}`);
 });
 
 jest.mock('../api/client', () => ({
@@ -17,24 +17,50 @@ jest.mock('../api/client', () => ({
 
 const response: AnalyzeResponse = {
   image_id: 'img-123',
-  predictions: [
-    { issue_id: 'stringing', confidence: 0.82 },
-    { issue_id: 'under_extrusion', confidence: 0.34 },
-  ],
-  recommendations: ['Reduce print speed by 10%'],
+  version: 'mvp-0.2',
+  machine: { id: 'bambu_p1p', brand: 'Bambu Lab', model: 'P1P' },
+  experience: 'Intermediate',
+  material: 'PLA',
+  predictions: [{ issue_id: 'stringing', confidence: 0.8 }],
+  explanations: [],
+  localization: { boxes: [{ issue_id: 'stringing', confidence: 0.8, x: 0.1, y: 0.1, width: 0.4, height: 0.3 }], heatmap: null },
   capability_notes: ['Supports input shaping'],
-  localization: {
-    heatmap: { data_url: 'data:image/png;base64,AAAA' },
-    boxes: [
-      { issue_id: 'stringing', x: 0.1, y: 0.1, width: 0.5, height: 0.4, confidence: 0.7 },
-    ],
-  },
-  applied: { print_speed: 180, nozzle_temp: 210 },
+  recommendations: ['Reduce speed by 20%'],
+  suggestions: [
+    {
+      issue_id: 'stringing',
+      changes: [
+        {
+          param: 'print_speed',
+          new_target: 260,
+          unit: 'mm/s',
+          delta: -20,
+          range_hint: [40, 300],
+        },
+      ],
+      why: 'Reduce ringing by slowing down moves.',
+      risk: 'medium',
+      confidence: 0.8,
+      clamped_to_machine_limits: false,
+      beginner_note: 'Tighten belts first.',
+      advanced_note: 'Consider input shaping.',
+    },
+  ],
   slicer_profile_diff: {
-    diff: { print_speed: 180 },
-    markdown: '# print_speed: 180',
+    slicer: 'generic',
+    parameters: {
+      print_speed: { value: 260, unit: 'mm/s' },
+    },
+    markdown: '# Diff',
   },
-  meta: { machine_id: 'bambu_p1p' },
+  applied: {
+    parameters: { print_speed: 260 },
+    hidden_parameters: [],
+    experience_level: 'Intermediate',
+    clamped_to_machine_limits: false,
+    explanations: [],
+  },
+  low_confidence: false,
 };
 
 const summary = {
@@ -58,8 +84,7 @@ describe('AnalysisResult', () => {
       />,
     );
 
-    expect(screen.getByText(/stringing/i)).toBeTruthy();
-    expect(screen.getByText(/print_speed/i)).toBeTruthy();
-    expect(screen.getByTestId('heatmap-slider').props.children).toBe('0:1');
+    const sliders = screen.getAllByTestId('adjustment-slider');
+    expect(sliders.some((node) => node.props.children === '40:300')).toBe(true);
   });
 });

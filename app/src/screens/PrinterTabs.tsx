@@ -83,45 +83,32 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
 
   const [activeMachineId, setActiveMachineId] = useState<string | null>(profile.machines[0]?.id ?? null);
   const [search, setSearch] = useState<string>('');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [result, setResult] = useState<AnalyzeResponse | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [previewSize, setPreviewSize] = useState<{ width: number; height: number } | null>(null);
-  const [exporting, setExporting] = useState(false);
-  const [webBusy, setWebBusy] = useState(false);
+  const [lastRequest, setLastRequest] = useState<{
+    machine: MachineRef;
+    material?: string;
+    imageUri?: string;
+    summary?: MachineSummary;
+    image?: { uri: string; width: number; height: number };
+  } | null>(null);
 
-  const pendingImageRef = useRef<{ uri: string; width: number; height: number } | null>(null);
-  const lastResponseIdRef = useRef<string | null>(null);
-
-  const {
-    mutate,
-    isPending,
-    isSuccess,
-    data: analyzeData,
-    reset,
-    progress,
-    queuedCount,
-    retryQueued,
-  } = useAnalyze({
-    onQueueSuccess: useCallback(
-      (item, response) => {
-        const summary = machines.find((machine) => machine.id === item.machine.id);
-        const entry: AnalysisHistoryRecord = {
-          imageId: response.image_id ?? `queued-${Date.now()}`,
-          machineId: item.machine.id,
-          machine: item.machine,
-          timestamp: Date.now(),
-          response,
-          material: item.material,
-          localUri: settings.storeImagesLocallyOnly ? undefined : item.fileUri,
-          summary,
-          predictions: response.predictions,
-        };
-        void onRecordHistory(entry);
-      },
-      [machines, onRecordHistory, settings.storeImagesLocallyOnly],
-    ),
-  });
+  const handleQueueSuccess = useCallback(
+    (item, response: AnalyzeResponse) => {
+      const summary = lookup.get(item.machine.id);
+      const entry: AnalysisHistoryRecord = {
+        imageId: response.image_id,
+        machineId: item.machine.id,
+        machine: item.machine,
+        timestamp: Date.now(),
+        issues: response.issue_list,
+        response,
+        material: item.material,
+        localUri: settings.storeImagesLocallyOnly ? undefined : item.fileUri,
+        summary,
+      };
+      void onRecordHistory(entry);
+    },
+    [lookup, onRecordHistory, settings.storeImagesLocallyOnly],
+  );
 
   const machinesLookup = useMemo(() => new Map(machines.map((item) => [item.id, item])), [machines]);
 
@@ -182,17 +169,28 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
         machineId: machine.id,
         machine,
         timestamp: Date.now(),
-        response,
-        material: options?.material,
-        localUri: settings.storeImagesLocallyOnly ? undefined : options?.image?.uri,
-        summary: options?.summary,
-        predictions: response.predictions,
+        issues: data.issue_list,
+        response: data,
+        material: lastRequest.material,
+        localUri: settings.storeImagesLocallyOnly ? undefined : lastRequest.imageUri,
+        summary: lastRequest.summary ?? machineSummary,
       };
       void onRecordHistory(entry);
-      onShowAnalysis({ machine, response, material: options?.material, summary: options?.summary, image: options?.image });
-    },
-    [onRecordHistory, onShowAnalysis, previewUrl, settings.storeImagesLocallyOnly],
-  );
+      onShowAnalysis({
+        machine: lastRequest.machine,
+        response: data,
+        material: lastRequest.material,
+        summary: lastRequest.summary ?? machineSummary,
+        image: lastRequest.image,
+      });
+      reset();
+      setLastRequest(null);
+    }
+  }, [data, isSuccess, lastRequest, machineSummary, onRecordHistory, onShowAnalysis, reset, settings.storeImagesLocallyOnly]);
+
+  useEffect(() => {
+    void retryQueued();
+  }, [retryQueued]);
 
   useEffect(() => {
     if (!isSuccess || !analyzeData || !activeMachine) {
@@ -284,39 +282,29 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
     if (!result) {
       return;
     }
-    try {
-      setExporting(true);
-      const changes = Object.keys(result.applied ?? {}).length
-        ? (result.applied as Record<string, string | number | boolean>)
-        : result.slicer_profile_diff?.diff ?? {};
-      const diff = await exportProfile({ slicer: 'cura', changes });
-      const markdown = result.slicer_profile_diff?.markdown ?? null;
-      if (Platform.OS === 'web') {
-        const payload = markdown ?? JSON.stringify({ diff: diff.diff }, null, 2);
-        const blob = new Blob([payload], { type: markdown ? 'text/markdown' : 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const anchor = document.createElement('a');
-        anchor.href = url;
-        anchor.download = `slicer-diff-${
-          result.meta?.machine?.id ?? result.image_id ?? 'printer'
-        }.${
-          markdown ? 'md' : 'json'
-        }`;
-        document.body.appendChild(anchor);
-        anchor.click();
-        document.body.removeChild(anchor);
-        URL.revokeObjectURL(url);
-      } else {
-        const message = markdown ?? JSON.stringify(diff.diff, null, 2);
-        await Share.share({ message, title: 'Slicer diff' });
-      }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      setErrorMessage(message);
-    } finally {
-      setExporting(false);
-    }
-  }, [result]);
+    const meta: AnalyzeRequestMeta = {
+      machine_id: activeMachine.id,
+      experience: profile.experience,
+      material: materialValue,
+      app_version: 'app-ai-alpha',
+    };
+    const summary = lookup.get(activeMachine.id);
+    setLastRequest({
+      machine: activeMachine,
+      material: materialValue,
+      imageUri: image.uri,
+      summary,
+      image: { uri: image.uri, width: image.width, height: image.height },
+    });
+    const filePayload: Blob | { uri: string; name: string; type: string } =
+      image.blob ?? { uri: image.uri, name: image.name, type: image.type };
+    mutate({
+      file: filePayload,
+      meta,
+      machine: activeMachine,
+      material: materialValue,
+    });
+  };
 
   const renderMachineFacts = useCallback((summary?: MachineSummary) => {
     if (!summary) {

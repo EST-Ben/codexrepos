@@ -28,6 +28,9 @@ function normalizeMap(raw: unknown): HistoryMap {
         machineId: normalized.machineId,
         machine: normalized.machine as AnalysisHistoryRecord['machine'],
         timestamp: typeof normalized.timestamp === 'number' ? normalized.timestamp : Date.now(),
+        issues: Array.isArray((normalized as any).issues)
+          ? ((normalized as any).issues as AnalysisHistoryRecord['issues'])
+          : [],
         response: normalized.response as AnalysisHistoryRecord['response'],
         material: normalized.material,
         localUri: typeof normalized.localUri === 'string' ? normalized.localUri : undefined,

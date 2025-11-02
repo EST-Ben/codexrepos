@@ -1,6 +1,8 @@
-import React, { useCallback, useRef, useState } from 'react';
-import { Alert, Platform, Pressable, Text } from 'react-native';
+import { Alert, Image, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
+import type { ChangeEvent } from 'react';
 
 export interface PreparedImage {
   uri: string;
@@ -19,15 +21,11 @@ interface CameraButtonProps {
 
 const FALLBACK_NAME = 'photo.jpg';
 
-async function toBlob(uri: string): Promise<Blob | undefined> {
-  try {
-    const response = await fetch(uri);
-    return await response.blob();
-  } catch (error) {
-    console.warn('Failed to fetch image blob', error);
-    return undefined;
-  }
-}
+export const CameraButton: React.FC<CameraButtonProps> = ({ disabled, onImageReady }) => {
+  const [preview, setPreview] = useState<PreparedImage | null>(null);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const webInputRef = useRef<HTMLInputElement | null>(null);
+  const webPreviewUri = useRef<string | null>(null);
 
 export const CameraButton: React.FC<CameraButtonProps> = ({
   disabled,
@@ -69,6 +67,45 @@ export const CameraButton: React.FC<CameraButtonProps> = ({
     [onImageReady],
   );
 
+  const prepareWebFile = useCallback(async (file: File) => {
+    const objectUrl = URL.createObjectURL(file);
+    webPreviewUri.current = objectUrl;
+    let width = 1024;
+    let height = 1024;
+    try {
+      const dims = await new Promise<{ width: number; height: number }>((resolve) => {
+        const img = new window.Image();
+        img.onload = () => resolve({ width: img.width, height: img.height });
+        img.onerror = () => resolve({ width: 1024, height: 1024 });
+        img.src = objectUrl;
+      });
+      width = dims.width;
+      height = dims.height;
+    } catch (err) {
+      console.warn('Failed to read web image dimensions', err);
+    }
+    const prepared: PreparedImage = {
+      blob: file,
+      uri: objectUrl,
+      name: file.name ?? 'upload.jpg',
+      type: file.type || 'image/jpeg',
+      size: file.size,
+      width,
+      height,
+    };
+    setPreview(prepared);
+    setModalVisible(true);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (webPreviewUri.current) {
+        URL.revokeObjectURL(webPreviewUri.current);
+        webPreviewUri.current = null;
+      }
+    };
+  }, []);
+
   const launchCamera = useCallback(async () => {
     setBusy(true);
     try {
@@ -107,8 +144,41 @@ export const CameraButton: React.FC<CameraButtonProps> = ({
       webInputRef.current?.click();
       return;
     }
-    void launchCamera();
-  }, [busy, disabled, launchCamera]);
+  }, [prepareImage]);
+
+  const handlePress = useCallback(() => {
+    if (Platform.OS === 'web') {
+      webInputRef.current?.click();
+      return;
+    }
+    Alert.alert('Add a photo', 'Choose how you want to provide a photo of your print.', [
+      { text: 'Take Photo', onPress: launchCamera },
+      { text: 'Upload from Library', onPress: launchPicker },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
+  }, [launchCamera, launchPicker]);
+
+  const handleFileChange = useCallback(
+    async (event: ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      event.target.value = '';
+      if (!file) {
+        return;
+      }
+      await prepareWebFile(file);
+    },
+    [prepareWebFile],
+  );
+
+  const clearPreview = useCallback((preserveUri: boolean = false) => {
+    if (!preserveUri && Platform.OS === 'web' && webPreviewUri.current) {
+      URL.revokeObjectURL(webPreviewUri.current);
+      webPreviewUri.current = null;
+    }
+    setPreview(null);
+  }, []);
+
+  const confirmDisabled = useMemo(() => !preview, [preview]);
 
   return (
     <>
@@ -123,18 +193,55 @@ export const CameraButton: React.FC<CameraButtonProps> = ({
           alignItems: 'center',
         }}
       >
-        <Text style={{ color: '#fff', fontWeight: '600' }}>{busy ? 'Opening…' : label}</Text>
+        <Text style={styles.label}>{disabled ? 'Uploading…' : 'Take Photo'}</Text>
       </Pressable>
       {Platform.OS === 'web' ? (
         <input
           ref={webInputRef}
           type="file"
           accept="image/*"
-          capture="environment"
-          onChange={handleWebChange}
           style={{ display: 'none' }}
+          onChange={handleFileChange}
         />
       ) : null}
+      <Modal visible={modalVisible} animationType="slide" transparent>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalContent}>
+            {preview && (
+              <>
+                <Image source={{ uri: preview.uri }} style={styles.preview} />
+                <Text style={styles.modalTitle}>Ready to analyze?</Text>
+                <Text style={styles.modalDetail}>Resolution: {preview.width}×{preview.height}</Text>
+                <Text style={styles.modalDetail}>File size: {formatSize(preview.size)}</Text>
+              </>
+            )}
+            <View style={styles.modalActions}>
+              <Pressable
+                style={[styles.modalButton, styles.modalCancel]}
+                onPress={() => {
+                  setModalVisible(false);
+                  clearPreview();
+                }}
+              >
+                <Text style={styles.modalCancelLabel}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.modalButton, confirmDisabled && styles.modalButtonDisabled]}
+                disabled={confirmDisabled}
+                onPress={() => {
+                  if (preview) {
+                    onImageReady(preview);
+                  }
+                  setModalVisible(false);
+                  clearPreview(true);
+                }}
+              >
+                <Text style={styles.modalConfirmLabel}>Send</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </>
   );
 };

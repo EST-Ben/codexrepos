@@ -28,8 +28,6 @@ from server import settings
 from server.machines import MachineProfile
 from server.models.api import BoundingBox, Prediction as ApiPrediction
 
-Prediction = ApiPrediction
-
 # ---------------------------------------------------------------------------
 # Model metadata
 # ---------------------------------------------------------------------------
@@ -684,38 +682,8 @@ class DiagnosticPipeline:
         return float(fallback)
 
 
-_PIPELINE_SINGLETON: "DiagnosticPipeline" | None = None
-
-
-def _get_pipeline_singleton() -> DiagnosticPipeline:
-    global _PIPELINE_SINGLETON
-    if _PIPELINE_SINGLETON is None:
-        _PIPELINE_SINGLETON = DiagnosticPipeline()
-    return _PIPELINE_SINGLETON
-
-
-def predict_json(payload: Mapping[str, object], machine: MachineProfile) -> SingleIssueResult:
-    """Convenience wrapper that reuses a shared pipeline instance."""
-
-    pipeline = _get_pipeline_singleton()
-    return pipeline.predict(payload, machine)
-
-
-def predict_image(
-    image_path: Path | str, machine: MachineProfile, material: str | None = None
-) -> ImageAnalysisResult:
-    """Run image-based diagnostics using a shared pipeline instance."""
-
-    pipeline = _get_pipeline_singleton()
-    path = Path(image_path)
-    return pipeline.predict_image(path, machine, material)
-
-
 __all__ = [
     "DiagnosticPipeline",
     "ImageAnalysisResult",
     "SingleIssueResult",
-    "Prediction",
-    "predict_image",
-    "predict_json",
 ]

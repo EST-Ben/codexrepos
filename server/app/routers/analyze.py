@@ -110,32 +110,31 @@ def analyze_json(payload: AnalyzeRequest):
         machine, prediction.parameter_targets, payload.experience
     )
 
-    if isinstance(clamp_summary, dict):
-        applied_parameters = clamp_summary.get("parameters", {})
-        explanations = clamp_summary.get("explanations", [])
-    else:  # pragma: no cover - defensive
-        applied_parameters = {}
-        explanations = []
+    applied_parameters = (
+        clamp_summary.get("parameters", {}) if isinstance(clamp_summary, dict) else clamp_summary
+    )
+    clamp_explanations = (
+        clamp_summary.get("explanations", []) if isinstance(clamp_summary, dict) else []
+    )
+    hidden_parameters = (
+        clamp_summary.get("hidden_parameters", []) if isinstance(clamp_summary, dict) else []
+    )
 
     return {
         "image_id": f"json-{uuid.uuid4().hex}",
-        "predictions": [
-            {"issue_id": prediction.issue, "confidence": float(prediction.confidence)}
-        ],
+        "machine": {
+            "id": machine.get("id"),
+            "brand": machine.get("brand"),
+            "model": machine.get("model"),
+        },
+        "issue_list": [{"id": prediction.issue, "confidence": prediction.confidence}],
+        "top_issue": prediction.issue,
+        "boxes": [],
+        "heatmap": None,
+        "parameter_targets": prediction.parameter_targets,
+        "applied": applied_parameters,
         "recommendations": prediction.recommendations,
         "capability_notes": getattr(prediction, "capability_notes", []),
-        "slicer_profile_diff": {
-            "diff": {key: float(value) for key, value in prediction.parameter_targets.items()}
-        },
-        "applied": {key: float(value) for key, value in applied_parameters.items()},
-        "explanations": explanations,
-        "meta": {
-            "machine": {
-                "id": machine.get("id"),
-                "brand": machine.get("brand"),
-                "model": machine.get("model"),
-            },
-            "experience": payload.experience,
-            "material": payload.material,
-        },
+        "clamp_explanations": clamp_explanations,
+        "hidden_parameters": hidden_parameters,
     }
