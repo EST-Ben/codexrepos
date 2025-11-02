@@ -26,7 +26,7 @@ function normalizeMap(raw: unknown): HistoryMap {
       entries.push({
         imageId: normalized.imageId,
         machineId: normalized.machineId,
-        machine: normalized.machine,
+        machine: normalized.machine as AnalysisHistoryRecord['machine'],
         timestamp: typeof normalized.timestamp === 'number' ? normalized.timestamp : Date.now(),
         issues: Array.isArray((normalized as any).issues)
           ? ((normalized as any).issues as AnalysisHistoryRecord['issues'])
@@ -35,6 +35,9 @@ function normalizeMap(raw: unknown): HistoryMap {
         material: normalized.material,
         localUri: typeof normalized.localUri === 'string' ? normalized.localUri : undefined,
         summary: normalized.summary,
+        predictions: Array.isArray((normalized as any).predictions)
+          ? ((normalized as any).predictions as AnalysisHistoryRecord['predictions'])
+          : undefined,
       });
     }
     if (entries.length) {

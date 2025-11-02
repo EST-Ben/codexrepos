@@ -34,8 +34,7 @@ export function filterMachines(machines: MachineSummary[], query: string): Machi
   }
   const lower = query.trim().toLowerCase();
   return machines.filter((machine) => {
-    const brandModel = `${machine.brand ?? ''} ${machine.model ?? ''}`.toLowerCase();
-    const aliasHit = (machine.aliases ?? []).some((alias) => alias.toLowerCase().includes(lower));
-    return brandModel.includes(lower) || aliasHit || machine.id.toLowerCase().includes(lower);
+    const brandModel = `${machine.brand} ${machine.model}`.toLowerCase();
+    return brandModel.includes(lower) || machine.id.toLowerCase().includes(lower);
   });
 }

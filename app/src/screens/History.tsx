@@ -1,11 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import type { AnalysisHistoryRecord, HistoryMap, MachineRef } from '../types';
 
@@ -56,9 +50,7 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
 }) => {
   const machineIds = useMemo(() => {
     const ids = new Set<string>();
-    for (const key of Object.keys(history)) {
-      ids.add(key);
-    }
+    Object.keys(history).forEach((id) => ids.add(id));
     machines.forEach((machine) => ids.add(machine.id));
     return Array.from(ids);
   }, [history, machines]);
@@ -109,11 +101,11 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
       ) : null}
 
       <View style={styles.details}>
-        {activeMachine && (
+        {activeMachine ? (
           <Text style={styles.machineHeading}>
             {activeMachine.brand} {activeMachine.model}
           </Text>
-        )}
+        ) : null}
         {entries.length === 0 ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyTitle}>No analyses yet.</Text>
@@ -200,13 +192,12 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     backgroundColor: '#111c2c',
+    padding: 20,
     borderRadius: 12,
-    padding: 24,
     gap: 8,
-    marginTop: 24,
   },
   emptyTitle: {
-    color: '#f8fafc',
+    color: '#e2e8f0',
     fontSize: 18,
     fontWeight: '600',
   },
@@ -221,12 +212,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    gap: 8,
+    gap: 6,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
   },
   cardTitle: {
     color: '#f8fafc',
@@ -234,15 +224,14 @@ const styles = StyleSheet.create({
   },
   cardMeta: {
     color: '#94a3b8',
-    fontSize: 12,
   },
   cardSummary: {
-    color: '#e2e8f0',
-    fontSize: 14,
-    lineHeight: 20,
+    color: '#cbd5f5',
   },
   cardFooter: {
     color: '#64748b',
     fontSize: 12,
   },
 });
+
+export default HistoryScreen;

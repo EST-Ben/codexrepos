@@ -39,11 +39,26 @@ export interface Suggestion {
 }
 
 export interface AnalyzeResponse {
-  predictions: Prediction[];
-  explanations: { issue_id: string; cues: string[] }[];
-  suggestions: Suggestion[];
-  slicer_profile_diff: Record<string, any>;
   image_id: string;
-  version: string;
-  low_confidence?: boolean;
+  predictions: Prediction[];
+  recommendations: string[];
+  capability_notes: string[];
+  localization?: {
+    heatmap?: { data_url: string };
+    boxes?: Array<{
+      issue_id: string;
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      confidence: number;
+    }>;
+  };
+  slicer_profile_diff?: {
+    diff: Record<string, string | number | boolean>;
+    markdown?: string;
+  };
+  explanations?: string[];
+  applied?: Record<string, string | number>;
+  meta?: Record<string, unknown>;
 }

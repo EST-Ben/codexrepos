@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 
 import { analyzeMachine, exportProfile } from '../api/client';
+import { useMachineRegistry } from '../hooks/useMachineRegistry';
 import { filterParametersForExperience, deriveParameterRanges } from '../state/onboarding';
-import type { AnalyzeResponse, ExperienceLevel } from '../types';
+import type { AnalyzeResponse, ExperienceLevel, MachineRef, MachineSummary } from '../types';
 
 interface ResultsProps {
   selectedMachines: string[];
@@ -19,24 +20,49 @@ const SLICERS = [
   { id: 'orca', label: 'Copy for OrcaSlicer' },
 ] as const;
 
+function coerceNumericParameters(values: Record<string, string | number | boolean | undefined>): Record<string, number> {
+  const result: Record<string, number> = {};
+  for (const [key, value] of Object.entries(values)) {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      result[key] = value;
+    }
+  }
+  return result;
+}
+
+function buildMachineRef(id: string, summaries: MachineSummary[]): MachineRef {
+  const summary = summaries.find((item) => item.id === id);
+  if (summary) {
+    return { id: summary.id, brand: summary.brand, model: summary.model };
+  }
+  return { id, brand: id, model: id };
+}
+
 export const ResultsScreen: React.FC<ResultsProps> = ({ selectedMachines, experience, onReset }) => {
-  const [activeMachine, setActiveMachine] = useState<string | null>(selectedMachines[0] ?? null);
+  const { machines, loading: machinesLoading, error: machinesError, refresh } = useMachineRegistry();
+  const [activeMachineId, setActiveMachineId] = useState<string | null>(selectedMachines[0] ?? null);
   const [analysis, setAnalysis] = useState<AnalyzeResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
 
+  const selectedSummaries = useMemo(
+    () => machines.filter((machine) => selectedMachines.includes(machine.id)),
+    [machines, selectedMachines],
+  );
+
   useEffect(() => {
-    if (!activeMachine) {
+    if (!activeMachineId) {
       setAnalysis(null);
       return;
     }
+    const machineRef = buildMachineRef(activeMachineId, selectedSummaries.length ? selectedSummaries : machines);
     const run = async () => {
       setLoading(true);
       setError(null);
       try {
         const result = await analyzeMachine({
-          machine: activeMachine,
+          machine: machineRef,
           experience,
           material: 'PLA',
           issues: [],
@@ -49,10 +75,10 @@ export const ResultsScreen: React.FC<ResultsProps> = ({ selectedMachines, experi
       }
     };
     run();
-  }, [activeMachine, experience]);
+  }, [activeMachineId, experience, machines, selectedSummaries]);
 
   useEffect(() => {
-    setActiveMachine(selectedMachines[0] ?? null);
+    setActiveMachineId(selectedMachines[0] ?? null);
   }, [selectedMachines]);
 
   const filteredParameters = useMemo(() => {
@@ -71,12 +97,13 @@ export const ResultsScreen: React.FC<ResultsProps> = ({ selectedMachines, experi
     if (!analysis) {
       return;
     }
-    const diff = await exportProfile({
-      slicer,
-      changes: filteredParameters,
-    });
-    await Clipboard.setStringAsync(JSON.stringify(diff, null, 2));
-    setCopied(diff.slicer);
+  const diff = await exportProfile({
+    slicer,
+    changes: analysis.slicer_profile_diff?.diff ?? analysis.applied ?? {},
+  });
+    const payload = analysis.slicer_profile_diff?.markdown ?? JSON.stringify(diff, null, 2);
+    await Clipboard.setStringAsync(payload);
+    setCopied(slicer);
     setTimeout(() => setCopied(null), 2500);
   };
 
@@ -91,16 +118,18 @@ export const ResultsScreen: React.FC<ResultsProps> = ({ selectedMachines, experi
     );
   }
 
+  const predictions = analysis?.predictions ?? [];
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.badgeRow}>
           {selectedMachines.map((id) => {
-            const active = id === activeMachine;
+            const active = id === activeMachineId;
             return (
               <Pressable
                 key={id}
-                onPress={() => setActiveMachine(id)}
+                onPress={() => setActiveMachineId(id)}
                 style={[styles.badge, active && styles.badgeActive]}
               >
                 <Text style={[styles.badgeLabel, active && styles.badgeLabelActive]}>{id}</Text>
@@ -113,10 +142,15 @@ export const ResultsScreen: React.FC<ResultsProps> = ({ selectedMachines, experi
         </Pressable>
       </View>
 
-      {loading && <ActivityIndicator style={styles.loader} />}
+      {machinesLoading && <ActivityIndicator style={styles.loader} />}
+      {machinesError ? (
+        <Pressable onPress={refresh} style={styles.errorBox}>
+          <Text style={styles.errorText}>Failed to load machine data: {machinesError}. Tap to retry.</Text>
+        </Pressable>
+      ) : null}
       {error && <Text style={styles.error}>{error}</Text>}
 
-      {analysis && !loading && (
+      {analysis && !loading ? (
         <ScrollView style={styles.scroll}>
           <Text style={styles.title}>Recommended parameters</Text>
           <Text style={styles.subtitle}>Experience mode: {experience}</Text>
@@ -165,7 +199,9 @@ export const ResultsScreen: React.FC<ResultsProps> = ({ selectedMachines, experi
             </>
           ) : null}
         </ScrollView>
-      )}
+      ) : null}
+
+      {loading && <ActivityIndicator style={styles.loader} />}
 
       <View style={styles.exportRow}>
         {SLICERS.map((item) => (
@@ -226,6 +262,14 @@ const styles = StyleSheet.create({
   loader: {
     marginTop: 12,
   },
+  errorBox: {
+    backgroundColor: '#7f1d1d',
+    padding: 12,
+    borderRadius: 8,
+  },
+  errorText: {
+    color: '#fecaca',
+  },
   error: {
     color: '#fca5a5',
   },
@@ -266,6 +310,17 @@ const styles = StyleSheet.create({
   note: {
     color: '#cbd5f5',
     marginBottom: 4,
+  },
+  diffBox: {
+    marginTop: 16,
+    backgroundColor: '#1f2937',
+    borderRadius: 8,
+    padding: 12,
+    gap: 8,
+  },
+  diffPreview: {
+    color: '#cbd5f5',
+    fontFamily: Platform.select({ web: 'monospace', default: 'Courier' }),
   },
   exportRow: {
     flexDirection: 'row',
@@ -311,3 +366,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
+export default ResultsScreen;

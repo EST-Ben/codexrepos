@@ -1,9 +1,5 @@
-// app/src/api/analyzeImage.ts
-// Sends an image to FastAPI POST /api/analyze (multipart/form-data)
-
-import Constants from "expo-constants";
-
 import { getApiRoot } from "./client";
+import type { AnalyzeResponse } from "../types";
 
 export type Experience = "Beginner" | "Intermediate" | "Advanced";
 
@@ -73,15 +69,14 @@ export async function analyzeImage(
 
   const res = await fetch(`${API_BASE}/analyze`, {
     method: "POST",
-    // Do NOT set Content-Type; fetch sets correct boundary for FormData
     headers: { Accept: "application/json" },
-    body: form,
+    body: formData,
   });
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`Analyze image failed (${res.status}): ${text || res.statusText}`);
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(text || `Analyze image failed with status ${response.status}`);
   }
 
-  return (await res.json()) as AnalyzeImageResponse;
+  return (await response.json()) as AnalyzeResponse;
 }

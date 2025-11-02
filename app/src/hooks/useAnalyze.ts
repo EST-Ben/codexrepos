@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert } from 'react-native';
 
 import { analyze } from '../api/client';
-import type { AnalyzeRequestMeta, AnalyzeResponse } from '../types';
+import type { AnalyzeRequestMeta, AnalyzeResponse, MachineRef } from '../types';
 import {
   enqueueAnalysis,
   listQueuedAnalyses,
@@ -14,7 +14,7 @@ import {
 interface AnalyzeVariables {
   file: Blob | { uri: string; name: string; type: string };
   meta: AnalyzeRequestMeta;
-  machine?: { id: string; brand: string; model: string };
+  machine?: MachineRef;
   material?: string;
 }
 
@@ -112,7 +112,10 @@ export function useAnalyze(options?: UseAnalyzeOptions) {
 
   return {
     mutate: mutateWithProgress,
-    ...mutation,
+    isPending: mutation.isPending,
+    isSuccess: mutation.isSuccess,
+    data: mutation.data,
+    reset: mutation.reset,
     progress,
     queuedCount: queued.length,
     retryQueued: processQueue,

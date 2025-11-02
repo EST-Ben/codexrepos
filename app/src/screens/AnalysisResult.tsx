@@ -60,8 +60,24 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
   onRetake,
   image,
 }) => {
-  const [adjustments, setAdjustments] = useState<Record<string, AdjustmentValue>>(() =>
-    initialiseAdjustments(response.suggestions),
+  const [overlayOpacity, setOverlayOpacity] = useState<number>(0.65);
+  const [exportMessage, setExportMessage] = useState<string | null>(null);
+
+  const predictions = useMemo(() => response.predictions ?? [], [response.predictions]);
+  const topPrediction = predictions[0];
+  const heatmapUri = response.localization?.heatmap?.data_url ?? null;
+  const boxes = response.localization?.boxes ?? [];
+  const appliedEntries = useMemo(
+    () => Object.entries(response.applied ?? {}) as Array<[string, string | number]>,
+    [response.applied],
+  );
+  const diffEntries = useMemo(
+    () =>
+      Object.entries(response.slicer_profile_diff?.diff ?? {}) as Array<[
+        string,
+        string | number | boolean,
+      ]>,
+    [response.slicer_profile_diff?.diff],
   );
   const [copied, setCopied] = useState<SlicerId | null>(null);
   const [exportMessage, setExportMessage] = useState<string | null>(null);
@@ -141,12 +157,16 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
     };
   }, [image?.uri]);
 
-  const handleExport = async (slicer: SlicerId) => {
-    const diff = await exportProfile({ slicer, changes: aggregatedChanges });
-    await Clipboard.setStringAsync(JSON.stringify(diff.diff, null, 2));
-    setCopied(slicer);
-    setTimeout(() => setCopied(null), 2500);
-  };
+  const handleExport = useCallback(
+    async (slicer: SlicerId) => {
+      try {
+        const changes = Object.keys(response.applied ?? {}).length
+          ? (response.applied as Record<string, string | number | boolean>)
+          : response.slicer_profile_diff?.diff ?? {};
+        const diff = await exportProfile({ slicer, changes });
+        const baseName = `${machine.id}-${slicer}-profile`;
+        const markdown = response.slicer_profile_diff?.markdown ?? null;
+        const jsonPayload = JSON.stringify(diff, null, 2);
 
   const renderSuggestion = (suggestion: Suggestion) => (
     <View key={suggestion.issue_id} style={styles.suggestionCard}>
@@ -563,9 +583,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingVertical: 2,
   },
-  suggestionCard: {
-    backgroundColor: '#111c2c',
-    borderRadius: 16,
+  section: {
+    backgroundColor: '#111827',
+    borderRadius: 12,
     padding: 16,
     gap: 8,
   },
@@ -646,3 +666,5 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
 });
+
+export default AnalysisResult;

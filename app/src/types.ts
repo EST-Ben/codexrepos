@@ -1,4 +1,4 @@
-export type ExperienceLevel = 'Beginner' | 'Intermediate' | 'Advanced';
+export type ExperienceLevel = "Beginner" | "Intermediate" | "Advanced";
 
 export interface MachineRef {
   id: string;
@@ -132,7 +132,7 @@ export type SlicerId = 'cura' | 'prusaslicer' | 'bambu' | 'orca';
 export interface ExportDiff {
   slicer: SlicerId;
   diff: Record<string, number | string | boolean>;
-  source_keys: string[];
+  markdown?: string;
 }
 
 export interface OnboardingState {
