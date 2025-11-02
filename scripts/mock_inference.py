@@ -72,20 +72,37 @@ def main() -> None:
     prediction = pipeline.predict(payload, machine)
 
     engine = RulesEngine()
-    applied = engine.clamp_to_machine(machine, prediction.parameter_targets, args.experience)
+    applied_summary = engine.clamp_to_machine(
+        machine, prediction.parameter_targets, args.experience
+    )
+
+    if isinstance(applied_summary, dict):
+        applied_parameters = applied_summary.get("parameters", {})
+        explanations = applied_summary.get("explanations", [])
+    else:  # pragma: no cover - defensive
+        applied_parameters = {}
+        explanations = []
 
     output = {
-        "machine": {
-            "id": machine.get("id"),
-            "brand": machine.get("brand"),
-            "model": machine.get("model"),
+        "meta": {
+            "machine": {
+                "id": machine.get("id"),
+                "brand": machine.get("brand"),
+                "model": machine.get("model"),
+            },
+            "experience": args.experience,
+            "material": args.material,
         },
-        "issue": prediction.issue,
-        "confidence": prediction.confidence,
+        "predictions": [
+            {"issue_id": prediction.issue, "confidence": float(prediction.confidence)}
+        ],
         "recommendations": prediction.recommendations,
-        "parameter_targets": prediction.parameter_targets,
-        "applied": applied,
         "capability_notes": prediction.capability_notes,
+        "slicer_profile_diff": {
+            "diff": {key: float(value) for key, value in prediction.parameter_targets.items()}
+        },
+        "applied": {key: float(value) for key, value in applied_parameters.items()},
+        "explanations": explanations,
     }
 
     print(json.dumps(output, indent=2, sort_keys=True))

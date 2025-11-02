@@ -126,10 +126,31 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
   onRetake,
   image,
 }) => {
+<<<<<<< HEAD
   // Derived fields
   const predictions = useMemo(
     () => (response.predictions ?? response.issue_list ?? []),
     [response.predictions, (response as any).issue_list]
+=======
+  const [overlayOpacity, setOverlayOpacity] = useState<number>(0.65);
+  const [exportMessage, setExportMessage] = useState<string | null>(null);
+
+  const predictions = useMemo(() => response.predictions ?? [], [response.predictions]);
+  const topPrediction = predictions[0];
+  const heatmapUri = response.localization?.heatmap?.data_url ?? null;
+  const boxes = response.localization?.boxes ?? [];
+  const appliedEntries = useMemo(
+    () => Object.entries(response.applied ?? {}) as Array<[string, string | number]>,
+    [response.applied],
+  );
+  const diffEntries = useMemo(
+    () =>
+      Object.entries(response.slicer_profile_diff?.diff ?? {}) as Array<[
+        string,
+        string | number | boolean,
+      ]>,
+    [response.slicer_profile_diff?.diff],
+>>>>>>> dc18027a43493057f17ef6cef96318a53002a2f1
   );
   const topIssue =
     response.top_issue ??
@@ -222,7 +243,139 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
     } catch (e) {
       Alert.alert('Export failed', String(e));
     }
+<<<<<<< HEAD
   }, [aggregatedChanges]);
+=======
+    const timer = setTimeout(() => setExportMessage(null), 2500);
+    return () => clearTimeout(timer);
+  }, [exportMessage]);
+
+  useEffect(() => {
+    if (Platform.OS !== 'web' || !image?.uri || !image.uri.startsWith('blob:')) {
+      return;
+    }
+    return () => {
+      URL.revokeObjectURL(image.uri);
+    };
+  }, [image?.uri]);
+
+  const handleExport = useCallback(
+    async (slicer: SlicerId) => {
+      try {
+        const changes = Object.keys(response.applied ?? {}).length
+          ? (response.applied as Record<string, string | number | boolean>)
+          : response.slicer_profile_diff?.diff ?? {};
+        const diff = await exportProfile({ slicer, changes });
+        const baseName = `${machine.id}-${slicer}-profile`;
+        const markdown = response.slicer_profile_diff?.markdown ?? null;
+        const jsonPayload = JSON.stringify(diff, null, 2);
+
+  const renderSuggestion = (suggestion: Suggestion) => (
+    <View key={suggestion.issue_id} style={styles.suggestionCard}>
+      <Text style={styles.suggestionTitle}>Fix {suggestion.issue_id}</Text>
+      <Text style={styles.suggestionWhy}>{suggestion.why}</Text>
+      <View style={styles.changesList}>
+        {suggestion.changes.map((change) => {
+          const key = `${suggestion.issue_id}:${change.param}`;
+          const state = adjustments[key];
+          const bounds = change.range_hint
+            ? { min: change.range_hint[0], max: change.range_hint[1] }
+            : deriveBounds(change.param, machineSummary);
+          const unit = change.unit ? ` ${change.unit}` : '';
+          return (
+            <View key={key} style={styles.changeRow}>
+              <Text style={styles.changeLabel}>{change.param}</Text>
+              <View style={styles.sliderRow}>
+                <Pressable
+                  accessibilityHint="Decrease value"
+                  onPress={() =>
+                    setAdjustments((prev) => ({
+                      ...prev,
+                      [key]: {
+                        ...state,
+                        value: Math.max(bounds.min, state.value - Math.max(1, (bounds.max - bounds.min) / 20)),
+                      },
+                    }))
+                  }
+                  style={styles.bumpButton}
+                >
+                  <Text style={styles.bumpLabel}>-</Text>
+                </Pressable>
+                <Slider
+                  style={styles.slider}
+                  minimumValue={bounds.min}
+                  maximumValue={bounds.max}
+                  value={state?.value ?? bounds.min}
+                  minimumTrackTintColor="#38bdf8"
+                  maximumTrackTintColor="#1f2937"
+                  thumbTintColor="#38bdf8"
+                  step={Math.max((bounds.max - bounds.min) / 100, 0.1)}
+                  onValueChange={(value) =>
+                    setAdjustments((prev) => ({
+                      ...prev,
+                      [key]: {
+                        ...state,
+                        value,
+                      },
+                    }))
+                  }
+                />
+                <Pressable
+                  accessibilityHint="Increase value"
+                  onPress={() =>
+                    setAdjustments((prev) => ({
+                      ...prev,
+                      [key]: {
+                        ...state,
+                        value: Math.min(bounds.max, state.value + Math.max(1, (bounds.max - bounds.min) / 20)),
+                      },
+                    }))
+                  }
+                  style={styles.bumpButton}
+                >
+                  <Text style={styles.bumpLabel}>+</Text>
+                </Pressable>
+              </View>
+              <View style={styles.valueDisplay}>
+                <Text style={styles.valueText}>{state?.value.toFixed(2)}{unit}</Text>
+                <Text style={styles.rangeText}>
+                  Range {bounds.min.toFixed(1)} – {bounds.max.toFixed(1)}{unit}
+                </Text>
+              </View>
+              {state?.type === 'delta' && change.delta !== undefined && (
+                <Text style={styles.deltaNote}>Recommended change: {change.delta > 0 ? '+' : ''}{change.delta}{unit}</Text>
+              )}
+            </View>
+          );
+        })}
+      </View>
+      <Text style={styles.riskLabel}>Risk: {suggestion.risk}</Text>
+      <Text style={styles.confidenceLabel}>Confidence: {(suggestion.confidence * 100).toFixed(0)}%</Text>
+      {suggestion.clamped_to_machine_limits && (
+        <Text style={styles.clampedNote}>Some values were clamped to your machine limits.</Text>
+      )}
+      {suggestion.beginner_note && (
+        <Text style={styles.note}>Beginner tip: {suggestion.beginner_note}</Text>
+      )}
+      {suggestion.advanced_note && (
+        <Text style={styles.note}>Advanced tip: {suggestion.advanced_note}</Text>
+      )}
+    </View>
+  );
+
+  useEffect(() => {
+    if (!exportMessage) {
+      return;
+    }
+    const timer = setTimeout(() => setExportMessage(null), 2600);
+    return () => clearTimeout(timer);
+  }, [exportMessage]);
+
+  const topIssue = response.top_issue ?? sortedIssues[0]?.id ?? 'general_tuning';
+  const boxes = response.boxes ?? [];
+  const clampNotes = response.clamp_explanations ?? [];
+  const hiddenParameters = response.hidden_parameters ?? [];
+>>>>>>> dc18027a43493057f17ef6cef96318a53002a2f1
 
   return (
     <View style={styles.container}>
@@ -454,6 +607,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
   },
+<<<<<<< HEAD
 
   opacityRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   overlayLabel: { color: '#cbd5f5', fontSize: 12 },
@@ -466,6 +620,59 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     backgroundColor: '#111c2c',
+=======
+  section: {
+    backgroundColor: '#111827',
+    borderRadius: 12,
+    padding: 16,
+    gap: 8,
+  },
+  sectionTitle: {
+    color: '#f8fafc',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  emptyText: {
+    color: '#94a3b8',
+  },
+  issueRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  issueName: {
+    color: '#e2e8f0',
+    fontWeight: '600',
+  },
+  issueConfidence: {
+    color: '#38bdf8',
+    fontVariant: ['tabular-nums'],
+  },
+  parameterRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 12,
+  },
+  parameterName: {
+    flex: 2,
+    color: '#f1f5f9',
+  },
+  parameterValue: {
+    flex: 1,
+    textAlign: 'right',
+    color: '#cbd5f5',
+    fontVariant: ['tabular-nums'],
+  },
+  parameterApplied: {
+    flex: 1,
+    textAlign: 'right',
+    color: '#38bdf8',
+    fontVariant: ['tabular-nums'],
+  },
+  exportPrimaryButton: {
+    backgroundColor: '#38bdf8',
+>>>>>>> dc18027a43493057f17ef6cef96318a53002a2f1
     borderRadius: 12,
     padding: 12,
   },
@@ -489,3 +696,5 @@ const styles = StyleSheet.create({
   exportButton: { backgroundColor: '#1f2937', paddingVertical: 10, paddingHorizontal: 16, borderRadius: 8 },
   exportLabel: { color: '#38bdf8', fontWeight: '600' },
 });
+
+export default AnalysisResult;
