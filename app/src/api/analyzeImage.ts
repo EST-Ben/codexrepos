@@ -3,9 +3,10 @@
 
 import Constants from "expo-constants";
 
+import type { AnalyzeRequestMeta, AnalyzeResponse, ExperienceLevel } from "../types";
 import { getApiRoot } from "./client";
 
-export type Experience = "Beginner" | "Intermediate" | "Advanced";
+export type Experience = ExperienceLevel;
 
 export interface AnalyzeImageRequest {
   uri: string; // file://... (from ImagePicker)
@@ -18,19 +19,7 @@ export interface AnalyzeImageRequest {
   mimeType?: string; // optional override (default: "image/jpeg")
 }
 
-export interface AnalyzeImageResponse {
-  machine: { id?: string; brand?: string; model?: string };
-  issue?: string;
-  confidence?: number;
-  recommendations?: string[];
-  suggestions?: any;                 // server may return "suggestions"
-  parameter_targets?: Record<string, number>;
-  slicer_profile_diff?: Record<string, any>;
-  applied?: Record<string, number> | any;
-  capability_notes?: string[];
-  predictions?: any[];
-  version?: string;
-}
+export type AnalyzeImageResponse = AnalyzeResponse;
 
 // Some Android/iOS URIs come without file extension; default a stable name
 function inferName(uri: string, fallback = "print.jpg"): string {
@@ -49,19 +38,14 @@ export async function analyzeImage(
   const form = new FormData();
 
   // Server expects a JSON "meta" field alongside the file
-  const meta = {
+  const meta: AnalyzeRequestMeta = {
     machine_id: req.machine,
     experience: req.experience ?? "Intermediate",
     material: req.material ?? "PLA",
     base_profile: req.baseProfile ?? undefined,
-    app_version:
-      req.appVersion ?? (Constants?.expoConfig as any)?.version ?? "dev",
+    app_version: req.appVersion ?? (Constants?.expoConfig as any)?.version ?? "dev",
   };
-  // Remove undefined keys before serialising to keep payload tidy
-  const metaClean = Object.fromEntries(
-    Object.entries(meta).filter(([_, value]) => value !== undefined)
-  );
-  form.append("meta", JSON.stringify(metaClean));
+  form.append("meta", JSON.stringify(meta));
 
   const name = req.fileName ?? inferName(req.uri);
   const type = req.mimeType ?? "image/jpeg";

@@ -13,6 +13,9 @@ if (-not (Test-Path -Path $env:UPLOAD_DIR)) {
 if ([string]::IsNullOrWhiteSpace($env:INFERENCE_MODE)) {
     $env:INFERENCE_MODE = "stub"
 }
+if ([string]::IsNullOrWhiteSpace($env:ENVIRONMENT)) {
+    $env:ENVIRONMENT = "development"
+}
 if ([string]::IsNullOrWhiteSpace($env:PYTHONPATH)) {
     $env:PYTHONPATH = $repoRoot
 } else {

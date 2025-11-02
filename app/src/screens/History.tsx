@@ -37,13 +37,13 @@ function formatTimestamp(timestamp: number): string {
   return `${days} day${days === 1 ? '' : 's'} ago`;
 }
 
-function formatPredictions(predictions: AnalysisHistoryRecord['predictions']): string {
-  if (!predictions?.length) {
-    return 'No predictions logged';
+function formatIssues(issues: AnalysisHistoryRecord['issues']): string {
+  if (!issues?.length) {
+    return 'No issues logged';
   }
-  const top = predictions.slice(0, 3);
+  const top = issues.slice(0, 3);
   return top
-    .map((item) => `${item.issue_id} (${Math.round(item.confidence * 100)}%)`)
+    .map((item) => `${item.id} (${Math.round(item.confidence * 100)}%)`)
     .join(' • ');
 }
 
@@ -129,7 +129,7 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
                   <Text style={styles.cardTitle}>{formatTimestamp(entry.timestamp)}</Text>
                   <Text style={styles.cardMeta}>{entry.material ?? 'Material unknown'}</Text>
                 </View>
-                <Text style={styles.cardSummary}>{formatPredictions(entry.predictions)}</Text>
+                <Text style={styles.cardSummary}>{formatIssues(entry.issues)}</Text>
                 <Text style={styles.cardFooter}>Image ID: {entry.imageId}</Text>
               </Pressable>
             ))}

@@ -1,8 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
+  Platform,
   Pressable,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   TextInput,
@@ -10,10 +13,15 @@ import {
   View,
 } from 'react-native';
 
+import {
+  analyzeImage as analyzeImageApi,
+  exportProfile,
+  type RNFileLike,
+} from '../api/client';
 import { CameraButton, type PreparedImage } from '../components/CameraButton';
-import { useAnalyze } from '../hooks/useAnalyze';
 import { filterMachines, useMachineRegistry } from '../hooks/useMachineRegistry';
 import type {
+  AppliedParametersDetails,
   AnalyzeRequestMeta,
   AnalyzeResponse,
   AnalysisHistoryRecord,
@@ -31,6 +39,7 @@ interface PrinterTabsProps {
     response: AnalyzeResponse;
     material?: string;
     summary?: MachineSummary;
+    image?: { uri: string; width: number; height: number };
   }): void;
   onUpdateMaterial(machineId: string, material: string | undefined): void | Promise<void>;
   onOpenHistory(machine?: MachineRef): void;
@@ -40,47 +49,66 @@ interface PrinterTabsProps {
 
 const MATERIAL_OPTIONS = ['PLA', 'PETG', 'ABS', 'ASA', 'TPU', 'Nylon'];
 
+const DEFAULT_APP_VERSION = 'printer-page';
+
+function formatConfidence(value?: number): string {
+  if (typeof value !== 'number') {
+    return '—';
+  }
+  return `${(value * 100).toFixed(1)}%`;
+}
+
+function extractAppliedParameters(
+  applied: AnalyzeResponse['applied'],
+): Record<string, number | string> {
+  if (!applied) {
+    return {};
+  }
+  const maybeDetails = applied as Extract<AnalyzeResponse['applied'], { parameters?: unknown }>;
+  if (maybeDetails && typeof maybeDetails === 'object' && 'parameters' in maybeDetails) {
+    const params = (maybeDetails as { parameters?: Record<string, number | string> }).parameters;
+    return params ? { ...params } : {};
+  }
+  return { ...(applied as Record<string, number | string>) };
+}
+
+function entriesFromRecord(record?: Record<string, number | string>): Array<[string, number | string]> {
+  return Object.entries(record ?? {});
+}
+
 export const PrinterTabs: React.FC<PrinterTabsProps> = ({
   profile,
   onEditProfile,
-  onShowAnalysis,
+  onShowAnalysis: _onShowAnalysis,
   onUpdateMaterial,
   onOpenHistory,
   onRecordHistory,
   historyCounts,
 }) => {
-  const { machines, lookup, loading, error, refresh } = useMachineRegistry();
+  const {
+    machines,
+    lookup,
+    loading: machinesLoading,
+    error: machinesError,
+    refresh,
+  } = useMachineRegistry();
   const { settings, update: updatePrivacy } = usePrivacySettings();
   const [activeMachineId, setActiveMachineId] = useState<string | null>(profile.machines[0]?.id ?? null);
   const [search, setSearch] = useState<string>('');
-  const [lastRequest, setLastRequest] = useState<{
-    machine: MachineRef;
-    material?: string;
-    imageUri?: string;
-    summary?: MachineSummary;
-  } | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [exporting, setExporting] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [result, setResult] = useState<AnalyzeResponse | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewSize, setPreviewSize] = useState<{ width: number; height: number } | null>(null);
 
-  const handleQueueSuccess = useCallback(
-    (item, response: AnalyzeResponse) => {
-      const summary = lookup.get(item.machine.id);
-      const entry: AnalysisHistoryRecord = {
-        imageId: response.image_id,
-        machineId: item.machine.id,
-        machine: item.machine,
-        timestamp: Date.now(),
-        predictions: response.predictions,
-        response,
-        material: item.material,
-        localUri: settings.storeImagesLocallyOnly ? undefined : item.fileUri,
-        summary,
-      };
-      void onRecordHistory(entry);
-    },
-    [lookup, onRecordHistory, settings.storeImagesLocallyOnly],
-  );
-
-  const analyzeMutation = useAnalyze({ onQueueSuccess: handleQueueSuccess });
-  const { mutate, isPending, isSuccess, data, reset, progress, queuedCount, retryQueued } = analyzeMutation;
+  useEffect(() => {
+    return () => {
+      if (Platform.OS === 'web' && previewUrl && previewUrl.startsWith('blob:') && typeof URL !== 'undefined') {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   useEffect(() => {
     const currentIds = profile.machines.map((item) => item.id);
@@ -88,41 +116,6 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
       setActiveMachineId(currentIds[0] ?? null);
     }
   }, [activeMachineId, profile.machines]);
-
-  useEffect(() => {
-    if (isSuccess && data && lastRequest) {
-      const entry: AnalysisHistoryRecord = {
-        imageId: data.image_id,
-        machineId: lastRequest.machine.id,
-        machine: lastRequest.machine,
-        timestamp: Date.now(),
-        predictions: data.predictions,
-        response: data,
-        material: lastRequest.material,
-        localUri: settings.storeImagesLocallyOnly ? undefined : lastRequest.imageUri,
-        summary: lastRequest.summary ?? machineSummary,
-      };
-      void onRecordHistory(entry);
-      onShowAnalysis({
-        machine: lastRequest.machine,
-        response: data,
-        material: lastRequest.material,
-        summary: lastRequest.summary ?? machineSummary,
-      });
-      reset();
-      setLastRequest(null);
-    }
-  }, [data, isSuccess, lastRequest, machineSummary, onRecordHistory, onShowAnalysis, reset, settings.storeImagesLocallyOnly]);
-
-  useEffect(() => {
-    void retryQueued();
-  }, [retryQueued]);
-
-  useEffect(() => {
-    if (isSuccess) {
-      void retryQueued();
-    }
-  }, [isSuccess, retryQueued]);
 
   const activeMachine = useMemo(
     () => profile.machines.find((machine) => machine.id === activeMachineId) ?? null,
@@ -141,25 +134,141 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
     [machines, search],
   );
 
-  const handleAnalyze = async (image: PreparedImage) => {
-    if (!activeMachine) {
+  const handleAnalyze = useCallback(
+    async (image: PreparedImage) => {
+      if (!activeMachine) {
+        return;
+      }
+      const meta: AnalyzeRequestMeta = {
+        machine_id: activeMachine.id,
+        experience: profile.experience,
+        material: materialValue ?? 'PLA',
+        app_version: DEFAULT_APP_VERSION,
+      };
+
+      const filePayload: Blob | RNFileLike =
+        Platform.OS === 'web' && image.blob ? image.blob : { uri: image.uri, name: image.name, type: image.type };
+
+      if (previewUrl && Platform.OS === 'web' && previewUrl.startsWith('blob:') && typeof URL !== 'undefined') {
+        URL.revokeObjectURL(previewUrl);
+      }
+      setPreviewUrl(image.uri);
+      setPreviewSize({ width: image.width, height: image.height });
+      setLoading(true);
+      setErrorMessage(null);
+      setResult(null);
+
+      try {
+        const response = await analyzeImageApi(filePayload, meta);
+        setResult(response);
+
+        const summary = lookup.get(activeMachine.id);
+        const historyEntry: AnalysisHistoryRecord = {
+          imageId: response.image_id ?? `local-${Date.now()}`,
+          machineId: activeMachine.id,
+          machine: activeMachine,
+          timestamp: Date.now(),
+          issues: response.issue_list ?? [],
+          response,
+          material: materialValue,
+          localUri: settings.storeImagesLocallyOnly ? undefined : image.uri,
+          summary,
+        };
+        void onRecordHistory(historyEntry);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        setErrorMessage(message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [activeMachine, lookup, materialValue, onRecordHistory, previewUrl, profile.experience, settings.storeImagesLocallyOnly],
+  );
+
+  const issueList = result?.issue_list ?? [];
+  const topIssue = useMemo(() => {
+    if (!result) {
+      return null;
+    }
+    if (result.top_issue) {
+      return result.top_issue;
+    }
+    if (result.issue) {
+      return result.issue;
+    }
+    return issueList.length ? issueList[0].id : null;
+  }, [issueList, result]);
+
+  const topConfidence = useMemo(() => {
+    if (!result) {
+      return undefined;
+    }
+    if (typeof result.confidence === 'number') {
+      return result.confidence;
+    }
+    if (topIssue) {
+      const match = issueList.find((entry) => entry.id === topIssue);
+      if (match) {
+        return match.confidence;
+      }
+    }
+    return issueList.length ? issueList[0]?.confidence : undefined;
+  }, [issueList, result, topIssue]);
+
+  const parameterEntries = useMemo(
+    () => entriesFromRecord(result?.parameter_targets as Record<string, number | string> | undefined),
+    [result?.parameter_targets],
+  );
+
+  const appliedParameters = useMemo(() => extractAppliedParameters(result?.applied), [result?.applied]);
+  const appliedEntries = useMemo(() => entriesFromRecord(appliedParameters), [appliedParameters]);
+  const appliedDetails = (result?.applied as AppliedParametersDetails | undefined) ?? undefined;
+
+  const heatmapUri = result?.heatmap ?? null;
+  const boundingBoxes = result?.boxes ?? [];
+  const recommendations = result?.recommendations ?? [];
+  const capabilityNotes = result?.capability_notes ?? [];
+  const clampExplanations = appliedDetails?.explanations ?? result?.clamp_explanations ?? [];
+  const hiddenParameters = appliedDetails?.hidden_parameters ?? result?.hidden_parameters ?? [];
+  const experienceLevel = appliedDetails?.experience_level;
+  const clamped = appliedDetails?.clamped_to_machine_limits;
+
+  const handleExport = useCallback(async () => {
+    if (!result) {
       return;
     }
-    const meta: AnalyzeRequestMeta = {
-      machine_id: activeMachine.id,
-      experience: profile.experience,
-      material: materialValue,
-      app_version: 'app-ai-alpha',
-    };
-    const summary = lookup.get(activeMachine.id);
-    setLastRequest({ machine: activeMachine, material: materialValue, imageUri: image.uri, summary });
-    mutate({
-      file: { uri: image.uri, name: image.name, type: image.type },
-      meta,
-      machine: activeMachine,
-      material: materialValue,
-    });
-  };
+    setExporting(true);
+    setErrorMessage(null);
+    try {
+      const changes = Object.keys(appliedParameters).length
+        ? appliedParameters
+        : result.parameter_targets ?? {};
+      const diff = await exportProfile({
+        slicer: 'cura',
+        changes,
+        baseProfile: undefined,
+      });
+      const markdown = diff.markdown ?? JSON.stringify(diff, null, 2);
+      if (Platform.OS === 'web') {
+        const blob = new Blob([markdown], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = `slicer-diff-${result.machine?.id ?? 'printer'}.md`;
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+        URL.revokeObjectURL(url);
+      } else {
+        await Share.share({ message: markdown, title: 'Slicer diff' });
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setErrorMessage(message);
+    } finally {
+      setExporting(false);
+    }
+  }, [appliedParameters, result]);
 
   const renderMachineFacts = (summary?: MachineSummary) => {
     if (!summary) {
@@ -212,21 +321,21 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
         </View>
       </View>
 
-      {profile.machines.length === 0 && !loading ? (
+      {profile.machines.length === 0 && !machinesLoading ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyTitle}>No machines selected yet.</Text>
           <Text style={styles.emptySubtitle}>Run onboarding to add printers or routers.</Text>
         </View>
       ) : null}
 
-      {loading && <ActivityIndicator style={styles.loader} />}
-      {error && (
+      {machinesLoading && <ActivityIndicator style={styles.loader} />}
+      {machinesError && (
         <Pressable onPress={refresh} style={styles.errorBox}>
-          <Text style={styles.errorText}>Failed to load machines: {error}. Tap to retry.</Text>
+          <Text style={styles.errorText}>Failed to load machines: {machinesError}. Tap to retry.</Text>
         </Pressable>
       )}
 
-      {!loading && profile.machines.length > 0 && (
+      {!machinesLoading && profile.machines.length > 0 && (
         <>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabBar}>
             {profile.machines.map((machine) => {
@@ -320,13 +429,163 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
                     trackColor={{ true: '#38bdf855', false: '#1f2937' }}
                   />
                 </View>
-                {queuedCount > 0 && (
-                  <Pressable style={styles.queueBanner} onPress={() => retryQueued()}>
-                    <Text style={styles.queueText}>
-                      {queuedCount} upload{queuedCount > 1 ? 's' : ''} queued. Tap to retry now.
-                    </Text>
-                  </Pressable>
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Analyze this machine</Text>
+                <Text style={styles.sectionSubtitle}>
+                  Take a fresh photo or choose one from your library to diagnose failed prints.
+                </Text>
+                <CameraButton
+                  floating={false}
+                  disabled={loading || exporting || !activeMachine}
+                  label={loading ? 'Analyzing…' : 'Take Photo'}
+                  onImageReady={handleAnalyze}
+                />
+                {errorMessage ? <Text style={styles.analysisError}>{errorMessage}</Text> : null}
+                {loading && (
+                  <View style={styles.analysisProgress}>
+                    <ActivityIndicator color="#38bdf8" />
+                    <Text style={styles.analysisProgressText}>Analyzing photo…</Text>
+                  </View>
                 )}
+                {previewUrl ? (
+                  <View
+                    style={[
+                      styles.previewContainer,
+                      previewSize?.height ? { aspectRatio: Math.max(previewSize.width, 1) / Math.max(previewSize.height, 1) } : null,
+                    ]}
+                  >
+                    <Image source={{ uri: previewUrl }} style={styles.previewImage} resizeMode="contain" />
+                    {heatmapUri ? (
+                      <Image source={{ uri: heatmapUri }} style={styles.heatmapOverlay} resizeMode="cover" />
+                    ) : null}
+                    {boundingBoxes.map((box, index) => (
+                      <View
+                        key={`box-${index}`}
+                        style={[
+                          styles.boxOverlay,
+                          {
+                            left: `${Math.max(0, Math.min(1, box.x)) * 100}%`,
+                            top: `${Math.max(0, Math.min(1, box.y)) * 100}%`,
+                            width: `${Math.max(0, Math.min(1, box.w)) * 100}%`,
+                            height: `${Math.max(0, Math.min(1, box.h)) * 100}%`,
+                          },
+                        ]}
+                      >
+                        <Text style={styles.boxLabel}>
+                          {box.issue_id ?? ''}
+                          {typeof box.score === 'number' ? ` ${(box.score * 100).toFixed(0)}%` : ''}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                ) : null}
+
+                {result ? (
+                  <View style={styles.analysisResult}>
+                    {topIssue ? (
+                      <Text style={styles.resultHeading}>
+                        Top issue: {topIssue}
+                        {typeof topConfidence === 'number' ? ` (${formatConfidence(topConfidence)})` : ''}
+                      </Text>
+                    ) : null}
+
+                    {issueList.length ? (
+                      <View style={styles.issueList}>
+                        {issueList.map((issue) => (
+                          <View key={issue.id} style={styles.issueRow}>
+                            <Text style={styles.issueName}>{issue.id}</Text>
+                            <Text style={styles.issueConfidence}>{formatConfidence(issue.confidence)}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    ) : null}
+
+                    {parameterEntries.length || appliedEntries.length ? (
+                      <View style={styles.parameterGroup}>
+                        {parameterEntries.length ? (
+                          <View style={styles.parameterColumn}>
+                            <Text style={styles.parameterTitle}>Parameter targets</Text>
+                            {parameterEntries.map(([key, value]) => (
+                              <View key={`target-${key}`} style={styles.parameterRow}>
+                                <Text style={styles.parameterKey}>{key}</Text>
+                                <Text style={styles.parameterValue}>{String(value)}</Text>
+                              </View>
+                            ))}
+                          </View>
+                        ) : null}
+                        {appliedEntries.length ? (
+                          <View style={styles.parameterColumn}>
+                            <Text style={styles.parameterTitle}>Applied (clamped)</Text>
+                            {appliedEntries.map(([key, value]) => (
+                              <View key={`applied-${key}`} style={styles.parameterRow}>
+                                <Text style={styles.parameterKey}>{key}</Text>
+                                <Text style={styles.parameterValue}>{String(value)}</Text>
+                              </View>
+                            ))}
+                          </View>
+                        ) : null}
+                      </View>
+                    ) : null}
+
+                    {clamped !== undefined || experienceLevel ? (
+                      <Text style={styles.parameterMeta}>
+                        {clamped ? 'Clamped to machine limits.' : ''}
+                        {experienceLevel ? ` Experience: ${experienceLevel}.` : ''}
+                      </Text>
+                    ) : null}
+
+                    {recommendations.length ? (
+                      <View style={styles.listBlock}>
+                        <Text style={styles.listTitle}>Recommendations</Text>
+                        {recommendations.map((item, idx) => (
+                          <Text key={`rec-${idx}`} style={styles.listItem}>
+                            • {item}
+                          </Text>
+                        ))}
+                      </View>
+                    ) : null}
+
+                    {capabilityNotes.length ? (
+                      <View style={styles.listBlock}>
+                        <Text style={styles.listTitle}>Capability notes</Text>
+                        {capabilityNotes.map((item, idx) => (
+                          <Text key={`cap-${idx}`} style={styles.listItem}>
+                            • {item}
+                          </Text>
+                        ))}
+                      </View>
+                    ) : null}
+
+                    {clampExplanations.length ? (
+                      <View style={styles.listBlock}>
+                        <Text style={styles.listTitle}>Clamp details</Text>
+                        {clampExplanations.map((item, idx) => (
+                          <Text key={`ex-${idx}`} style={styles.listItem}>
+                            • {item}
+                          </Text>
+                        ))}
+                      </View>
+                    ) : null}
+
+                    {hiddenParameters.length ? (
+                      <Text style={styles.parameterMeta}>
+                        Hidden parameters: {hiddenParameters.join(', ')}
+                      </Text>
+                    ) : null}
+
+                    <Pressable
+                      onPress={handleExport}
+                      disabled={!result || exporting}
+                      style={[styles.exportButton, (!result || exporting) && styles.exportButtonDisabled]}
+                    >
+                      <Text style={styles.exportButtonLabel}>
+                        {exporting ? 'Preparing export…' : 'Export slicer diff'}
+                      </Text>
+                    </Pressable>
+                  </View>
+                ) : null}
               </View>
 
               <View style={styles.section}>
@@ -355,16 +614,6 @@ export const PrinterTabs: React.FC<PrinterTabsProps> = ({
         </>
       )}
 
-      {isPending && (
-        <View style={styles.uploadBanner}>
-          <ActivityIndicator color="#0f172a" />
-          <Text style={styles.uploadText}>
-            Uploading… {Math.round((progress || 0) * 100)}%
-          </Text>
-        </View>
-      )}
-
-      <CameraButton disabled={isPending || !activeMachine} onImageReady={handleAnalyze} />
     </View>
   );
 };
@@ -474,6 +723,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  sectionSubtitle: {
+    color: '#94a3b8',
+    fontSize: 12,
+  },
   toggleRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -541,6 +794,136 @@ const styles = StyleSheet.create({
   emptyFacts: {
     color: '#94a3b8',
   },
+  analysisError: {
+    color: '#fca5a5',
+    fontSize: 13,
+  },
+  analysisProgress: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  analysisProgressText: {
+    color: '#e2e8f0',
+  },
+  previewContainer: {
+    width: '100%',
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: '#0f172a',
+    borderWidth: 1,
+    borderColor: '#1e293b',
+    position: 'relative',
+  },
+  previewImage: {
+    width: '100%',
+    height: '100%',
+  },
+  heatmapOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.55,
+  },
+  boxOverlay: {
+    position: 'absolute',
+    borderWidth: 2,
+    borderColor: '#38bdf8',
+    borderStyle: 'dashed',
+    justifyContent: 'flex-start',
+  },
+  boxLabel: {
+    backgroundColor: 'rgba(56, 189, 248, 0.9)',
+    color: '#0f172a',
+    fontWeight: '600',
+    fontSize: 11,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+  },
+  analysisResult: {
+    gap: 12,
+  },
+  resultHeading: {
+    color: '#f8fafc',
+    fontWeight: '700',
+    fontSize: 16,
+  },
+  issueList: {
+    borderWidth: 1,
+    borderColor: '#1e293b',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  issueRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#1e293b',
+  },
+  issueName: {
+    color: '#e2e8f0',
+    fontWeight: '500',
+    textTransform: 'capitalize',
+  },
+  issueConfidence: {
+    color: '#38bdf8',
+    fontWeight: '600',
+  },
+  parameterGroup: {
+    flexDirection: 'row',
+    gap: 16,
+    flexWrap: 'wrap',
+  },
+  parameterColumn: {
+    flex: 1,
+    minWidth: 140,
+    gap: 6,
+  },
+  parameterTitle: {
+    color: '#f8fafc',
+    fontWeight: '600',
+  },
+  parameterRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  parameterKey: {
+    color: '#94a3b8',
+  },
+  parameterValue: {
+    color: '#e2e8f0',
+    fontWeight: '500',
+  },
+  parameterMeta: {
+    color: '#cbd5f5',
+    fontSize: 12,
+  },
+  listBlock: {
+    gap: 4,
+  },
+  listTitle: {
+    color: '#f8fafc',
+    fontWeight: '600',
+  },
+  listItem: {
+    color: '#e2e8f0',
+    fontSize: 13,
+  },
+  exportButton: {
+    marginTop: 8,
+    backgroundColor: '#38bdf8',
+    paddingVertical: 12,
+    borderRadius: 999,
+    alignItems: 'center',
+  },
+  exportButtonDisabled: {
+    opacity: 0.6,
+  },
+  exportButtonLabel: {
+    color: '#0f172a',
+    fontWeight: '700',
+  },
   searchInput: {
     backgroundColor: '#0f172a',
     borderRadius: 8,
@@ -567,32 +950,5 @@ const styles = StyleSheet.create({
   searchSubLabel: {
     color: '#94a3b8',
     fontSize: 12,
-  },
-  uploadBanner: {
-    position: 'absolute',
-    left: 16,
-    right: 16,
-    bottom: 96,
-    backgroundColor: '#38bdf8',
-    padding: 12,
-    borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-  },
-  uploadText: {
-    color: '#0f172a',
-    fontWeight: '600',
-  },
-  queueBanner: {
-    marginTop: 8,
-    backgroundColor: '#1e3a8a',
-    borderRadius: 10,
-    padding: 12,
-  },
-  queueText: {
-    color: '#bfdbfe',
-    fontWeight: '500',
   },
 });

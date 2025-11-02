@@ -1,7 +1,8 @@
-import { Alert, Image, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import React, { useCallback, useMemo, useState } from 'react';
+import { Alert, Image, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
+import type { ChangeEvent } from 'react';
 
 export interface PreparedImage {
   blob: Blob;
@@ -15,14 +16,23 @@ export interface PreparedImage {
 
 interface CameraButtonProps {
   disabled?: boolean;
+  label?: string;
+  floating?: boolean;
   onImageReady(image: PreparedImage): void;
 }
 
 const MAX_EDGE = 2048;
 
-export const CameraButton: React.FC<CameraButtonProps> = ({ disabled, onImageReady }) => {
+export const CameraButton: React.FC<CameraButtonProps> = ({
+  disabled,
+  label = 'Take Photo',
+  floating = true,
+  onImageReady,
+}) => {
   const [preview, setPreview] = useState<PreparedImage | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const webInputRef = useRef<HTMLInputElement | null>(null);
+  const webPreviewUri = useRef<string | null>(null);
 
   const formatSize = useCallback((bytes: number) => {
     if (!bytes) return '0 B';
@@ -65,6 +75,45 @@ export const CameraButton: React.FC<CameraButtonProps> = ({ disabled, onImageRea
     setModalVisible(true);
   }, []);
 
+  const prepareWebFile = useCallback(async (file: File) => {
+    const objectUrl = URL.createObjectURL(file);
+    webPreviewUri.current = objectUrl;
+    let width = 1024;
+    let height = 1024;
+    try {
+      const dims = await new Promise<{ width: number; height: number }>((resolve) => {
+        const img = new window.Image();
+        img.onload = () => resolve({ width: img.width, height: img.height });
+        img.onerror = () => resolve({ width: 1024, height: 1024 });
+        img.src = objectUrl;
+      });
+      width = dims.width;
+      height = dims.height;
+    } catch (err) {
+      console.warn('Failed to read web image dimensions', err);
+    }
+    const prepared: PreparedImage = {
+      blob: file,
+      uri: objectUrl,
+      name: file.name ?? 'upload.jpg',
+      type: file.type || 'image/jpeg',
+      size: file.size,
+      width,
+      height,
+    };
+    setPreview(prepared);
+    setModalVisible(true);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (webPreviewUri.current) {
+        URL.revokeObjectURL(webPreviewUri.current);
+        webPreviewUri.current = null;
+      }
+    };
+  }, []);
+
   const launchCamera = useCallback(async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
@@ -100,6 +149,10 @@ export const CameraButton: React.FC<CameraButtonProps> = ({ disabled, onImageRea
   }, [prepareImage]);
 
   const handlePress = useCallback(() => {
+    if (Platform.OS === 'web') {
+      webInputRef.current?.click();
+      return;
+    }
     Alert.alert('Add a photo', 'Choose how you want to provide a photo of your print.', [
       { text: 'Take Photo', onPress: launchCamera },
       { text: 'Upload from Library', onPress: launchPicker },
@@ -107,18 +160,51 @@ export const CameraButton: React.FC<CameraButtonProps> = ({ disabled, onImageRea
     ]);
   }, [launchCamera, launchPicker]);
 
+  const handleFileChange = useCallback(
+    async (event: ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      event.target.value = '';
+      if (!file) {
+        return;
+      }
+      await prepareWebFile(file);
+    },
+    [prepareWebFile],
+  );
+
+  const clearPreview = useCallback((preserveUri: boolean = false) => {
+    if (!preserveUri && Platform.OS === 'web' && webPreviewUri.current) {
+      URL.revokeObjectURL(webPreviewUri.current);
+      webPreviewUri.current = null;
+    }
+    setPreview(null);
+  }, []);
+
   const confirmDisabled = useMemo(() => !preview, [preview]);
 
   return (
     <>
       <Pressable
         accessibilityRole="button"
-        style={[styles.button, disabled && styles.buttonDisabled]}
+        style={[
+          styles.button,
+          floating ? styles.buttonFloating : styles.buttonInline,
+          disabled && styles.buttonDisabled,
+        ]}
         onPress={handlePress}
         disabled={disabled}
       >
-        <Text style={styles.label}>{disabled ? 'Uploading…' : 'Camera'}</Text>
+        <Text style={styles.label}>{disabled ? 'Uploading…' : label}</Text>
       </Pressable>
+      {Platform.OS === 'web' ? (
+        <input
+          ref={webInputRef}
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={handleFileChange}
+        />
+      ) : null}
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.modalBackdrop}>
           <View style={styles.modalContent}>
@@ -135,7 +221,7 @@ export const CameraButton: React.FC<CameraButtonProps> = ({ disabled, onImageRea
                 style={[styles.modalButton, styles.modalCancel]}
                 onPress={() => {
                   setModalVisible(false);
-                  setPreview(null);
+                  clearPreview();
                 }}
               >
                 <Text style={styles.modalCancelLabel}>Cancel</Text>
@@ -148,7 +234,7 @@ export const CameraButton: React.FC<CameraButtonProps> = ({ disabled, onImageRea
                     onImageReady(preview);
                   }
                   setModalVisible(false);
-                  setPreview(null);
+                  clearPreview(true);
                 }}
               >
                 <Text style={styles.modalConfirmLabel}>Send</Text>
@@ -163,9 +249,6 @@ export const CameraButton: React.FC<CameraButtonProps> = ({ disabled, onImageRea
 
 const styles = StyleSheet.create({
   button: {
-    position: 'absolute',
-    right: 24,
-    bottom: 24,
     backgroundColor: '#38bdf8',
     borderRadius: 999,
     paddingVertical: 16,
@@ -175,6 +258,15 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 6,
     elevation: 8,
+  },
+  buttonFloating: {
+    position: 'absolute',
+    right: 24,
+    bottom: 24,
+  },
+  buttonInline: {
+    alignSelf: 'flex-start',
+    marginTop: 12,
   },
   buttonDisabled: {
     opacity: 0.7,
