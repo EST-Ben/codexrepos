@@ -41,7 +41,7 @@ export function getApiRoot(): string {
 }
 
 function apiBase(): string {
-  return `${API_ROOT}/api`;
+  return `${getApiRoot()}/api`;
 }
 
 /** Shared JSON response handler */

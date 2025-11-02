@@ -16,12 +16,19 @@ export interface PreparedImage {
 
 interface CameraButtonProps {
   disabled?: boolean;
+  label?: string;
+  floating?: boolean;
   onImageReady(image: PreparedImage): void;
 }
 
 const MAX_EDGE = 2048;
 
-export const CameraButton: React.FC<CameraButtonProps> = ({ disabled, onImageReady }) => {
+export const CameraButton: React.FC<CameraButtonProps> = ({
+  disabled,
+  label = 'Take Photo',
+  floating = true,
+  onImageReady,
+}) => {
   const [preview, setPreview] = useState<PreparedImage | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const webInputRef = useRef<HTMLInputElement | null>(null);
@@ -179,7 +186,11 @@ export const CameraButton: React.FC<CameraButtonProps> = ({ disabled, onImageRea
     <>
       <Pressable
         accessibilityRole="button"
-        style={[styles.button, disabled && styles.buttonDisabled]}
+        style={[
+          styles.button,
+          floating ? styles.buttonFloating : styles.buttonInline,
+          disabled && styles.buttonDisabled,
+        ]}
         onPress={handlePress}
         disabled={disabled}
       >
@@ -238,9 +249,6 @@ export const CameraButton: React.FC<CameraButtonProps> = ({ disabled, onImageRea
 
 const styles = StyleSheet.create({
   button: {
-    position: 'absolute',
-    right: 24,
-    bottom: 24,
     backgroundColor: '#38bdf8',
     borderRadius: 999,
     paddingVertical: 16,
@@ -250,6 +258,15 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 6,
     elevation: 8,
+  },
+  buttonFloating: {
+    position: 'absolute',
+    right: 24,
+    bottom: 24,
+  },
+  buttonInline: {
+    alignSelf: 'flex-start',
+    marginTop: 12,
   },
   buttonDisabled: {
     opacity: 0.7,

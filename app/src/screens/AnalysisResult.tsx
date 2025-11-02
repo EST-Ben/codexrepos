@@ -141,12 +141,12 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
     };
   }, [image?.uri]);
 
-  const handleExport = async (slicer: SlicerId) => {
-    const diff = await exportProfile({ slicer, changes: aggregatedChanges });
-    await Clipboard.setStringAsync(JSON.stringify(diff.diff, null, 2));
-    setCopied(slicer);
-    setTimeout(() => setCopied(null), 2500);
-  };
+  const aspectRatio = useMemo(() => {
+    if (image?.width && image?.height) {
+      return image.width / image.height;
+    }
+    return 4 / 3;
+  }, [image]);
 
   const renderSuggestion = (suggestion: Suggestion) => (
     <View key={suggestion.issue_id} style={styles.suggestionCard}>
@@ -563,9 +563,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingVertical: 2,
   },
-  suggestionCard: {
-    backgroundColor: '#111c2c',
-    borderRadius: 16,
+  slider: {
+    width: '100%',
+    height: 40,
+  },
+  section: {
+    backgroundColor: '#111827',
+    borderRadius: 12,
     padding: 16,
     gap: 8,
   },
