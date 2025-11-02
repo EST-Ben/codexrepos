@@ -51,26 +51,26 @@ jest.mock('../components/CameraButton', () => {
   const React = require('react');
   const { Pressable, Text } = require('react-native');
   return {
-    CameraButton: ({ disabled, onImageReady }: any) => (
-      <Pressable
-        accessibilityRole="button"
-        testID="camera-button"
-        disabled={disabled}
-        onPress={() =>
-          onImageReady({
-            blob: new Blob(),
-            uri: 'file:///stringing.jpg',
-            name: 'stringing.jpg',
-            type: 'image/jpeg',
-            size: 1024,
-            width: 1024,
-            height: 768,
-          })
-        }
-      >
-        <Text>Camera</Text>
-      </Pressable>
-    ),
+    CameraButton: ({ disabled, onImageReady }: any) =>
+      React.createElement(
+        Pressable,
+        {
+          accessibilityRole: 'button',
+          testID: 'camera-button',
+          disabled,
+          onPress: () =>
+            onImageReady({
+              blob: new Blob(),
+              uri: 'file:///stringing.jpg',
+              name: 'stringing.jpg',
+              type: 'image/jpeg',
+              size: 1024,
+              width: 1024,
+              height: 768,
+            }),
+        },
+        React.createElement(Text, null, 'Camera'),
+      ),
   };
 });
 
