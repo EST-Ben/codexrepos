@@ -1,139 +1,348 @@
-// app/src/types.ts
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
-// ---------- Core domain types ----------
+import type {
+  ExperienceLevel,
+  MachineRef,
+  OnboardingState,
+} from '../types';
+import {
+  DEFAULT_ONBOARDING,
+  DEFAULT_PROFILE,
+  loadOnboardingState,
+  loadStoredProfile,
+  saveOnboardingState,
+  saveStoredProfile,
+} from '../storage/onboarding';
 
-export type ExperienceLevel = 'Beginner' | 'Intermediate' | 'Advanced';
+const EXPERIENCE_OPTIONS: ExperienceLevel[] = ['Beginner', 'Intermediate', 'Advanced'];
+const FALLBACK_STATE: OnboardingState = {
+  selectedMachines: [],
+  experience: 'Intermediate',
+};
 
-export interface MachineRef {
-  id: string;
-  brand: string;
-  model: string;
+function ensureStateShape(state: OnboardingState | null | undefined): OnboardingState {
+  if (!state) return { ...FALLBACK_STATE };
+  return {
+    selectedMachines: Array.isArray(state.selectedMachines)
+      ? [...state.selectedMachines]
+      : [...FALLBACK_STATE.selectedMachines],
+    experience: state.experience ?? FALLBACK_STATE.experience,
+  };
 }
 
-export interface MachineSummary {
-  id: string;
-  brand: string;
-  model: string;
-  capabilities?: string[];
-  // e.g. { speed: [80, 200], accel: [2000, 7000] }
-  safe_speed_ranges?: Record<string, number[]>;
-  max_nozzle_temp_c?: number;
-  max_bed_temp_c?: number;
-  spindle_rpm_range?: [number, number];
-  max_feed_mm_min?: number;
-}
-
-export interface ProfileState {
-  machines: MachineRef[];
-  experience: ExperienceLevel;
-  material?: string;
-}
-
-// ---------- Analyze: request/response ----------
-
-export interface AnalyzeRequestMeta {
-  machine_id: string;
-  experience: ExperienceLevel;
-  material?: string;
-  app_version?: string;
-}
-
-export interface Prediction {
-  issue_id: string;
-  confidence: number; // 0..1
-}
-
-export interface BoundingBox {
-  // support both legacy (x,y,w,h in 0..1) and new (x,y,width,height) shapes
-  x: number;
-  y: number;
-  w?: number;
-  h?: number;
-  width?: number;
-  height?: number;
-  issue_id?: string;
-  confidence?: number; // some payloads call this score/confidence
-  score?: number;      // legacy alias
-}
-
-export interface SlicerProfileDiff {
-  // Minimal structure used by UI: a normalized diff map and optional markdown
-  diff: Record<string, string | number>;
-  markdown?: string;
-}
-
-export interface AnalyzeResponse {
-  image_id: string;
-  machine: MachineRef;
-
-  // New canonical fields
-  predictions: Prediction[];                // ← replaces legacy issue_list
-  recommendations: string[];
-  capability_notes: string[];
-
-  // Parameter guidance
-  parameter_targets?: Record<string, string | number>;
-  /**
-   * Servers may return either:
-   *   - a plain param map (legacy), or
-   *   - an object with richer details.
-   * Support both.
-   */
-  applied?:
-    | Record<string, string | number>
-    | {
-        parameters?: Record<string, string | number>;
-        hidden_parameters?: string[];
-        experience_level?: ExperienceLevel | string;
-        clamped_to_machine_limits?: boolean;
-        explanations?: string[];
-      };
-
-  // General explanations / clamp notes (canonical)
-  explanations?: string[];
-
-  // Optional localization block (canonical)
-  localization?: {
-    // Some responses send a bare data URL string; others wrap it.
-    heatmap?: string | { data_url: string };
-    boxes?: BoundingBox[];
+async function persistState(
+  nextState: OnboardingState,
+  machines: MachineRef[],
+): Promise<void> {
+  const nextProfile = {
+    ...DEFAULT_PROFILE,
+    experience: nextState.experience,
+    machines: machines.map((machine) => ({ ...machine })),
+    material: DEFAULT_PROFILE.material,
+    materialByMachine: {
+      ...(DEFAULT_PROFILE.materialByMachine ?? {}),
+    },
   };
 
-  // Optional slicer export diff
-  slicer_profile_diff?: SlicerProfileDiff;
-
-  // ---------- Backward-compat aliases (do not rely on these long-term) ----------
-  // Old top-level names some screens/hooks might still touch
-  top_issue?: string;                       // prefer deriving from predictions[0]
-  heatmap?: string;                         // prefer localization.heatmap
-  boxes?: BoundingBox[];                    // prefer localization.boxes
-  hidden_parameters?: string[];             // prefer applied.hidden_parameters
-  clamp_explanations?: string[];            // prefer explanations
-  issue_list?: Prediction[];                // prefer predictions
-  parameters?: Record<string, string | number>; // prefer parameter_targets
+  await Promise.all([
+    saveOnboardingState(nextState),
+    saveStoredProfile(nextProfile),
+  ]);
 }
 
-// ---------- History & UI contracts ----------
+const OnboardingScreen: React.FC = () => {
+  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState<OnboardingState>(DEFAULT_ONBOARDING);
+  const [machines, setMachines] = useState<MachineRef[]>(DEFAULT_PROFILE.machines ?? []);
+  const [error, setError] = useState<string | null>(null);
 
-export interface AnalysisHistoryRecord {
-  imageId: string;
-  machineId: string;
-  machine: MachineRef;
-  timestamp: number;
-  response: AnalyzeResponse;
-  material?: string;
-  localUri?: string;
-  summary?: MachineSummary;
+  useEffect(() => {
+    let mounted = true;
 
-  // Backward-compat for legacy code that expected issues on the record:
-  issues?: Prediction[];       // deprecated — prefer response.predictions
-  // Convenience (optional) for quick display/search without digging into response:
-  predictions?: Prediction[];  // optional mirror of response.predictions
-}
+    (async () => {
+      try {
+        const [loadedState, storedProfile] = await Promise.all([
+          loadOnboardingState(),
+          loadStoredProfile(),
+        ]);
 
-// ---------- Slicer export ----------
+        if (!mounted) return;
+        setState(ensureStateShape(loadedState));
+        setMachines(storedProfile?.machines ?? DEFAULT_PROFILE.machines ?? []);
+        setError(null);
+      } catch (err) {
+        if (!mounted) return;
+        console.warn('Failed to hydrate onboarding state', err);
+        setState({ ...FALLBACK_STATE });
+        setMachines(DEFAULT_PROFILE.machines ?? []);
+        setError('We could not restore your previous settings. Please review them below.');
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    })();
 
-export type SlicerId = 'cura' | 'prusaslicer' | 'bambu' | 'orca';
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
-// Optional: small helper type some components import
-export type Experience = ExperienceLevel;
+  const selectedMachineObjects = useMemo(
+    () => machines.filter((machine) => state.selectedMachines.includes(machine.id)),
+    [machines, state.selectedMachines],
+  );
+
+  const handleExperiencePress = useCallback(
+    (experience: ExperienceLevel) => {
+      setState((prev) => {
+        if (prev.experience === experience) {
+          return prev;
+        }
+        const next: OnboardingState = {
+          ...prev,
+          experience,
+        };
+        void persistState(next, selectedMachineObjects)
+          .then(() => setError(null))
+          .catch((err) => {
+            console.warn('Failed to persist onboarding experience', err);
+            setError('Unable to save your experience preference. Please try again.');
+          });
+        return next;
+      });
+    },
+    [selectedMachineObjects],
+  );
+
+  const toggleMachine = useCallback(
+    (machine: MachineRef) => {
+      setState((prev) => {
+        const exists = prev.selectedMachines.includes(machine.id);
+        const nextSelected = exists
+          ? prev.selectedMachines.filter((id) => id !== machine.id)
+          : [...prev.selectedMachines, machine.id];
+        const next: OnboardingState = {
+          ...prev,
+          selectedMachines: nextSelected,
+        };
+        const nextMachineObjects = machines.filter((item) => nextSelected.includes(item.id));
+        void persistState(next, nextMachineObjects)
+          .then(() => setError(null))
+          .catch((err) => {
+            console.warn('Failed to persist onboarding machine selection', err);
+            setError('Unable to save your machine selection.');
+          });
+        return next;
+      });
+    },
+    [machines],
+  );
+
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" />
+        <Text style={styles.loadingText}>Preparing your onboarding experience…</Text>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Welcome to Codex</Text>
+      <Text style={styles.subtitle}>
+        Tell us a little bit about your setup to tailor the recommendations.
+      </Text>
+
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Experience level</Text>
+        <View style={styles.chipRow}>
+          {EXPERIENCE_OPTIONS.map((option) => {
+            const selected = state.experience === option;
+            return (
+              <Pressable
+                key={option}
+                onPress={() => handleExperiencePress(option)}
+                style={({ pressed }) => [
+                  styles.chip,
+                  selected && styles.chipSelected,
+                  pressed && styles.chipPressed,
+                ]}
+                accessibilityRole="button"
+                accessibilityState={{ selected }}
+              >
+                <Text
+                  style={[
+                    styles.chipLabel,
+                    selected && styles.chipLabelSelected,
+                  ]}
+                >
+                  {option}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Machines</Text>
+        {machines.length === 0 ? (
+          <Text style={styles.placeholder}>
+            No machines saved yet. You can add them later from the settings screen.
+          </Text>
+        ) : (
+          machines.map((machine) => {
+            const selected = state.selectedMachines.includes(machine.id);
+            return (
+              <Pressable
+                key={machine.id}
+                onPress={() => toggleMachine(machine)}
+                style={({ pressed }) => [
+                  styles.machineRow,
+                  selected && styles.machineRowSelected,
+                  pressed && styles.machineRowPressed,
+                ]}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: selected }}
+              >
+                <View>
+                  <Text style={styles.machineName}>
+                    {machine.brand} {machine.model}
+                  </Text>
+                  {machine.type ? (
+                    <Text style={styles.machineMeta}>{machine.type}</Text>
+                  ) : null}
+                </View>
+                {selected ? <Text style={styles.machineSelected}>Selected</Text> : null}
+              </Pressable>
+            );
+          })
+        )}
+      </View>
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 24,
+    paddingVertical: 32,
+    gap: 32,
+  },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 32,
+    gap: 16,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#4B5563',
+    textAlign: 'center',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#4B5563',
+  },
+  section: {
+    gap: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  chipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  chip: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    backgroundColor: '#FFFFFF',
+  },
+  chipSelected: {
+    backgroundColor: '#111827',
+    borderColor: '#111827',
+  },
+  chipPressed: {
+    opacity: 0.75,
+  },
+  chipLabel: {
+    fontSize: 14,
+    color: '#1F2937',
+    fontWeight: '600',
+  },
+  chipLabelSelected: {
+    color: '#FFFFFF',
+  },
+  placeholder: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  machineRow: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  machineRowSelected: {
+    borderColor: '#2563EB',
+    backgroundColor: '#DBEAFE',
+  },
+  machineRowPressed: {
+    opacity: 0.8,
+  },
+  machineName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  machineMeta: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 4,
+  },
+  machineSelected: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#2563EB',
+  },
+  error: {
+    backgroundColor: '#FEE2E2',
+    borderRadius: 12,
+    padding: 12,
+    color: '#991B1B',
+    fontSize: 14,
+  },
+});
+
+export default OnboardingScreen;

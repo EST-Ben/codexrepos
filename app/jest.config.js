@@ -1,10 +1,8 @@
-/** @type {import('jest').Config} */
+// jest.config.js
 module.exports = {
   preset: 'jest-expo',
-  transform: {
-    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest'
-  },
-  testPathIgnorePatterns: ['/node_modules/', '/android/', '/ios/'],
-  setupFilesAfterEnv: [],
-  // Don’t force testEnvironment; let jest-expo choose the right one
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  transformIgnorePatterns: [
+    'node_modules/(?!(react-native|@react-native|@react-navigation|@testing-library|expo|expo-.*|@expo|react-native-svg)/)',
+  ],
 };

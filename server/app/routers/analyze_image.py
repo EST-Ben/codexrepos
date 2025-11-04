@@ -10,7 +10,11 @@ from typing import Dict, List, TYPE_CHECKING
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 from server import settings
-from server.app.routers.analyze import load_pipeline_cls
+from server.app.routers.analyze import (
+    RESPONSE_VERSION,
+    _stringify_explanations,
+    load_pipeline_cls,
+)
 from server.machines import resolve_machine
 from server.models.api import AnalyzeRequestMeta
 from server.rules import RulesEngine
@@ -34,7 +38,7 @@ def _get_pipeline() -> "DiagnosticPipeline":
 
 def _summarise_predictions(analysis: "ImageAnalysisResult") -> List[Dict[str, object]]:
     return [
-        {"id": prediction.issue_id, "confidence": float(prediction.confidence)}
+        {"issue_id": prediction.issue_id, "confidence": float(prediction.confidence)}
         for prediction in analysis.predictions
     ]
 
@@ -74,28 +78,50 @@ async def analyze_image_route(
         pipeline = _get_pipeline()
         analysis = pipeline.predict_image(temp_path, machine, meta_model.material)
 
-        issue_list = _summarise_predictions(analysis)
-        top_issue = analysis.top_issue
+        predictions = _summarise_predictions(analysis)
 
         rules_engine = RulesEngine()
         applied = rules_engine.clamp_to_machine(
             machine, analysis.parameter_targets, meta_model.experience
         )
 
+        analysis_explanations = getattr(analysis, "explanations", None)
+        explanations = []
+        explanations.extend(_stringify_explanations(applied.get("explanations")))
+        explanations.extend(_stringify_explanations(analysis_explanations))
+
+        localization = {
+            "boxes": [box.model_dump() for box in analysis.boxes],
+            "heatmap": getattr(analysis.heatmap, "data_url", analysis.heatmap)
+            if analysis.heatmap
+            else None,
+        }
+
+        slicer_diff = getattr(analysis, "slicer_profile_diff", None)
+        suggestions = getattr(analysis, "suggestions", [])
+
+        low_confidence = not predictions or predictions[0]["confidence"] < 0.5
+
         return {
+            "image_id": image_id,
+            "version": RESPONSE_VERSION,
             "machine": {
                 "id": machine.get("id"),
                 "brand": machine.get("brand"),
                 "model": machine.get("model"),
             },
-            "issue_list": issue_list,
-            "top_issue": top_issue,
-            "boxes": [box.model_dump() for box in analysis.boxes],
-            "heatmap": analysis.heatmap,
-            "parameter_targets": analysis.parameter_targets,
-            "applied": applied,
-            "recommendations": analysis.recommendations,
+            "experience": meta_model.experience,
+            "material": meta_model.material,
+            "predictions": predictions,
+            "explanations": explanations,
+            "localization": localization,
             "capability_notes": analysis.capability_notes,
+            "recommendations": analysis.recommendations,
+            "suggestions": suggestions,
+            "slicer_profile_diff": slicer_diff,
+            "applied": applied,
+            "parameter_targets": analysis.parameter_targets,
+            "low_confidence": low_confidence,
         }
     except HTTPException:
         raise
