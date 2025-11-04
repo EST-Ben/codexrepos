@@ -7,6 +7,7 @@ import type {
   MachineRef,
   MachineSummary,
   SlicerId,
+  SlicerProfileParameter,
 } from "../types";
 
 /**
@@ -178,8 +179,40 @@ export async function exportProfile(payload: {
       changes: payload.changes,
     }),
   });
-  const data = await handleResponse<{
-    diff: Record<string, string | number | boolean>;
-  }>(res);
-  return { diff: data.diff };
+  type ExportProfileResponse = {
+    diff?: Record<string, string | number | boolean>;
+    slicer_profile_diff?: {
+      diff?: Record<string, string | number | boolean>;
+      parameters?: Record<string, SlicerProfileParameter>;
+    };
+  };
+
+  const data = await handleResponse<ExportProfileResponse>(res);
+  const structured = data.slicer_profile_diff ?? data;
+  const flatParameters = flattenParameters(structured?.parameters);
+  return { diff: structured?.diff ?? flatParameters };
+}
+
+function flattenParameters(
+  parameters?: Record<string, SlicerProfileParameter>,
+): Record<string, string | number | boolean> {
+  if (!parameters) return {};
+  const flat: Record<string, string | number | boolean> = {};
+  for (const [key, descriptor] of Object.entries(parameters)) {
+    if (!descriptor) continue;
+    if (descriptor.value !== undefined && descriptor.value !== null) {
+      flat[key] = descriptor.value;
+      continue;
+    }
+    if (descriptor.delta !== undefined && descriptor.delta !== null) {
+      flat[`${key}_delta`] = descriptor.delta;
+    }
+    if (descriptor.unit) {
+      flat[`${key}_unit`] = descriptor.unit;
+    }
+    if (descriptor.clamped !== undefined && descriptor.clamped !== null) {
+      flat[`${key}_clamped`] = descriptor.clamped;
+    }
+  }
+  return flat;
 }
