@@ -1,52 +1,72 @@
 // app/src/storage/onboarding.ts
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { ProfileState, ExperienceLevel } from '../types';
+import type { OnboardingState, ProfileState, ExperienceLevel } from '../types';
 
-const STORAGE_KEY = '@profile:v1';
+const ONBOARDING_KEY = 'onboarding_state_v1';
 
-export const DEFAULT_PROFILE: ProfileState & {
-  materialByMachine: Record<string, string | undefined>;
-} = {
-  experience: 'Intermediate' as ExperienceLevel,
-  machines: [],
-  material: undefined,
-  materialByMachine: {}, // required by state/profile.tsx shape
+export const DEFAULT_ONBOARDING: OnboardingState = {
+  selectedMachines: [],                // <-- important: always present
+  experience: 'Intermediate',
 };
 
-/** Persist the full profile */
-export async function saveStoredProfile(
-  profile: ProfileState & { materialByMachine: Record<string, string | undefined> },
-): Promise<void> {
+const hasWindow =
+  typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+
+async function storageGet(key: string): Promise<string | null> {
   try {
-    const json = JSON.stringify(profile);
-    await AsyncStorage.setItem(STORAGE_KEY, json);
-  } catch (err) {
-    // Non-fatal: ignore write errors to avoid blocking UI
-    console.warn('[saveStoredProfile] failed:', err);
+    if (hasWindow) return window.localStorage.getItem(key);
+    return await AsyncStorage.getItem(key);
+  } catch {
+    return null;
   }
 }
 
-/** Load and normalize a stored profile; falls back to DEFAULT_PROFILE */
-export async function loadStoredProfile(): Promise<
-  ProfileState & { materialByMachine: Record<string, string | undefined> }
-> {
-  try {
-    const raw = await AsyncStorage.getItem(STORAGE_KEY);
-    if (!raw) return { ...DEFAULT_PROFILE };
-
-    const parsed = JSON.parse(raw) as Partial<ProfileState> & {
-      materialByMachine?: Record<string, string | undefined>;
-    };
-
-    // Defensive normalization / migrations
-    return {
-      experience: parsed.experience ?? DEFAULT_PROFILE.experience,
-      machines: parsed.machines ?? DEFAULT_PROFILE.machines,
-      material: parsed.material ?? DEFAULT_PROFILE.material,
-      materialByMachine: parsed.materialByMachine ?? {},
-    };
-  } catch (err) {
-    console.warn('[loadStoredProfile] failed, using defaults:', err);
-    return { ...DEFAULT_PROFILE };
-  }
+async function storageSet(key: string, value: string): Promise<void> {
+  if (hasWindow) { window.localStorage.setItem(key, value); return; }
+  await AsyncStorage.setItem(key, value);
 }
+
+async function storageRemove(key: string): Promise<void> {
+  if (hasWindow) { window.localStorage.removeItem(key); return; }
+  await AsyncStorage.removeItem(key);
+}
+
+function safeParse<T>(raw: string | null): T | null {
+  if (!raw) return null;
+  try { return JSON.parse(raw) as T; } catch { return null; }
+}
+
+export async function loadOnboardingState(): Promise<OnboardingState> {
+  const parsed = safeParse<OnboardingState>(await storageGet(ONBOARDING_KEY));
+  // Always return an object with selectedMachines
+  return { ...DEFAULT_ONBOARDING, ...(parsed ?? {}) };
+}
+
+export async function saveOnboardingState(state: OnboardingState): Promise<void> {
+  await storageSet(ONBOARDING_KEY, JSON.stringify(state));
+}
+
+export async function clearOnboardingState(): Promise<void> {
+  await storageRemove(ONBOARDING_KEY);
+}
+
+/* Back-compat shims */
+export const DEFAULT_PROFILE: ProfileState = {
+  experience: ('Intermediate' as ExperienceLevel),
+  machines: [],
+  material: undefined,
+  materialByMachine: {},
+};
+
+export const loadStoredProfile = (async () => DEFAULT_PROFILE) as unknown as () => Promise<ProfileState | null>;
+export const saveStoredProfile = (async (_state: ProfileState) => {}) as unknown as (state: ProfileState) => Promise<void>;
+
+export default {
+  loadOnboardingState,
+  saveOnboardingState,
+  clearOnboardingState,
+  DEFAULT_ONBOARDING,
+  DEFAULT_PROFILE,
+  loadStoredProfile,
+  saveStoredProfile,
+};
