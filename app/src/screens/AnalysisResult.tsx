@@ -1,3 +1,4 @@
+// app/src/screens/AnalysisResult.tsx
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Alert,
@@ -17,13 +18,12 @@ import type {
   AnalyzeResponse,
   ExperienceLevel,
   MachineRef,
-  MachineSummary,
   SlicerId,
 } from '../types';
 
-// ---------------------------------------------
-// Utilities
-// ---------------------------------------------
+/** -------------------------------------------
+ * Utilities
+ * ------------------------------------------*/
 const SLICERS: Array<{ id: SlicerId; label: string }> = [
   { id: 'cura', label: 'Export for Cura' },
   { id: 'prusaslicer', label: 'Export for PrusaSlicer' },
@@ -34,29 +34,27 @@ const SLICERS: Array<{ id: SlicerId; label: string }> = [
 function pct(n: number) {
   return Math.max(0, Math.min(1, n));
 }
-
 function formatPct01(n: number) {
   return `${Math.round(pct(n) * 100)}%`;
 }
-
 function normalizeHeatmap(resp: AnalyzeResponse): string | null {
   if (resp.localization?.heatmap) {
-    const h = resp.localization.heatmap;
+    const h = resp.localization.heatmap as any;
     if (typeof h === 'string') return h;
-    if (h && typeof h === 'object' && 'data_url' in h) return (h as any).data_url as string;
+    if (h && typeof h === 'object' && 'data_url' in h) return h.data_url as string;
   }
-  if (resp.heatmap) return resp.heatmap;
-  return null;
+  // (legacy) some servers may return top-level heatmap
+  return (resp as any).heatmap ?? null;
 }
 
 type NormBox = { left: number; top: number; width: number; height: number; label: string };
-
 function normalizeBoxes(resp: AnalyzeResponse): NormBox[] {
-  const src = resp.localization?.boxes ?? resp.boxes ?? [];
-  return (src ?? []).map((b) => {
+  const src: any[] = resp.localization?.boxes ?? (resp as any).boxes ?? [];
+  return (src ?? []).map((b: any) => {
     const width = typeof b.width === 'number' ? b.width : (b.w ?? 0);
     const height = typeof b.height === 'number' ? b.height : (b.h ?? 0);
-    const label = b.issue_id ? `${b.issue_id}${b.confidence ? ` · ${formatPct01(b.confidence)}` : ''}` : 'region';
+    const label =
+      b.issue_id ? `${b.issue_id}${b.confidence ? ` · ${formatPct01(b.confidence)}` : ''}` : 'region';
     return {
       left: pct(b.x),
       top: pct(b.y),
@@ -68,17 +66,11 @@ function normalizeBoxes(resp: AnalyzeResponse): NormBox[] {
 }
 
 function getParamTargets(resp: AnalyzeResponse): Record<string, string | number> {
-  const targets = resp.parameter_targets ?? {};
-  // applied can be either a flat params object or { parameters, ... }
-  if (resp.applied && typeof resp.applied === 'object' && !Array.isArray(resp.applied)) {
-    const maybe = (resp.applied as any).parameters ?? resp.applied;
-    // Avoid copying non-param metadata keys if applied is the richer object
-    if ((resp.applied as any).parameters) {
-      return { ...targets, ...(maybe as Record<string, string | number>) };
-    }
-    // If it's a flat map and seems like params, merge
+  const targets = (resp as any).parameter_targets ?? {};
+  const applied = resp.applied as any;
+  if (applied && typeof applied === 'object' && !Array.isArray(applied)) {
+    const maybe = applied.parameters ?? applied;
     const flat = { ...(maybe as Record<string, string | number>) };
-    // Strip likely metadata keys if present
     delete (flat as any).hidden_parameters;
     delete (flat as any).experience_level;
     delete (flat as any).clamped_to_machine_limits;
@@ -89,7 +81,7 @@ function getParamTargets(resp: AnalyzeResponse): Record<string, string | number>
 }
 
 function getAppliedHidden(resp: AnalyzeResponse): string[] {
-  if (resp.hidden_parameters) return resp.hidden_parameters;
+  if (Array.isArray((resp as any).hidden_parameters)) return (resp as any).hidden_parameters as string[];
   if (resp.applied && typeof resp.applied === 'object') {
     const hp = (resp.applied as any).hidden_parameters;
     if (Array.isArray(hp)) return hp as string[];
@@ -98,25 +90,28 @@ function getAppliedHidden(resp: AnalyzeResponse): string[] {
 }
 
 function getExplanations(resp: AnalyzeResponse): string[] {
-  if (Array.isArray(resp.explanations)) return resp.explanations;
-  if (Array.isArray(resp.clamp_explanations)) return resp.clamp_explanations;
+  // support both `explanations` and legacy `clamp_explanations`
+  if (Array.isArray((resp as any).explanations)) return (resp as any).explanations as string[];
+  if (Array.isArray((resp as any).clamp_explanations)) return (resp as any).clamp_explanations as string[];
   return [];
 }
 
-// ---------------------------------------------
-// Component
-// ---------------------------------------------
+/** -------------------------------------------
+ * Props
+ * ------------------------------------------*/
 interface AnalysisResultProps {
   machine: MachineRef;
   response: AnalyzeResponse;
   experience: ExperienceLevel;
   material?: string;
-  machineSummary?: MachineSummary;
   onClose(): void;
   onRetake(): void;
   image?: { uri: string; width: number; height: number };
 }
 
+/** -------------------------------------------
+ * Component
+ * ------------------------------------------*/
 export const AnalysisResult: React.FC<AnalysisResultProps> = ({
   machine,
   response,
@@ -126,48 +121,24 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
   onRetake,
   image,
 }) => {
-<<<<<<< HEAD
-  // Derived fields
-  const predictions = useMemo(
-    () => (response.predictions ?? response.issue_list ?? []),
-    [response.predictions, (response as any).issue_list]
-=======
   const [overlayOpacity, setOverlayOpacity] = useState<number>(0.65);
   const [exportMessage, setExportMessage] = useState<string | null>(null);
+  const [copiedSlicer, setCopiedSlicer] = useState<SlicerId | null>(null);
 
   const predictions = useMemo(() => response.predictions ?? [], [response.predictions]);
-  const topPrediction = predictions[0];
-  const heatmapUri = response.localization?.heatmap?.data_url ?? null;
-  const boxes = response.localization?.boxes ?? [];
-  const appliedEntries = useMemo(
-    () => Object.entries(response.applied ?? {}) as Array<[string, string | number]>,
-    [response.applied],
+  const topIssue = useMemo(
+    () => (response as any).top_issue ?? (predictions[0]?.issue_id ?? 'general_tuning'),
+    [response, predictions],
   );
-  const diffEntries = useMemo(
-    () =>
-      Object.entries(response.slicer_profile_diff?.diff ?? {}) as Array<[
-        string,
-        string | number | boolean,
-      ]>,
-    [response.slicer_profile_diff?.diff],
->>>>>>> dc18027a43493057f17ef6cef96318a53002a2f1
-  );
-  const topIssue =
-    response.top_issue ??
-    (predictions.length ? predictions[0].issue_id : 'general_tuning');
 
-  const heatmapUrl = normalizeHeatmap(response);
+  const heatmapUrl = useMemo(() => normalizeHeatmap(response), [response]);
   const normBoxes = useMemo(() => normalizeBoxes(response), [response]);
 
   const parameterTargets = useMemo(() => getParamTargets(response), [response]);
   const explanations = useMemo(() => getExplanations(response), [response]);
   const hiddenParameters = useMemo(() => getAppliedHidden(response), [response]);
 
-  const [overlayOpacity, setOverlayOpacity] = useState<number>(0.6);
-  const [exportMessage, setExportMessage] = useState<string | null>(null);
-  const [copiedSlicer, setCopiedSlicer] = useState<string | null>(null);
-
-  // size of preview container to place boxes with pixels (avoids % style errors in RN)
+  // size of image preview to place pixel-absolute boxes
   const [previewSize, setPreviewSize] = useState<{ w: number; h: number }>({ w: 0, h: 0 });
   const onPreviewLayout = useCallback((e: LayoutChangeEvent) => {
     const { width, height } = e.nativeEvent.layout;
@@ -180,13 +151,13 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
     return () => clearTimeout(t);
   }, [exportMessage]);
 
-  // Clean up blob URLs on web
+  // Revoke blob URLs on web to avoid leaks
   useEffect(() => {
     if (Platform.OS !== 'web' || !image?.uri || !image.uri.startsWith('blob:')) return;
     return () => URL.revokeObjectURL(image.uri);
   }, [image?.uri]);
 
-  // Download helper (web)
+  // Web download helper
   const downloadBlob = useCallback((content: string, filename: string, mime: string) => {
     if (Platform.OS !== 'web') return;
     const blob = new Blob([content], { type: mime });
@@ -200,9 +171,9 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
     URL.revokeObjectURL(url);
   }, []);
 
-  // Export slicer diff (web: download; native: copy)
+  // Export slicer diff (JSON/Markdown)
   const handleExportSlicerDiff = useCallback(() => {
-    const diff = response.slicer_profile_diff;
+    const diff = (response as any).slicer_profile_diff;
     if (!diff) {
       Alert.alert('No diff available', 'The server did not provide a slicer profile diff.');
       return;
@@ -226,156 +197,27 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
       Alert.alert('Export ready', diff.markdown ? 'Markdown copied to clipboard.' : 'JSON copied to clipboard.');
       setExportMessage('Export copied to clipboard.');
     });
-  }, [downloadBlob, machine.id, response.slicer_profile_diff]);
+  }, [downloadBlob, machine.id, response]);
 
-  // Copy “changes for slicer” via API
-  const aggregatedChanges: Record<string, string | number> = useMemo(() => {
-    // We expose parameter_targets as the recommended “target” changes
-    return { ...parameterTargets };
-  }, [parameterTargets]);
-
-  const handleExportToSlicer = useCallback(async (slicer: SlicerId) => {
-    try {
-      const res = await exportProfile({ slicer, changes: aggregatedChanges });
-      await Clipboard.setStringAsync(JSON.stringify(res.diff ?? res, null, 2));
-      setCopiedSlicer(slicer);
-      setTimeout(() => setCopiedSlicer(null), 2500);
-    } catch (e) {
-      Alert.alert('Export failed', String(e));
-    }
-<<<<<<< HEAD
-  }, [aggregatedChanges]);
-=======
-    const timer = setTimeout(() => setExportMessage(null), 2500);
-    return () => clearTimeout(timer);
-  }, [exportMessage]);
-
-  useEffect(() => {
-    if (Platform.OS !== 'web' || !image?.uri || !image.uri.startsWith('blob:')) {
-      return;
-    }
-    return () => {
-      URL.revokeObjectURL(image.uri);
-    };
-  }, [image?.uri]);
-
-  const handleExport = useCallback(
-    async (slicer: SlicerId) => {
-      try {
-        const changes = Object.keys(response.applied ?? {}).length
-          ? (response.applied as Record<string, string | number | boolean>)
-          : response.slicer_profile_diff?.diff ?? {};
-        const diff = await exportProfile({ slicer, changes });
-        const baseName = `${machine.id}-${slicer}-profile`;
-        const markdown = response.slicer_profile_diff?.markdown ?? null;
-        const jsonPayload = JSON.stringify(diff, null, 2);
-
-  const renderSuggestion = (suggestion: Suggestion) => (
-    <View key={suggestion.issue_id} style={styles.suggestionCard}>
-      <Text style={styles.suggestionTitle}>Fix {suggestion.issue_id}</Text>
-      <Text style={styles.suggestionWhy}>{suggestion.why}</Text>
-      <View style={styles.changesList}>
-        {suggestion.changes.map((change) => {
-          const key = `${suggestion.issue_id}:${change.param}`;
-          const state = adjustments[key];
-          const bounds = change.range_hint
-            ? { min: change.range_hint[0], max: change.range_hint[1] }
-            : deriveBounds(change.param, machineSummary);
-          const unit = change.unit ? ` ${change.unit}` : '';
-          return (
-            <View key={key} style={styles.changeRow}>
-              <Text style={styles.changeLabel}>{change.param}</Text>
-              <View style={styles.sliderRow}>
-                <Pressable
-                  accessibilityHint="Decrease value"
-                  onPress={() =>
-                    setAdjustments((prev) => ({
-                      ...prev,
-                      [key]: {
-                        ...state,
-                        value: Math.max(bounds.min, state.value - Math.max(1, (bounds.max - bounds.min) / 20)),
-                      },
-                    }))
-                  }
-                  style={styles.bumpButton}
-                >
-                  <Text style={styles.bumpLabel}>-</Text>
-                </Pressable>
-                <Slider
-                  style={styles.slider}
-                  minimumValue={bounds.min}
-                  maximumValue={bounds.max}
-                  value={state?.value ?? bounds.min}
-                  minimumTrackTintColor="#38bdf8"
-                  maximumTrackTintColor="#1f2937"
-                  thumbTintColor="#38bdf8"
-                  step={Math.max((bounds.max - bounds.min) / 100, 0.1)}
-                  onValueChange={(value) =>
-                    setAdjustments((prev) => ({
-                      ...prev,
-                      [key]: {
-                        ...state,
-                        value,
-                      },
-                    }))
-                  }
-                />
-                <Pressable
-                  accessibilityHint="Increase value"
-                  onPress={() =>
-                    setAdjustments((prev) => ({
-                      ...prev,
-                      [key]: {
-                        ...state,
-                        value: Math.min(bounds.max, state.value + Math.max(1, (bounds.max - bounds.min) / 20)),
-                      },
-                    }))
-                  }
-                  style={styles.bumpButton}
-                >
-                  <Text style={styles.bumpLabel}>+</Text>
-                </Pressable>
-              </View>
-              <View style={styles.valueDisplay}>
-                <Text style={styles.valueText}>{state?.value.toFixed(2)}{unit}</Text>
-                <Text style={styles.rangeText}>
-                  Range {bounds.min.toFixed(1)} – {bounds.max.toFixed(1)}{unit}
-                </Text>
-              </View>
-              {state?.type === 'delta' && change.delta !== undefined && (
-                <Text style={styles.deltaNote}>Recommended change: {change.delta > 0 ? '+' : ''}{change.delta}{unit}</Text>
-              )}
-            </View>
-          );
-        })}
-      </View>
-      <Text style={styles.riskLabel}>Risk: {suggestion.risk}</Text>
-      <Text style={styles.confidenceLabel}>Confidence: {(suggestion.confidence * 100).toFixed(0)}%</Text>
-      {suggestion.clamped_to_machine_limits && (
-        <Text style={styles.clampedNote}>Some values were clamped to your machine limits.</Text>
-      )}
-      {suggestion.beginner_note && (
-        <Text style={styles.note}>Beginner tip: {suggestion.beginner_note}</Text>
-      )}
-      {suggestion.advanced_note && (
-        <Text style={styles.note}>Advanced tip: {suggestion.advanced_note}</Text>
-      )}
-    </View>
+  // Quick copy changes for slicers (API returns a diff)
+  const aggregatedChanges: Record<string, string | number> = useMemo(
+    () => ({ ...parameterTargets }),
+    [parameterTargets],
   );
 
-  useEffect(() => {
-    if (!exportMessage) {
-      return;
-    }
-    const timer = setTimeout(() => setExportMessage(null), 2600);
-    return () => clearTimeout(timer);
-  }, [exportMessage]);
-
-  const topIssue = response.top_issue ?? sortedIssues[0]?.id ?? 'general_tuning';
-  const boxes = response.boxes ?? [];
-  const clampNotes = response.clamp_explanations ?? [];
-  const hiddenParameters = response.hidden_parameters ?? [];
->>>>>>> dc18027a43493057f17ef6cef96318a53002a2f1
+  const handleExportToSlicer = useCallback(
+    async (slicer: SlicerId) => {
+      try {
+        const res: any = await exportProfile({ slicer, changes: aggregatedChanges });
+        await Clipboard.setStringAsync(JSON.stringify(res?.diff ?? res, null, 2));
+        setCopiedSlicer(slicer);
+        setTimeout(() => setCopiedSlicer(null), 2500);
+      } catch (e) {
+        Alert.alert('Export failed', String(e));
+      }
+    },
+    [aggregatedChanges],
+  );
 
   return (
     <View style={styles.container}>
@@ -407,27 +249,23 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
             <View style={styles.previewContainer} onLayout={onPreviewLayout}>
               <Image source={{ uri: image.uri }} style={styles.previewImage} />
               {heatmapUrl ? (
-                <Image
-                  source={{ uri: heatmapUrl }}
-                  style={[styles.previewImage, { opacity: overlayOpacity }]}
-                />
+                <Image source={{ uri: heatmapUrl }} style={[styles.previewImage, { opacity: overlayOpacity }]} />
               ) : null}
 
-              {/* Bounding boxes in pixels */}
-              {previewSize.w > 0 && previewSize.h > 0 && normBoxes.map((b, idx) => {
-                const left = b.left * previewSize.w;
-                const top = b.top * previewSize.h;
-                const width = b.width * previewSize.w;
-                const height = b.height * previewSize.h;
-                return (
-                  <View
-                    key={`box-${idx}`}
-                    style={[styles.boundingBox, { left, top, width, height }]}
-                  >
-                    <Text style={styles.boundingLabel}>{b.label}</Text>
-                  </View>
-                );
-              })}
+              {/* Bounding boxes drawn in absolute pixels */}
+              {previewSize.w > 0 &&
+                previewSize.h > 0 &&
+                normBoxes.map((b, idx) => {
+                  const left = b.left * previewSize.w;
+                  const top = b.top * previewSize.h;
+                  const width = b.width * previewSize.w;
+                  const height = b.height * previewSize.h;
+                  return (
+                    <View key={`box-${idx}`} style={[styles.boundingBox, { left, top, width, height }]}>
+                      <Text style={styles.boundingLabel}>{b.label}</Text>
+                    </View>
+                  );
+                })}
             </View>
           ) : (
             <Text style={styles.emptyFacts}>Photo preview unavailable.</Text>
@@ -474,9 +312,11 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
         {/* Recommendations */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Recommendations</Text>
-          {response.recommendations?.length ? (
-            response.recommendations.map((rec, idx) => (
-              <Text key={`${idx}-${rec}`} style={styles.note}>• {rec}</Text>
+          {(response as any).recommendations?.length ? (
+            (response as any).recommendations.map((rec: string, idx: number) => (
+              <Text key={`${idx}-${rec}`} style={styles.note}>
+                • {rec}
+              </Text>
             ))
           ) : (
             <Text style={styles.emptyFacts}>No recommendations generated.</Text>
@@ -486,16 +326,18 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
         {/* Capability notes */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Capability notes</Text>
-          {response.capability_notes?.length ? (
-            response.capability_notes.map((n, idx) => (
-              <Text key={`${idx}-${n}`} style={styles.note}>• {n}</Text>
+          {(response as any).capability_notes?.length ? (
+            (response as any).capability_notes.map((n: string, idx: number) => (
+              <Text key={`${idx}-${n}`} style={styles.note}>
+                • {n}
+              </Text>
             ))
           ) : (
             <Text style={styles.emptyFacts}>No capability notes available.</Text>
           )}
         </View>
 
-        {/* Parameter targets (merged view) */}
+        {/* Parameter targets */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Suggested parameter targets</Text>
           {Object.keys(parameterTargets).length ? (
@@ -509,15 +351,9 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
             <Text style={styles.emptyFacts}>No parameter guidance.</Text>
           )}
           {!!hiddenParameters.length && (
-            <Text style={styles.note}>
-              Hidden parameters: {hiddenParameters.join(', ')}
-            </Text>
+            <Text style={styles.note}>Hidden parameters: {hiddenParameters.join(', ')}</Text>
           )}
-          {!!explanations.length && (
-            <Text style={styles.note}>
-              Notes: {explanations.join(' · ')}
-            </Text>
-          )}
+          {!!explanations.length && <Text style={styles.note}>Notes: {explanations.join(' · ')}</Text>}
         </View>
 
         {/* Export slicer diff */}
@@ -535,9 +371,7 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
           <View style={styles.buttonRow}>
             {SLICERS.map((s) => (
               <Pressable key={s.id} style={styles.exportButton} onPress={() => handleExportToSlicer(s.id)}>
-                <Text style={styles.exportLabel}>
-                  {copiedSlicer === s.id ? 'Copied!' : s.label}
-                </Text>
+                <Text style={styles.exportLabel}>{copiedSlicer === s.id ? 'Copied!' : s.label}</Text>
               </Pressable>
             ))}
           </View>
@@ -547,9 +381,9 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({
   );
 };
 
-// ---------------------------------------------
-// Styles
-// ---------------------------------------------
+/** -------------------------------------------
+ * Styles
+ * ------------------------------------------*/
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0f172a' },
   header: {
@@ -566,17 +400,28 @@ const styles = StyleSheet.create({
   subtitle: { color: '#cbd5f5', marginTop: 4 },
   topIssue: { marginTop: 6, color: '#facc15', fontWeight: '600' },
 
-  primaryButton: { backgroundColor: '#38bdf8', borderRadius: 999, paddingHorizontal: 20, paddingVertical: 10 },
+  primaryButton: {
+    backgroundColor: '#38bdf8',
+    borderRadius: 999,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
   primaryLabel: { color: '#0f172a', fontWeight: '700' },
-  secondaryButton: { borderColor: '#38bdf8', borderWidth: 1, borderRadius: 999, paddingHorizontal: 20, paddingVertical: 10 },
+  secondaryButton: {
+    borderColor: '#38bdf8',
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
   secondaryLabel: { color: '#e0f2fe', fontWeight: '600' },
   smallButton: { paddingHorizontal: 16, paddingVertical: 8 },
 
   scroll: { flex: 1 },
   scrollContent: { padding: 16, gap: 20 },
 
-  section: { gap: 12 },
-  sectionTitle: { color: '#f8fafc', fontSize: 18, fontWeight: '600' },
+  section: { backgroundColor: '#111827', borderRadius: 12, padding: 16, gap: 8 },
+  sectionTitle: { color: '#f8fafc', fontSize: 16, fontWeight: '600' },
   emptyFacts: { color: '#94a3b8', fontStyle: 'italic' },
 
   previewContainer: {
@@ -589,6 +434,7 @@ const styles = StyleSheet.create({
   },
   previewImage: { ...StyleSheet.absoluteFillObject, resizeMode: 'cover' },
 
+  // Boxes
   boundingBox: {
     position: 'absolute',
     borderWidth: 2,
@@ -607,75 +453,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
   },
-<<<<<<< HEAD
 
-  opacityRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  overlayLabel: { color: '#cbd5f5', fontSize: 12 },
-  opacityButtons: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  bumpButton: { backgroundColor: '#1f2937', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 },
-  bumpLabel: { color: '#e2e8f0', fontWeight: '700', fontSize: 16 },
-  opacityValue: { color: '#f8fafc', fontVariant: ['tabular-nums'] },
-
-  predictionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#111c2c',
-=======
-  section: {
-    backgroundColor: '#111827',
-    borderRadius: 12,
-    padding: 16,
-    gap: 8,
-  },
-  sectionTitle: {
-    color: '#f8fafc',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  emptyText: {
-    color: '#94a3b8',
-  },
-  issueRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  issueName: {
-    color: '#e2e8f0',
-    fontWeight: '600',
-  },
-  issueConfidence: {
-    color: '#38bdf8',
-    fontVariant: ['tabular-nums'],
-  },
-  parameterRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 12,
-  },
-  parameterName: {
-    flex: 2,
-    color: '#f1f5f9',
-  },
-  parameterValue: {
-    flex: 1,
-    textAlign: 'right',
-    color: '#cbd5f5',
-    fontVariant: ['tabular-nums'],
-  },
-  parameterApplied: {
-    flex: 1,
-    textAlign: 'right',
-    color: '#38bdf8',
-    fontVariant: ['tabular-nums'],
-  },
-  exportPrimaryButton: {
-    backgroundColor: '#38bdf8',
->>>>>>> dc18027a43493057f17ef6cef96318a53002a2f1
-    borderRadius: 12,
-    padding: 12,
-  },
+  // Predictions
+  predictionRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   predictionLabel: { color: '#e2e8f0', fontWeight: '600' },
   predictionConfidence: { color: '#38bdf8', fontVariant: ['tabular-nums'] },
 
@@ -684,17 +464,31 @@ const styles = StyleSheet.create({
   paramName: { color: '#f1f5f9' },
   paramValue: { color: '#cbd5f5', fontVariant: ['tabular-nums'] },
 
-  note: { color: '#94a3b8' },
-
-  // Export diff primary button
-  primaryWide: { backgroundColor: '#38bdf8', borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
+  // Export diff button
+  primaryWide: {
+    backgroundColor: '#38bdf8',
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
   primaryWideLabel: { color: '#0f172a', fontWeight: '700', fontSize: 16 },
   exportStatus: { color: '#38bdf8' },
 
-  // Export buttons row
+  // Copy for slicers
   buttonRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   exportButton: { backgroundColor: '#1f2937', paddingVertical: 10, paddingHorizontal: 16, borderRadius: 8 },
   exportLabel: { color: '#38bdf8', fontWeight: '600' },
+
+  // Opacity controls
+  opacityRow: { marginTop: 8, gap: 8 },
+  overlayLabel: { color: '#f8fafc', marginBottom: 4 },
+  opacityButtons: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  bumpButton: { backgroundColor: '#1f2937', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 8 },
+  bumpLabel: { color: '#e2e8f0', fontWeight: '700' },
+  opacityValue: { color: '#cbd5f5', minWidth: 40, textAlign: 'center' },
+
+  // NEW: used for recommendations, capability notes, etc.
+  note: { color: '#94a3b8' },
 });
 
 export default AnalysisResult;

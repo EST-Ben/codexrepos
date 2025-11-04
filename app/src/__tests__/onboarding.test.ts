@@ -1,8 +1,19 @@
+// src/__tests__/onboarding.test.ts
+import { describe, it, expect, jest } from '@jest/globals';
+import type { MockedFunction } from 'jest-mock';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  loadOnboardingState,
+  saveOnboardingState,
+  ONBOARDING_STORAGE_KEY,
+} from '../storage/onboarding';
+import {
+  deriveParameterRanges,
+  filterParametersForExperience,
+} from '../state/onboarding';
 
-import { loadOnboardingState, saveOnboardingState, ONBOARDING_STORAGE_KEY } from '../storage/onboarding';
-import { deriveParameterRanges, filterParametersForExperience } from '../state/onboarding';
-
+// Mock AsyncStorage in-memory
 jest.mock('@react-native-async-storage/async-storage', () => {
   let store: Record<string, string> = {};
   return {
@@ -33,7 +44,12 @@ describe('onboarding storage helpers', () => {
   });
 
   it('hydrates onboarding state with defaults when nothing stored', async () => {
-    (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(null);
+    // Cast the mock so TS knows it resolves to string | null
+    const getItemMock = AsyncStorage.getItem as unknown as MockedFunction<
+      typeof AsyncStorage.getItem
+    >;
+    getItemMock.mockResolvedValueOnce(null);
+
     const result = await loadOnboardingState();
     expect(result.selectedMachines).toEqual([]);
     expect(result.experience).toBe('Beginner');
@@ -58,8 +74,8 @@ describe('experience filters', () => {
   it('widens ranges for advanced users', () => {
     const beginnerRanges = deriveParameterRanges(parameters, 'Beginner');
     const advancedRanges = deriveParameterRanges(parameters, 'Advanced');
-    expect(advancedRanges.nozzle_temp.max - advancedRanges.nozzle_temp.min).toBeGreaterThan(
-      beginnerRanges.nozzle_temp.max - beginnerRanges.nozzle_temp.min,
-    );
+    expect(
+      advancedRanges.nozzle_temp.max - advancedRanges.nozzle_temp.min,
+    ).toBeGreaterThan(beginnerRanges.nozzle_temp.max - beginnerRanges.nozzle_temp.min);
   });
 });

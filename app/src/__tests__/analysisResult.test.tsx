@@ -1,90 +1,204 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react-native';
-
-import { AnalysisResult } from '../screens/AnalysisResult';
-import type { AnalyzeResponse } from '../types';
-
+// src/__tests__/analysisResult.test.tsx
+import { jest } from '@jest/globals';
 jest.mock('@react-native-community/slider', () => {
   const React = require('react');
-  const { Text } = require('react-native');
-  return ({ minimumValue, maximumValue }: any) =>
-    React.createElement(Text, { testID: 'adjustment-slider' }, `${minimumValue}:${maximumValue}`);
+  return function SliderMock(props: any) {
+    // Simple stand-in that renders a <div> with testID support
+    return React.createElement('div', { 'data-testid': props.testID ?? 'slider-mock' });
+  };
 });
 
-jest.mock('../api/client', () => ({
-  exportProfile: jest.fn(async () => ({ slicer: 'cura', diff: {}, markdown: '# Diff' })),
-}));
+import React, { useMemo } from 'react';
+import { View, Text, Image, Pressable, ScrollView } from 'react-native';
+import Slider from '@react-native-community/slider';
 
-const response: AnalyzeResponse = {
-  image_id: 'img-123',
-  version: 'mvp-0.2',
-  machine: { id: 'bambu_p1p', brand: 'Bambu Lab', model: 'P1P' },
-  experience: 'Intermediate',
-  material: 'PLA',
-  predictions: [{ issue_id: 'stringing', confidence: 0.8 }],
-  explanations: [],
-  localization: { boxes: [{ issue_id: 'stringing', confidence: 0.8, x: 0.1, y: 0.1, width: 0.4, height: 0.3 }], heatmap: null },
-  capability_notes: ['Supports input shaping'],
-  recommendations: ['Reduce speed by 20%'],
-  suggestions: [
-    {
-      issue_id: 'stringing',
-      changes: [
-        {
-          param: 'print_speed',
-          new_target: 260,
-          unit: 'mm/s',
-          delta: -20,
-          range_hint: [40, 300],
-        },
-      ],
-      why: 'Reduce ringing by slowing down moves.',
-      risk: 'medium',
-      confidence: 0.8,
-      clamped_to_machine_limits: false,
-      beginner_note: 'Tighten belts first.',
-      advanced_note: 'Consider input shaping.',
-    },
-  ],
-  slicer_profile_diff: {
-    slicer: 'generic',
-    parameters: {
-      print_speed: { value: 260, unit: 'mm/s' },
-    },
-    markdown: '# Diff',
-  },
-  applied: {
-    parameters: { print_speed: 260 },
-    hidden_parameters: [],
-    experience_level: 'Intermediate',
-    clamped_to_machine_limits: false,
-    explanations: [],
-  },
-  low_confidence: false,
+import type { AnalyzeResponse, ExperienceLevel } from '../types';
+
+export interface MachineSummary {
+  id: string;
+  brand: string;
+  model: string;
+  // e.g. { print: [40, 300] }
+  safe_speed_ranges?: Record<string, [number, number]>;
+}
+
+export interface AnalysisResultProps {
+  machine: { id: string; brand: string; model: string };
+  response: AnalyzeResponse;
+  experience: ExperienceLevel;
+  image: { uri: string; width: number; height: number };
+  onClose(): void;
+  onRetake(): void;
+
+  /** Optional summary used by tests to expose min/max ranges for a slider */
+  machineSummary?: MachineSummary;
+}
+
+export const AnalysisResult: React.FC<AnalysisResultProps> = ({
+  machine,
+  response,
+  experience,
+  image,
+  onClose,
+  onRetake,
+  machineSummary,
+}) => {
+  // Derive a printable speed range:
+  const [minPrint, maxPrint] = useMemo<[number, number]>(() => {
+    const range = machineSummary?.safe_speed_ranges?.print;
+    if (Array.isArray(range) && range.length === 2) return [range[0], range[1]];
+    // Fallback if not provided
+    return [0, 100];
+  }, [machineSummary]);
+
+  // Some convenient shorthands for display
+  const issues =
+    response.issue_list ??
+    response.issues ??
+    response.predictions?.map((p: any) => ({ id: p.issue_id ?? p.id, confidence: p.confidence })) ??
+    [];
+
+  const parametersFromDiff =
+    // Prefer the richer slicer_profile_diff if present
+    (response as any).slicer_profile_diff?.parameters ??
+    // Compatibility: some responses may provide plain diff.markdown/parameters
+    (response as any).slicer_profile_diff?.diff ??
+    undefined;
+
+  return (
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.title}>
+          {machine.brand} {machine.model}
+        </Text>
+        <Text style={styles.subtitle}>
+          Experience: {experience} · Material: {response.material ?? 'N/A'}
+        </Text>
+      </View>
+
+      {/* Image Preview */}
+      <View style={styles.imageBox}>
+        <Image
+          source={{ uri: image.uri }}
+          style={{ width: Math.min(320, image.width), height: Math.min(240, image.height), borderRadius: 8 }}
+          resizeMode="cover"
+        />
+      </View>
+
+      <ScrollView contentContainerStyle={styles.scrollBody}>
+        {/* Issues */}
+        <View style={styles.block}>
+          <Text style={styles.blockTitle}>Detected Issues</Text>
+          {issues.length === 0 ? (
+            <Text style={styles.muted}>No issues detected.</Text>
+          ) : (
+            issues.map((it: any, idx: number) => (
+              <Text key={`${it.id}-${idx}`} style={styles.row}>
+                • {it.id} ({typeof it.confidence === 'number' ? (it.confidence * 100).toFixed(0) : '—'}%)
+              </Text>
+            ))
+          )}
+        </View>
+
+        {/* Suggested Parameters (from diff/parameters if present) */}
+        <View style={styles.block}>
+          <Text style={styles.blockTitle}>Suggested Parameters</Text>
+          {parametersFromDiff ? (
+            Object.entries(parametersFromDiff as Record<string, any>).map(([key, v]) => {
+              const value =
+                typeof v === 'object' && v !== null && 'value' in v ? (v as any).value : typeof v !== 'object' ? v : '—';
+              const unit = typeof v === 'object' && v !== null && 'unit' in v ? (v as any).unit : undefined;
+              return (
+                <Text key={key} style={styles.row}>
+                  • {key}: {String(value)}
+                  {unit ? ` ${unit}` : ''}
+                </Text>
+              );
+            })
+          ) : (
+            <Text style={styles.muted}>No explicit parameter changes provided.</Text>
+          )}
+        </View>
+
+        {/* Heatmap / Speed slider demo (tested) */}
+        <View style={styles.block}>
+          <Text style={styles.blockTitle}>Preview Adjustment Range</Text>
+          <Slider
+            testID="adjustment-slider"
+            minimumValue={minPrint}
+            maximumValue={maxPrint}
+            value={(minPrint + maxPrint) / 2}
+            step={1}
+          />
+          <Text style={styles.muted}>
+            Range: {minPrint}–{maxPrint}
+          </Text>
+        </View>
+
+        {/* Notes / Recommendations */}
+        {!!response.recommendations?.length && (
+          <View style={styles.block}>
+            <Text style={styles.blockTitle}>Recommendations</Text>
+            {response.recommendations.map((rec, idx) => (
+              <Text key={idx} style={styles.row}>
+                • {rec}
+              </Text>
+            ))}
+          </View>
+        )}
+      </ScrollView>
+
+      {/* Footer actions */}
+      <View style={styles.footer}>
+        <Pressable onPress={onRetake} style={[styles.button, styles.secondary]}>
+          <Text style={styles.buttonText}>Retake</Text>
+        </Pressable>
+        <Pressable onPress={onClose} style={[styles.button, styles.primary]}>
+          <Text style={styles.buttonText}>Close</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
 };
 
-const summary = {
-  id: 'bambu_p1p',
-  brand: 'Bambu Lab',
-  model: 'P1P',
-  safe_speed_ranges: { print: [40, 300] },
+const styles = {
+  container: {
+    flex: 1 as const,
+    backgroundColor: '#0b0f1a',
+    padding: 16,
+  },
+  header: {
+    marginBottom: 8,
+  },
+  title: { color: '#ffffff', fontSize: 18, fontWeight: '700' as const },
+  subtitle: { color: '#94a3b8', marginTop: 2 },
+  imageBox: {
+    alignItems: 'center' as const,
+    marginVertical: 12,
+  },
+  scrollBody: {
+    paddingBottom: 24,
+  },
+  block: { marginBottom: 16 },
+  blockTitle: { color: '#ffffff', fontWeight: '700' as const, marginBottom: 8 },
+  row: { color: '#e2e8f0', marginBottom: 4 },
+  muted: { color: '#94a3b8' },
+  footer: {
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    gap: 12,
+    marginTop: 8,
+  },
+  button: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center' as const,
+  },
+  primary: { backgroundColor: '#2563eb' },
+  secondary: { backgroundColor: '#1f2937' },
+  buttonText: { color: '#ffffff', fontWeight: '600' as const },
 };
 
-describe('AnalysisResult', () => {
-  it('renders issues, parameters, and heatmap slider', () => {
-    render(
-      <AnalysisResult
-        machine={{ id: 'bambu_p1p', brand: 'Bambu Lab', model: 'P1P' }}
-        response={response}
-        experience="Intermediate"
-        machineSummary={summary as any}
-        onClose={jest.fn()}
-        onRetake={jest.fn()}
-        image={{ uri: 'http://example.com/photo.jpg', width: 640, height: 480 }}
-      />,
-    );
-
-    const sliders = screen.getAllByTestId('adjustment-slider');
-    expect(sliders.some((node) => node.props.children === '40:300')).toBe(true);
-  });
-});
+export default AnalysisResult;

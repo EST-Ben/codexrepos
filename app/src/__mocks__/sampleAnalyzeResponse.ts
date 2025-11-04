@@ -1,67 +1,92 @@
-import { AnalyzeResponse } from "../types";
+// src/__mocks__/sampleAnalyzeResponse.ts
+import type { AnalyzeResponse, ExperienceLevel } from '../types';
 
-export const sampleAnalyzeResponse: AnalyzeResponse = {
-  image_id: "sample-image-001",
+export const makeSampleAnalyzeResponse = (
+  experience: ExperienceLevel = 'Intermediate',
+  overrides: Partial<AnalyzeResponse> = {},
+): AnalyzeResponse => ({
+  image_id: 'mock-image-id',
+  version: 'test-mock-1',
+  machine: { id: 'bambu_p1s', brand: 'Bambu Lab', model: 'P1S' },
+  experience,
+  material: 'PLA',
   predictions: [
-    { issue_id: "stringing", confidence: 0.82 },
-    { issue_id: "under_extrusion", confidence: 0.47 },
+    // Example: { issue_id: 'stringing', confidence: 0.87 },
+  ],
+  // IMPORTANT: explanations is string[]
+  explanations: [
+    'Detected artifacts consistent with stringing.',
+    'Consider tuning retraction and temperature.',
+  ],
+  localization: { boxes: [], heatmap: null },
+  capability_notes: [
+    'Increase retraction distance for PLA.',
+    'Dry filament to reduce stringing.',
   ],
   recommendations: [
-    "Increase retraction distance by 0.5 mm to reduce stringing.",
-    "Verify filament path for obstructions to address under-extrusion.",
+    'Try a lower nozzle temperature (e.g., 205°C).',
+    'Reduce travel speed slightly to improve quality.',
   ],
-  capability_notes: [
-    "CoreXY motion allows higher travel speeds without backlash.",
-    "Enclosed chamber supports elevated bed temperatures for ABS.",
-  ],
-  localization: {
-    heatmap: {
-      data_url:
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAGgwJ/lh9i7gAAAABJRU5ErkJggg==",
+  suggestions: [
+    {
+      issue_id: 'stringing',
+      why: 'Visible fine strings between towers.',
+      risk: 'Low',
+      confidence: 0.8,
+      beginner_note: 'Lower temperature and increase retraction slightly.',
+      advanced_note: 'Tune retraction extra prime amount and wipe.',
+      clamped_to_machine_limits: false,
+      changes: [
+        {
+          param: 'retraction_distance',
+          delta: 0.5,
+          unit: 'mm',
+          range_hint: [0, 3],
+        },
+        {
+          param: 'nozzle_temperature',
+          delta: -5,
+          unit: '°C',
+          range_hint: [190, 230],
+        },
+      ],
     },
-    boxes: [
-      {
-        issue_id: "stringing",
-        x: 0.32,
-        y: 0.18,
-        width: 0.24,
-        height: 0.27,
-        confidence: 0.79,
-      },
-      {
-        issue_id: "under_extrusion",
-        x: 0.58,
-        y: 0.52,
-        width: 0.19,
-        height: 0.21,
-        confidence: 0.58,
-      },
-    ],
-  },
+  ],
+  // Matches your SlicerProfileDiff (no `slicer`)
   slicer_profile_diff: {
-    diff: {
-      nozzle_temp: 205,
-      retraction_distance: 4.5,
-      travel_speed: 160,
-      enable_combing: true,
+    parameters: {
+      retraction_distance: { value: 1.5, unit: 'mm', range_hint: [0, 3] },
+      nozzle_temperature: { value: 205, unit: '°C', range_hint: [190, 230] },
+      travel_speed: { value: 180, unit: 'mm/s', range_hint: [80, 300], clamped: false },
     },
-    markdown: "- Set nozzle temperature to **205°C**\n- Increase retraction distance to **4.5 mm**\n- Raise travel speed to **160 mm/s**\n- Enable combing for cleaner travel moves",
+    // Legacy plain diff: values must be string | number | boolean
+    diff: {
+      retraction_distance: 1.5,
+      nozzle_temperature: 205,
+      travel_speed: 180,
+    },
+    markdown: [
+      '**Suggested Profile Adjustments**',
+      '- Increase retraction distance slightly',
+      '- Lower nozzle temperature for PLA',
+      '- Keep travel speed moderate',
+    ].join('\n'),
   },
-  explanations: [
-    "Detected fine wisps indicative of stringing across infill gaps.",
-    "Surface gaps along the perimeter suggest under-extrusion symptoms.",
-  ],
   applied: {
-    nozzle_temp: 205,
-    retraction_distance: 4.5,
-    travel_speed: 160,
-    enable_combing: true,
+    parameters: {
+      retraction_distance: 1.5,
+      nozzle_temperature: 205,
+      travel_speed: 180,
+    },
+    hidden_parameters: [],
+    experience_level: experience,
+    clamped_to_machine_limits: false,
+    explanations: [],
   },
-  meta: {
-    machine_id: "bambu_x1c",
-    material: "PLA",
-    experience: "Intermediate",
-  },
-};
+  low_confidence: false,
+  ...overrides,
+});
 
+// Default export: a ready-to-use sample object
+const sampleAnalyzeResponse = makeSampleAnalyzeResponse();
 export default sampleAnalyzeResponse;

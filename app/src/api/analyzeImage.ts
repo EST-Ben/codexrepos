@@ -1,7 +1,12 @@
-import { getApiRoot } from "./client";
-import type { AnalyzeResponse } from "../types";
+// app/src/api/analyzeImage.ts
+// Wrapper that preserves this module's API while delegating the actual
+// upload/handling to the stable implementation in ./client to avoid drift.
 
-export type Experience = "Beginner" | "Intermediate" | "Advanced";
+import Constants from "expo-constants";
+import { analyzeImage as coreAnalyzeImage, type RNFileLike } from "./client";
+import type { AnalyzeRequestMeta, AnalyzeResponse, ExperienceLevel } from "../types";
+
+export type Experience = ExperienceLevel;
 
 export interface AnalyzeImageRequest {
   uri: string; // file://... (from ImagePicker)
@@ -14,21 +19,6 @@ export interface AnalyzeImageRequest {
   mimeType?: string; // optional override (default: "image/jpeg")
 }
 
-export interface AnalyzeImageResponse {
-  image_id: string;
-  machine: { id?: string; brand?: string; model?: string };
-  issue_list: Array<{ id: string; confidence: number }>;
-  top_issue?: string | null;
-  boxes?: Array<{ issue_id?: string; x: number; y: number; w: number; h: number; score?: number }>;
-  heatmap?: string | null;
-  parameter_targets: Record<string, number>;
-  applied: Record<string, number>;
-  recommendations: string[];
-  capability_notes: string[];
-  clamp_explanations?: string[];
-  hidden_parameters?: string[];
-}
-
 // Some Android/iOS URIs come without file extension; default a stable name
 function inferName(uri: string, fallback = "print.jpg"): string {
   try {
@@ -38,45 +28,29 @@ function inferName(uri: string, fallback = "print.jpg"): string {
   return fallback;
 }
 
-export async function analyzeImage(
-  req: AnalyzeImageRequest
-): Promise<AnalyzeImageResponse> {
-  const API_BASE = `${getApiRoot()}/api`;
-
-  const form = new FormData();
-
-  // Server expects a JSON "meta" field alongside the file
-  const meta = {
-    machine_id: req.machine,
-    experience: req.experience ?? "Intermediate",
-    material: req.material ?? "PLA",
-    base_profile: req.baseProfile ?? undefined,
-    app_version:
-      req.appVersion ?? (Constants?.expoConfig as any)?.version ?? "dev",
+export async function analyzeImage(req: AnalyzeImageRequest): Promise<AnalyzeResponse> {
+  // Build RN-style file object for the shared client
+  const file: RNFileLike = {
+    uri: req.uri,
+    name: req.fileName ?? inferName(req.uri),
+    type: req.mimeType ?? "image/jpeg",
   };
-  // Remove undefined keys before serialising to keep payload tidy
-  const metaClean = Object.fromEntries(
-    Object.entries(meta).filter(([_, value]) => value !== undefined)
-  );
-  form.append("meta", JSON.stringify(metaClean));
 
-  const name = req.fileName ?? inferName(req.uri);
-  const type = req.mimeType ?? "image/jpeg";
+  // Build meta in the canonical shape used by the backend & client.ts
+  const meta: AnalyzeRequestMeta = {
+    machine_id: req.machine,
+    experience: (req.experience ?? "Intermediate") as ExperienceLevel,
+    material: req.material ?? "PLA",
+    base_profile: (req.baseProfile ?? undefined) as Record<string, number> | undefined,
+    app_version:
+      req.appVersion ??
+      // Expo SDK 49+: expoConfig
+      (Constants?.expoConfig as any)?.version ??
+      // Older SDKs: manifest
+      (Constants as any)?.manifest?.version ??
+      "dev",
+  };
 
-  // React Native/Expo FormData file shape: { uri, name, type }
-  const rnFile: any = { uri: req.uri, name, type };
-  form.append("image", rnFile);
-
-  const res = await fetch(`${API_BASE}/analyze`, {
-    method: "POST",
-    headers: { Accept: "application/json" },
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const text = await response.text().catch(() => "");
-    throw new Error(text || `Analyze image failed with status ${response.status}`);
-  }
-
-  return (await response.json()) as AnalyzeResponse;
+  // Delegate to the central implementation (handles FormData, fetch, etc.)
+  return coreAnalyzeImage(file, meta);
 }

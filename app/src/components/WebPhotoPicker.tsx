@@ -1,26 +1,8 @@
-<<<<<<< HEAD
-// app/src/components/WebPhotoPicker.tsx
-import React, { useRef, useState } from "react";
-import { Platform } from "react-native";
-import { analyzeImage } from "../api/client";
-import type { AnalyzeResponse, ExperienceLevel } from "../types";
-
-type Props = {
-  machineId: string;
-  material: string;
-  experience: ExperienceLevel;
-  onResult: (res: AnalyzeResponse) => void;
-  onError?: (msg: string) => void;
-  label?: string;
-};
-
-export default function WebPhotoPicker({
-=======
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, Text } from 'react-native';
 
-import analyzeImage from '../api/analyzeImage';
-import type { AnalyzeResponse, ExperienceLevel } from '../types';
+import { analyzeImage as analyzeImageApi } from '../api/client';
+import type { AnalyzeResponse, ExperienceLevel, AnalyzeRequestMeta } from '../types';
 
 interface WebPhotoPickerProps {
   machineId: string;
@@ -35,51 +17,11 @@ interface WebPhotoPickerProps {
 }
 
 export const WebPhotoPicker: React.FC<WebPhotoPickerProps> = ({
->>>>>>> dc18027a43493057f17ef6cef96318a53002a2f1
   machineId,
   material,
   experience,
   onResult,
   onError,
-<<<<<<< HEAD
-  label = "Choose photo",
-}: Props) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  function openPicker() {
-    if (Platform.OS !== "web") {
-      onError?.("WebPhotoPicker is web-only; use CameraButton on native.");
-      return;
-    }
-    inputRef.current?.click();
-  }
-
-  async function onChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setBusy(true);
-    try {
-      const res = await analyzeImage(file, {
-        machine_id: machineId,
-        experience,
-        material,
-        app_version: "web-inline",
-      });
-      onResult(res);
-    } catch (err: any) {
-      onError?.(err?.message ?? String(err));
-    } finally {
-      // reset the input so the same file can be chosen again if needed
-      e.target.value = "";
-      setBusy(false);
-    }
-  }
-
-  return (
-    <>
-      {/* Hidden input for web file choose */}
-=======
   label = 'Choose Photo',
   appVersion = 'web-photo-picker',
   onPreviewReady,
@@ -94,6 +36,7 @@ export const WebPhotoPicker: React.FC<WebPhotoPickerProps> = ({
   }, [isUploading, onBusyChange]);
 
   useEffect(() => {
+    // cleanup any object URL we created
     return () => {
       if (objectUrlRef.current && typeof URL !== 'undefined') {
         URL.revokeObjectURL(objectUrlRef.current);
@@ -111,27 +54,20 @@ export const WebPhotoPicker: React.FC<WebPhotoPickerProps> = ({
   const handleChange = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
-      if (!file) {
-        return;
-      }
+      if (!file) return;
 
       if (objectUrlRef.current && typeof URL !== 'undefined') {
         URL.revokeObjectURL(objectUrlRef.current);
         objectUrlRef.current = null;
       }
 
-      const meta = {
-        machine_id: machineId,
-        experience,
-        app_version: appVersion,
-        ...(material ? { material } : {}),
-      };
-
       const nextUrl = URL.createObjectURL(file);
       objectUrlRef.current = nextUrl;
 
       try {
         setIsUploading(true);
+
+        // Best-effort preview (non-blocking for analysis)
         if (onPreviewReady) {
           const ImageCtor = typeof Image !== 'undefined' ? Image : undefined;
           if (ImageCtor) {
@@ -152,11 +88,17 @@ export const WebPhotoPicker: React.FC<WebPhotoPickerProps> = ({
           }
         }
 
-        const form = new FormData();
-        form.append('image', file, file.name ?? 'upload.jpg');
-        form.append('meta', JSON.stringify(meta));
+        // Build meta for the API that matches AnalyzeRequestMeta
+        const meta: AnalyzeRequestMeta = {
+          machine_id: machineId,
+          experience,
+          material,
+          app_version: appVersion,
+          // base_profile intentionally omitted here (not used in web picker)
+        };
 
-        const response = await analyzeImage(form);
+        // Call the shared API helper: (file, meta) -> AnalyzeResponse
+        const response = await analyzeImageApi(file, meta);
         onResult(response);
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
@@ -170,9 +112,7 @@ export const WebPhotoPicker: React.FC<WebPhotoPickerProps> = ({
   );
 
   const handlePress = useCallback(() => {
-    if (isUploading) {
-      return;
-    }
+    if (isUploading) return;
     inputRef.current?.click();
   }, [isUploading]);
 
@@ -191,33 +131,10 @@ export const WebPhotoPicker: React.FC<WebPhotoPickerProps> = ({
       >
         <Text style={{ color: '#fff', fontWeight: '600' }}>{isUploading ? 'Uploading…' : label}</Text>
       </Pressable>
->>>>>>> dc18027a43493057f17ef6cef96318a53002a2f1
       <input
         ref={inputRef}
         type="file"
         accept="image/*"
-<<<<<<< HEAD
-        style={{ display: "none" }}
-        onChange={onChange}
-      />
-      <button
-        type="button"
-        onClick={openPicker}
-        disabled={busy}
-        style={{
-          padding: "10px 14px",
-          borderRadius: 8,
-          border: "1px solid #ccc",
-          cursor: busy ? "not-allowed" : "pointer",
-          background: busy ? "#eee" : "#f7f7f7",
-        }}
-      >
-        {busy ? "Uploading…" : label}
-      </button>
-    </>
-  );
-}
-=======
         capture="environment"
         onChange={handleChange}
         style={{ display: 'none' }}
@@ -227,4 +144,3 @@ export const WebPhotoPicker: React.FC<WebPhotoPickerProps> = ({
 };
 
 export default WebPhotoPicker;
->>>>>>> dc18027a43493057f17ef6cef96318a53002a2f1
