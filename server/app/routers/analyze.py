@@ -18,6 +18,8 @@ from server.machines import MachineProfile, resolve_machine
 
 router = APIRouter(tags=["analyze"])
 
+RESPONSE_VERSION = "2024.01"
+
 _PIPELINE_CANDIDATES = (
     "server.inference.pipeline",
     "server.ml.pipeline",
@@ -67,6 +69,20 @@ def load_rules_engine() -> Type[Any]:
     return rules_engine
 
 
+def _stringify_explanations(values: Any) -> List[str]:
+    result: List[str] = []
+    if not values:
+        return result
+    for item in values:
+        if item is None:
+            continue
+        if isinstance(item, str):
+            result.append(item)
+        else:
+            result.append(str(item))
+    return result
+
+
 @router.post("/analyze")
 def deprecated_analyze() -> None:  # pragma: no cover
     """Historical location for analyze. Multipart now lives in analyze_image router."""
@@ -110,31 +126,30 @@ def analyze_json(payload: AnalyzeRequest):
         machine, prediction.parameter_targets, payload.experience
     )
 
-    applied_parameters = (
-        clamp_summary.get("parameters", {}) if isinstance(clamp_summary, dict) else clamp_summary
-    )
-    clamp_explanations = (
-        clamp_summary.get("explanations", []) if isinstance(clamp_summary, dict) else []
-    )
-    hidden_parameters = (
-        clamp_summary.get("hidden_parameters", []) if isinstance(clamp_summary, dict) else []
-    )
+    predictions = [
+        {"issue_id": prediction.issue, "confidence": float(prediction.confidence)}
+    ]
+    explanations = _stringify_explanations(clamp_summary.get("explanations"))
+    heatmap = None
 
     return {
         "image_id": f"json-{uuid.uuid4().hex}",
+        "version": RESPONSE_VERSION,
         "machine": {
             "id": machine.get("id"),
             "brand": machine.get("brand"),
             "model": machine.get("model"),
         },
-        "issue_list": [{"id": prediction.issue, "confidence": prediction.confidence}],
-        "top_issue": prediction.issue,
-        "boxes": [],
-        "heatmap": None,
-        "parameter_targets": prediction.parameter_targets,
-        "applied": applied_parameters,
-        "recommendations": prediction.recommendations,
+        "experience": payload.experience,
+        "material": payload.material,
+        "predictions": predictions,
+        "explanations": explanations,
+        "localization": {"boxes": [], "heatmap": heatmap},
         "capability_notes": getattr(prediction, "capability_notes", []),
-        "clamp_explanations": clamp_explanations,
-        "hidden_parameters": hidden_parameters,
+        "recommendations": prediction.recommendations,
+        "suggestions": [],
+        "slicer_profile_diff": None,
+        "applied": clamp_summary,
+        "parameter_targets": prediction.parameter_targets,
+        "low_confidence": predictions[0]["confidence"] < 0.5,
     }
