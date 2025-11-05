@@ -1,76 +1,37 @@
-/**
- * Onboarding/profile local storage helpers for web + native.
- * Provides:
- *  - loadOnboardingState / saveOnboardingState (used at app start)
- *  - DEFAULT_PROFILE / loadStoredProfile / saveStoredProfile (compat exports used by profile state)
- */
+// src/storage/onboarding.ts
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import type { OnboardingState } from '../types';
 
-import type { OnboardingState, ProfileState } from '../types';
+export const ONBOARDING_STORAGE_KEY = 'onboarding:v1';
 
-// Storage keys
-const ONBOARDING_KEY = 'codex.onboarding.v1';
-const PROFILE_KEY = 'codex.profile.v1';
-
-// A minimal default profile the app can hydrate with
-export const DEFAULT_PROFILE: ProfileState = {
-  experience: 'Intermediate',
-  machines: [],
-  material: undefined,
-  materialByMachine: {}
+export const DEFAULT_ONBOARDING: OnboardingState = {
+  selectedMachines: [],
+  experience: 'Beginner',
 };
 
-// ---- Onboarding state ----
-export async function loadOnboardingState(): Promise<OnboardingState | null> {
-  try {
-    if (typeof localStorage === 'undefined') return null;
-    const raw = localStorage.getItem(ONBOARDING_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    // Basic shape guard
-    if (!parsed || !Array.isArray(parsed.selectedMachines) || !parsed.experience) {
-      return null;
-    }
-    return parsed as OnboardingState;
-  } catch {
-    return null;
-  }
+export async function saveOnboardingState(state: OnboardingState): Promise<void> {
+  // Persist a minimal, validated shape
+  const payload: OnboardingState = {
+    selectedMachines: Array.isArray(state.selectedMachines) ? state.selectedMachines : [],
+    experience: state.experience ?? 'Beginner',
+  };
+  await AsyncStorage.setItem(ONBOARDING_STORAGE_KEY, JSON.stringify(payload));
 }
 
-export async function saveOnboardingState(state: OnboardingState | null): Promise<void> {
+export async function loadOnboardingState(): Promise<OnboardingState> {
   try {
-    if (typeof localStorage === 'undefined') return;
-    if (!state) {
-      localStorage.removeItem(ONBOARDING_KEY);
-      return;
+    const raw = await AsyncStorage.getItem(ONBOARDING_STORAGE_KEY);
+    if (!raw) {
+      return DEFAULT_ONBOARDING;
     }
-    localStorage.setItem(ONBOARDING_KEY, JSON.stringify(state));
-  } catch {
-    // ignore
-  }
-}
+    const parsed = JSON.parse(raw) as Partial<OnboardingState> | null;
 
-// ---- Profile state (compat with existing imports) ----
-export async function loadStoredProfile(): Promise<ProfileState> {
-  try {
-    if (typeof localStorage === 'undefined') return DEFAULT_PROFILE;
-    const raw = localStorage.getItem(PROFILE_KEY);
-    if (!raw) return DEFAULT_PROFILE;
-    const parsed = JSON.parse(raw);
-    // Shallow sanity checks
-    if (!parsed || !parsed.experience || !Array.isArray(parsed.machines)) {
-      return DEFAULT_PROFILE;
-    }
-    return parsed as ProfileState;
-  } catch {
-    return DEFAULT_PROFILE;
-  }
-}
+    const selectedMachines = Array.isArray(parsed?.selectedMachines) ? parsed!.selectedMachines : [];
+    const experience = (parsed?.experience ?? 'Beginner') as OnboardingState['experience'];
 
-export async function saveStoredProfile(profile: ProfileState): Promise<void> {
-  try {
-    if (typeof localStorage === 'undefined') return;
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+    return { selectedMachines, experience };
   } catch {
-    // ignore
+    // Corrupt JSON or any other error → fall back to defaults
+    return DEFAULT_ONBOARDING;
   }
 }

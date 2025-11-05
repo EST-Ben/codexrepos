@@ -1,348 +1,128 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+import type { ExperienceLevel, OnboardingState } from '../types';
+import { saveOnboardingState } from '../storage/onboarding';
 
-import type {
-  ExperienceLevel,
-  MachineRef,
-  OnboardingState,
-} from '../types';
-import {
-  DEFAULT_ONBOARDING,
-  DEFAULT_PROFILE,
-  loadOnboardingState,
-  loadStoredProfile,
-  saveOnboardingState,
-  saveStoredProfile,
-} from '../storage/onboarding';
-
-const EXPERIENCE_OPTIONS: ExperienceLevel[] = ['Beginner', 'Intermediate', 'Advanced'];
-const FALLBACK_STATE: OnboardingState = {
-  selectedMachines: [],
-  experience: 'Intermediate',
+type Props = {
+  initialSelection?: string[];
+  initialExperience?: ExperienceLevel;
+  onComplete(state: OnboardingState): void;
 };
 
-function ensureStateShape(state: OnboardingState | null | undefined): OnboardingState {
-  if (!state) return { ...FALLBACK_STATE };
-  return {
-    selectedMachines: Array.isArray(state.selectedMachines)
-      ? [...state.selectedMachines]
-      : [...FALLBACK_STATE.selectedMachines],
-    experience: state.experience ?? FALLBACK_STATE.experience,
-  };
-}
+// Minimal inline options; replace with real registry if you like
+const MACHINE_CHOICES = [
+  { id: 'bambu_p1s', label: 'Bambu Lab P1S' },
+  { id: 'ender_3', label: 'Creality Ender-3' },
+  { id: 'mk4', label: 'Prusa MK4' },
+];
 
-async function persistState(
-  nextState: OnboardingState,
-  machines: MachineRef[],
-): Promise<void> {
-  const nextProfile = {
-    ...DEFAULT_PROFILE,
-    experience: nextState.experience,
-    machines: machines.map((machine) => ({ ...machine })),
-    material: DEFAULT_PROFILE.material,
-    materialByMachine: {
-      ...(DEFAULT_PROFILE.materialByMachine ?? {}),
-    },
-  };
+const EXPERIENCES: ExperienceLevel[] = ['Beginner', 'Intermediate', 'Advanced'];
 
-  await Promise.all([
-    saveOnboardingState(nextState),
-    saveStoredProfile(nextProfile),
-  ]);
-}
+const OnboardingScreen: React.FC<Props> = ({
+  initialSelection = [],
+  initialExperience = 'Beginner',
+  onComplete,
+}) => {
+  const [selected, setSelected] = useState<string[]>(initialSelection);
+  const [experience, setExperience] = useState<ExperienceLevel>(initialExperience);
 
-const OnboardingScreen: React.FC = () => {
-  const [loading, setLoading] = useState(true);
-  const [state, setState] = useState<OnboardingState>(DEFAULT_ONBOARDING);
-  const [machines, setMachines] = useState<MachineRef[]>(DEFAULT_PROFILE.machines ?? []);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-
-    (async () => {
-      try {
-        const [loadedState, storedProfile] = await Promise.all([
-          loadOnboardingState(),
-          loadStoredProfile(),
-        ]);
-
-        if (!mounted) return;
-        setState(ensureStateShape(loadedState));
-        setMachines(storedProfile?.machines ?? DEFAULT_PROFILE.machines ?? []);
-        setError(null);
-      } catch (err) {
-        if (!mounted) return;
-        console.warn('Failed to hydrate onboarding state', err);
-        setState({ ...FALLBACK_STATE });
-        setMachines(DEFAULT_PROFILE.machines ?? []);
-        setError('We could not restore your previous settings. Please review them below.');
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    })();
-
-    return () => {
-      mounted = false;
-    };
+  const toggleMachine = useCallback((id: string) => {
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   }, []);
 
-  const selectedMachineObjects = useMemo(
-    () => machines.filter((machine) => state.selectedMachines.includes(machine.id)),
-    [machines, state.selectedMachines],
-  );
+  const canContinue = useMemo(() => selected.length > 0, [selected]);
 
-  const handleExperiencePress = useCallback(
-    (experience: ExperienceLevel) => {
-      setState((prev) => {
-        if (prev.experience === experience) {
-          return prev;
-        }
-        const next: OnboardingState = {
-          ...prev,
-          experience,
-        };
-        void persistState(next, selectedMachineObjects)
-          .then(() => setError(null))
-          .catch((err) => {
-            console.warn('Failed to persist onboarding experience', err);
-            setError('Unable to save your experience preference. Please try again.');
-          });
-        return next;
-      });
-    },
-    [selectedMachineObjects],
-  );
-
-  const toggleMachine = useCallback(
-    (machine: MachineRef) => {
-      setState((prev) => {
-        const exists = prev.selectedMachines.includes(machine.id);
-        const nextSelected = exists
-          ? prev.selectedMachines.filter((id) => id !== machine.id)
-          : [...prev.selectedMachines, machine.id];
-        const next: OnboardingState = {
-          ...prev,
-          selectedMachines: nextSelected,
-        };
-        const nextMachineObjects = machines.filter((item) => nextSelected.includes(item.id));
-        void persistState(next, nextMachineObjects)
-          .then(() => setError(null))
-          .catch((err) => {
-            console.warn('Failed to persist onboarding machine selection', err);
-            setError('Unable to save your machine selection.');
-          });
-        return next;
-      });
-    },
-    [machines],
-  );
-
-  if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" />
-        <Text style={styles.loadingText}>Preparing your onboarding experience…</Text>
-      </View>
-    );
-  }
+  const handleContinue = useCallback(async () => {
+    const payload: OnboardingState = {
+      selectedMachines: selected,
+      experience,
+    };
+    await saveOnboardingState(payload);
+    onComplete(payload);
+  }, [experience, onComplete, selected]);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Welcome to Codex</Text>
-      <Text style={styles.subtitle}>
-        Tell us a little bit about your setup to tailor the recommendations.
-      </Text>
+    <View style={styles.root}>
+      <Text style={styles.heading}>Choose your machine(s)</Text>
+      {MACHINE_CHOICES.map((m) => {
+        const active = selected.includes(m.id);
+        return (
+          <Pressable
+            key={m.id}
+            onPress={() => toggleMachine(m.id)}
+            style={[styles.row, active && styles.rowActive]}
+            accessibilityRole="button"
+            accessibilityState={{ selected: active }}
+          >
+            <Text style={styles.rowText}>{m.label}</Text>
+            <Text style={styles.rowTick}>{active ? '✓' : ''}</Text>
+          </Pressable>
+        );
+      })}
 
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Experience level</Text>
-        <View style={styles.chipRow}>
-          {EXPERIENCE_OPTIONS.map((option) => {
-            const selected = state.experience === option;
-            return (
-              <Pressable
-                key={option}
-                onPress={() => handleExperiencePress(option)}
-                style={({ pressed }) => [
-                  styles.chip,
-                  selected && styles.chipSelected,
-                  pressed && styles.chipPressed,
-                ]}
-                accessibilityRole="button"
-                accessibilityState={{ selected }}
-              >
-                <Text
-                  style={[
-                    styles.chipLabel,
-                    selected && styles.chipLabelSelected,
-                  ]}
-                >
-                  {option}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
+      <Text style={[styles.heading, { marginTop: 24 }]}>Experience level</Text>
+      <View style={styles.chips}>
+        {EXPERIENCES.map((lvl) => {
+          const active = lvl === experience;
+          return (
+            <Pressable
+              key={lvl}
+              onPress={() => setExperience(lvl)}
+              style={[styles.chip, active && styles.chipActive]}
+              accessibilityRole="button"
+              accessibilityState={{ selected: active }}
+            >
+              <Text style={[styles.chipText, active && styles.chipTextActive]}>{lvl}</Text>
+            </Pressable>
+          );
+        })}
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Machines</Text>
-        {machines.length === 0 ? (
-          <Text style={styles.placeholder}>
-            No machines saved yet. You can add them later from the settings screen.
-          </Text>
-        ) : (
-          machines.map((machine) => {
-            const selected = state.selectedMachines.includes(machine.id);
-            return (
-              <Pressable
-                key={machine.id}
-                onPress={() => toggleMachine(machine)}
-                style={({ pressed }) => [
-                  styles.machineRow,
-                  selected && styles.machineRowSelected,
-                  pressed && styles.machineRowPressed,
-                ]}
-                accessibilityRole="checkbox"
-                accessibilityState={{ checked: selected }}
-              >
-                <View>
-                  <Text style={styles.machineName}>
-                    {machine.brand} {machine.model}
-                  </Text>
-                  {machine.type ? (
-                    <Text style={styles.machineMeta}>{machine.type}</Text>
-                  ) : null}
-                </View>
-                {selected ? <Text style={styles.machineSelected}>Selected</Text> : null}
-              </Pressable>
-            );
-          })
-        )}
-      </View>
-    </ScrollView>
+      <Pressable
+        onPress={handleContinue}
+        disabled={!canContinue}
+        style={[styles.cta, !canContinue && styles.ctaDisabled]}
+        accessibilityRole="button"
+      >
+        <Text style={styles.ctaText}>Continue</Text>
+      </Pressable>
+    </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 24,
-    paddingVertical: 32,
-    gap: 32,
-  },
-  centered: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 32,
-    gap: 16,
-  },
-  loadingText: {
-    fontSize: 16,
-    color: '#4B5563',
-    textAlign: 'center',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#4B5563',
-  },
-  section: {
-    gap: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1F2937',
-  },
-  chipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    backgroundColor: '#FFFFFF',
-  },
-  chipSelected: {
-    backgroundColor: '#111827',
-    borderColor: '#111827',
-  },
-  chipPressed: {
-    opacity: 0.75,
-  },
-  chipLabel: {
-    fontSize: 14,
-    color: '#1F2937',
-    fontWeight: '600',
-  },
-  chipLabelSelected: {
-    color: '#FFFFFF',
-  },
-  placeholder: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  machineRow: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#FFFFFF',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  machineRowSelected: {
-    borderColor: '#2563EB',
-    backgroundColor: '#DBEAFE',
-  },
-  machineRowPressed: {
-    opacity: 0.8,
-  },
-  machineName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  machineMeta: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginTop: 4,
-  },
-  machineSelected: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#2563EB',
-  },
-  error: {
-    backgroundColor: '#FEE2E2',
-    borderRadius: 12,
-    padding: 12,
-    color: '#991B1B',
-    fontSize: 14,
-  },
-});
-
 export default OnboardingScreen;
+
+const styles = StyleSheet.create({
+  root: { flex: 1, padding: 16, backgroundColor: '#0f172a' },
+  heading: { color: '#e2e8f0', fontSize: 18, fontWeight: '600', marginBottom: 8 },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#1f2937',
+    marginBottom: 8,
+  },
+  rowActive: { backgroundColor: '#334155' },
+  rowText: { color: '#e5e7eb' },
+  rowTick: { color: '#a7f3d0', fontWeight: '700' },
+  chips: { flexDirection: 'row', gap: 8 },
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    backgroundColor: '#1f2937',
+  },
+  chipActive: { backgroundColor: '#2563eb' },
+  chipText: { color: '#cbd5e1' },
+  chipTextActive: { color: 'white', fontWeight: '700' },
+  cta: {
+    marginTop: 24,
+    alignItems: 'center',
+    padding: 14,
+    borderRadius: 8,
+    backgroundColor: '#2563eb',
+  },
+  ctaDisabled: { backgroundColor: '#64748b' },
+  ctaText: { color: 'white', fontWeight: '700' },
+});

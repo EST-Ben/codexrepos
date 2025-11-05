@@ -94,11 +94,10 @@ export const WebPhotoPicker: React.FC<WebPhotoPickerProps> = ({
           experience,
           material,
           app_version: appVersion,
-          // base_profile intentionally omitted here (not used in web picker)
         };
 
-        // Call the shared API helper: (file, meta) -> AnalyzeResponse
-        const response = await analyzeImageApi(file, meta);
+        // Pass undefined for the optional progress callback (3rd arg)
+        const response = await analyzeImageApi(file, meta, undefined);
         onResult(response);
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);

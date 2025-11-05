@@ -12,11 +12,10 @@ import {
 import * as Clipboard from 'expo-clipboard';
 
 import { useMachineRegistry } from '../hooks/useMachineRegistry';
-import { analyzeMachineJSON, exportProfile } from '../api/client';
+import { exportProfile as exportProfileRaw } from '../api/client';
 import type {
   AnalyzeResponse,
   ExperienceLevel,
-  MachineRef,
   MachineSummary,
   SlicerId,
 } from '../types';
@@ -28,6 +27,38 @@ interface ResultsScreenProps {
   onBack(): void;
 }
 
+/** Local helper: JSON-only analyze (no photo).
+ *  Calls the backend at /api/analyze-json relative to current origin or Metro dev server.
+ */
+async function analyzeMachineJSON(payload: unknown): Promise<AnalyzeResponse> {
+  // Try to guess base URL for native/web dev:
+  // - Web: use window.location.origin
+  // - Native: Expo dev servers often proxy via localhost:8000; adjust if you have a different port.
+  let base = '';
+  if (Platform.OS === 'web') {
+    base = typeof window !== 'undefined' ? window.location.origin : '';
+  } else {
+    base = 'http://127.0.0.1:8000';
+  }
+
+  const res = await fetch(`${base}/api/analyze-json`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(payload ?? {}),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`analyze-json failed: ${res.status} ${text}`);
+  }
+  return (await res.json()) as AnalyzeResponse;
+}
+
+const exportProfile = exportProfileRaw as unknown as (payload: {
+  slicer: SlicerId;
+  changes: Record<string, string | number | boolean>;
+}) => Promise<{ diff?: Record<string, unknown> } | any>;
+
 const SLICERS: Array<{ id: SlicerId; label: string }> = [
   { id: 'cura', label: 'Export for Cura' },
   { id: 'prusaslicer', label: 'Export for PrusaSlicer' },
@@ -35,7 +66,7 @@ const SLICERS: Array<{ id: SlicerId; label: string }> = [
   { id: 'orca', label: 'Export for OrcaSlicer' },
 ];
 
-export const ResultsScreen: React.FC<ResultsScreenProps> = ({
+const ResultsScreen: React.FC<ResultsScreenProps> = ({
   selectedMachines,
   experience,
   material,
@@ -70,7 +101,7 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
         experience,
         material,
         issues: [], // leave empty; backend can still return predictions/recs based on metadata
-      });
+      } as any);
       setResponse(res);
     } catch (e: any) {
       Alert.alert('Analyze error', String(e?.message ?? e));
@@ -122,9 +153,9 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
       const result = await exportProfile({
         slicer,
         // keep changes minimal — backend will translate to precise slicer keys
-        changes: response.slicer_profile_diff.diff ?? {}, // already Record<string, number|string|boolean>
+        changes: response.slicer_profile_diff.diff ?? {}, // Record<string, number|string|boolean>
       });
-      await Clipboard.setStringAsync(JSON.stringify(result.diff, null, 2));
+      await Clipboard.setStringAsync(JSON.stringify((result as any).diff ?? result, null, 2));
       setExportMessage(`Copied diff for ${slicer}`);
     } catch (e: any) {
       Alert.alert('Export error', String(e?.message ?? e));

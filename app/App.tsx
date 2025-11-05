@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
-import AnalyzeFromPhoto from "./src/components/AnalyzeFromPhoto"; // adjust the path if your file lives elsewhere
 
-import { OnboardingScreen } from './src/screens/Onboarding';
-import { ResultsScreen } from './src/screens/Results';
+import OnboardingScreen from './src/screens/Onboarding';
+import ResultsScreen from './src/screens/Results';
+
 import type { OnboardingState } from './src/types';
 import { loadOnboardingState } from './src/storage/onboarding';
 
-export default function App(): JSX.Element {
+export default function App() {
   const [state, setState] = useState<OnboardingState | null>(null);
   const [showOnboarding, setShowOnboarding] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
@@ -15,8 +15,15 @@ export default function App(): JSX.Element {
   useEffect(() => {
     const hydrate = async () => {
       const saved = await loadOnboardingState();
+      if (!saved) {
+        // first run or no state saved yet
+        setState({ selectedMachines: [], experience: 'Beginner' });
+        setShowOnboarding(true);
+        setLoading(false);
+        return;
+      }
       setState(saved);
-      setShowOnboarding(saved.selectedMachines.length === 0);
+      setShowOnboarding((saved.selectedMachines ?? []).length === 0);
       setLoading(false);
     };
     hydrate();
@@ -27,7 +34,7 @@ export default function App(): JSX.Element {
     setShowOnboarding(false);
   };
 
-  const handleReset = () => {
+  const handleBackToOnboarding = () => {
     setShowOnboarding(true);
   };
 
@@ -47,7 +54,7 @@ export default function App(): JSX.Element {
           <ResultsScreen
             selectedMachines={state.selectedMachines}
             experience={state.experience}
-            onReset={handleReset}
+            onBack={handleBackToOnboarding}
           />
         )}
       </View>
