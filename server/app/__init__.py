@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from server.machines import reload_registry
-from .routers import analyze, export, machines
+from .routers import analyze, analyze_image, export, machines
 
 app = FastAPI(title="Machine Registry API", version="0.1.0")
 
@@ -31,4 +31,5 @@ def _load_registry() -> None:
 
 app.include_router(machines.router, prefix="/api")
 app.include_router(export.router, prefix="/api")
+app.include_router(analyze_image.router, prefix="/api")
 app.include_router(analyze.router, prefix="/api")

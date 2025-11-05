@@ -6,13 +6,32 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from server import settings
-from server.app.routers import (
-    analyze as analyze_router,
-    analyze_image as analyze_image_router,
-    export as export_router,
-    machines as machines_router,
-)
+try:
+    from . import settings
+    from .app.routers import (
+        analyze as analyze_router,
+        analyze_image as analyze_image_router,
+        export as export_router,
+        machines as machines_router,
+    )
+    from .services import INFERENCE_ENGINE, LOCALIZATION_ENGINE  # noqa: E402  pylint: disable=wrong-import-position
+except ImportError:  # pragma: no cover
+    import sys
+    from pathlib import Path
+
+    package_dir = Path(__file__).resolve().parent
+    parent_dir = package_dir.parent
+    if str(parent_dir) not in sys.path:
+        sys.path.append(str(parent_dir))
+
+    import settings  # type: ignore
+    from app.routers import (  # type: ignore
+        analyze as analyze_router,
+        analyze_image as analyze_image_router,
+        export as export_router,
+        machines as machines_router,
+    )
+    from services import INFERENCE_ENGINE, LOCALIZATION_ENGINE  # type: ignore  # noqa: E402  pylint: disable=wrong-import-position
 
 app = FastAPI(title="3D Diagnostics API", version="0.1.0")
 
@@ -51,6 +70,5 @@ app.include_router(analyze_router.router, prefix="/api")
 app.include_router(export_router.router, prefix="/api")
 
 # Re-export singleton services for tests/patching convenience
-from server.services import INFERENCE_ENGINE, LOCALIZATION_ENGINE  # noqa: E402  pylint: disable=wrong-import-position
 
 __all__ = ["app", "INFERENCE_ENGINE", "LOCALIZATION_ENGINE"]

@@ -19,25 +19,27 @@ function normalizeMap(raw: unknown): HistoryMap {
       if (!entry || typeof entry !== 'object') {
         continue;
       }
-      const normalized = entry as Partial<AnalysisHistoryRecord>;
+      const normalized = entry as Partial<AnalysisHistoryRecord> & {
+        issues?: Array<{ id: string; confidence: number }>;
+      };
       if (typeof normalized.imageId !== 'string' || typeof normalized.machineId !== 'string') {
         continue;
       }
+      const predictions = Array.isArray(normalized.predictions)
+        ? normalized.predictions
+        : Array.isArray(normalized.issues)
+          ? normalized.issues.map((issue) => ({ issue_id: issue.id, confidence: issue.confidence }))
+          : [];
       entries.push({
         imageId: normalized.imageId,
         machineId: normalized.machineId,
         machine: normalized.machine as AnalysisHistoryRecord['machine'],
         timestamp: typeof normalized.timestamp === 'number' ? normalized.timestamp : Date.now(),
-        issues: Array.isArray((normalized as any).issues)
-          ? ((normalized as any).issues as AnalysisHistoryRecord['issues'])
-          : [],
         response: normalized.response as AnalysisHistoryRecord['response'],
         material: normalized.material,
         localUri: typeof normalized.localUri === 'string' ? normalized.localUri : undefined,
         summary: normalized.summary,
-        predictions: Array.isArray((normalized as any).predictions)
-          ? ((normalized as any).predictions as AnalysisHistoryRecord['predictions'])
-          : undefined,
+        predictions,
       });
     }
     if (entries.length) {

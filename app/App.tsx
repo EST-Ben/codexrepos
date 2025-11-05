@@ -1,23 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
-import AnalyzeFromPhoto from "./src/components/AnalyzeFromPhoto"; // adjust the path if your file lives elsewhere
 
-import { OnboardingScreen } from './src/screens/Onboarding';
+import OnboardingScreen from './src/screens/Onboarding';
 import { ResultsScreen } from './src/screens/Results';
 import type { OnboardingState } from './src/types';
-import { loadOnboardingState } from './src/storage/onboarding';
+import { DEFAULT_ONBOARDING, loadOnboardingState } from './src/storage/onboarding';
 
-export default function App(): JSX.Element {
-  const [state, setState] = useState<OnboardingState | null>(null);
+export default function App() {
+  const [state, setState] = useState<OnboardingState>(DEFAULT_ONBOARDING);
   const [showOnboarding, setShowOnboarding] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const hydrate = async () => {
-      const saved = await loadOnboardingState();
-      setState(saved);
-      setShowOnboarding(saved.selectedMachines.length === 0);
-      setLoading(false);
+      try {
+        const saved = await loadOnboardingState();
+        setState(saved);
+        setShowOnboarding(saved.selectedMachines.length === 0);
+      } catch (err) {
+        console.warn('Failed to hydrate onboarding state', err);
+        setState(DEFAULT_ONBOARDING);
+        setShowOnboarding(true);
+      } finally {
+        setLoading(false);
+      }
     };
     hydrate();
   }, []);
@@ -27,7 +33,7 @@ export default function App(): JSX.Element {
     setShowOnboarding(false);
   };
 
-  const handleReset = () => {
+  const handleBack = () => {
     setShowOnboarding(true);
   };
 
@@ -36,18 +42,18 @@ export default function App(): JSX.Element {
       <StatusBar barStyle="light-content" />
       <View style={styles.container}>
         {loading && <ActivityIndicator />}
-        {!loading && showOnboarding && state && (
+        {!loading && showOnboarding && (
           <OnboardingScreen
             initialSelection={state.selectedMachines}
             initialExperience={state.experience}
             onComplete={handleComplete}
           />
         )}
-        {!loading && !showOnboarding && state && (
+        {!loading && !showOnboarding && (
           <ResultsScreen
             selectedMachines={state.selectedMachines}
             experience={state.experience}
-            onReset={handleReset}
+            onBack={handleBack}
           />
         )}
       </View>

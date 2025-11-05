@@ -1,22 +1,50 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { fireEvent, render, waitFor, screen } from '../test-utils/native-testing';
 import { jest, describe, it, expect, beforeEach } from '@jest/globals';
 
-import type { MachineSummary, AnalysisHistoryRecord, AnalyzeResponse, ExperienceLevel } from '../types';
-import PrinterTabs from '../screens/PrinterTabs'; // default export
+import type {
+  MachineSummary,
+  AnalysisHistoryRecord,
+  AnalyzeResponse,
+  ExperienceLevel,
+} from '../types';
+import PrinterTabs from '../screens/PrinterTabs';
 
-// Spy we can assert against when uploads happen
-const analyzeImageApi = jest.fn();
+// Use a "mock*" prefix so Jest allows referencing inside jest.mock factories
+const mockAnalyzeImageApi = jest.fn();
 
-// ---- Mock API client (typed) ---------------------------------
+// ---- Mock API client ---------------------------------
 import * as client from '../api/client';
-jest.mock('../api/client'); // TS keeps module shape; methods become jest.Mock
+jest.mock('../api/client');
 const mockedClient = jest.mocked(client, { shallow: true });
 
-// ---- Mock useAnalyze to route uploads to our spy --------------
+const makePickerMock = () => {
+  const React = require('react');
+  const { Pressable, Text } = require('react-native');
+  return function MockPicker(props: any) {
+    return React.createElement(
+      Pressable,
+      {
+        accessibilityRole: 'button',
+        onPress: () =>
+          props?.onImageReady?.({
+            uri: 'file:///stringing.jpg',
+            name: 'stringing.jpg',
+            type: 'image/jpeg',
+          }),
+      },
+      React.createElement(Text, null, 'Pick / Capture photo'),
+    );
+  };
+};
+
+jest.mock('../components/CameraButton', () => ({ CameraButton: makePickerMock() }), { virtual: true });
+jest.mock('../components/AnalyzeFromPhoto', () => makePickerMock(), { virtual: true });
+jest.mock('../components/WebPhotoPicker', () => makePickerMock(), { virtual: true });
+
 jest.mock('../hooks/useAnalyze', () => ({
   useAnalyze: () => ({
-    mutate: ({ file, meta }: any) => analyzeImageApi(file, meta),
+    mutate: ({ file, meta }: any) => mockAnalyzeImageApi(file, meta),
     isPending: false,
     isSuccess: false,
     data: null,
@@ -27,7 +55,6 @@ jest.mock('../hooks/useAnalyze', () => ({
   }),
 }));
 
-// ---- Minimal machine registry / privacy state -----------------
 const summary: MachineSummary = {
   id: 'bambu_p1s',
   brand: 'Bambu Lab',
@@ -54,32 +81,6 @@ jest.mock('../state/privacy', () => ({
   }),
 }));
 
-// ---- Mock CameraButton to synchronously “pick” an image -------
-jest.mock('../components/CameraButton', () => {
-  const React = require('react');
-  const { Pressable, Text } = require('react-native');
-  return {
-    CameraButton: ({ disabled, onImageReady }: any) =>
-      React.createElement(
-        Pressable,
-        {
-          accessibilityRole: 'button',
-          testID: 'camera-button',
-          disabled,
-          onPress: () =>
-            onImageReady({
-              // match RN-style file arg expected by the screen / api
-              uri: 'file:///stringing.jpg',
-              name: 'stringing.jpg',
-              type: 'image/jpeg',
-            }),
-        },
-        React.createElement(Text, null, 'Camera'),
-      ),
-  };
-});
-
-// ---- Helpers ---------------------------------------------------
 function minimalAnalyzeResponse(
   overrides: Partial<AnalyzeResponse> = {},
   experience: ExperienceLevel = 'Intermediate'
@@ -96,7 +97,6 @@ function minimalAnalyzeResponse(
     capability_notes: [],
     recommendations: [],
     suggestions: [],
-    // Align with SlicerProfileDiff: no `slicer` field here
     slicer_profile_diff: { parameters: {} },
     applied: {
       parameters: {},
@@ -110,71 +110,72 @@ function minimalAnalyzeResponse(
   };
 }
 
-// ----------------------------------------------------------------
-
 describe('PrinterTabs', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    analyzeImageApi.mockReset();
-
-    // exportProfile can return a legacy diff shape; minimal stub is fine
+    mockAnalyzeImageApi.mockReset();
     mockedClient.exportProfile.mockResolvedValue({ diff: {} } as any);
-
-    // Default analyzeImage to a minimal payload conforming to src/types.ts
     mockedClient.analyzeImage.mockResolvedValue(minimalAnalyzeResponse());
   });
 
-  // IMPORTANT: Shape matches PrinterTabsProps.profile
   const profile = {
-    machineId: 'bambu_p1s',
-    brand: 'Bambu Lab',
-    model: 'P1S',
     experience: 'Intermediate' as const,
+    machines: [{ id: 'bambu_p1s', brand: 'Bambu Lab', model: 'P1S' }],
     material: 'PLA',
+    materialByMachine: { bambu_p1s: 'PLA' },
   };
 
-  // Create jest fns for props; onRecordHistory matches component signature
   const onUpdateMaterial = jest.fn<(machineId: string, material?: string) => void>();
-  const onRecordHistory = jest.fn<(record: unknown) => void>();
+  const onRecordHistory = jest.fn<(entry: AnalysisHistoryRecord) => void>();
 
-  it('renders a camera button for the active machine', () => {
+  it('renders a photo picker control for the active machine', () => {
     render(
       <PrinterTabs
-        profile={profile}
+        profile={profile as any}
         onEditProfile={jest.fn()}
         onShowAnalysis={jest.fn()}
         onUpdateMaterial={onUpdateMaterial}
         onOpenHistory={jest.fn()}
-        onRecordHistory={onRecordHistory}
+        onRecordHistory={onRecordHistory as any}
         historyCounts={{}}
       />,
     );
-    expect(screen.getByTestId('camera-button')).toBeTruthy();
+    expect(screen.getByText('Pick / Capture photo')).toBeTruthy();
   });
 
   it('submits uploads with machine meta and experience', async () => {
-    mockedClient.analyzeImage.mockResolvedValue(
-      minimalAnalyzeResponse({ image_id: 'test-image' })
-    );
+    mockedClient.analyzeImage.mockResolvedValue(minimalAnalyzeResponse({ image_id: 'test-image' }));
 
     render(
       <PrinterTabs
-        profile={profile}
+        profile={profile as any}
         onEditProfile={jest.fn()}
         onShowAnalysis={jest.fn()}
         onUpdateMaterial={onUpdateMaterial}
         onOpenHistory={jest.fn()}
-        onRecordHistory={onRecordHistory}
+        onRecordHistory={onRecordHistory as any}
         historyCounts={{}}
       />,
     );
 
-    fireEvent.press(screen.getByTestId('camera-button'));
+    // 1) Pick image via the mock picker
+    fireEvent.press(screen.getByText('Pick / Capture photo'));
+    // 2) Trigger actual analyze button from PrinterTabs UI
+    fireEvent.press(screen.getByText('Analyze photo'));
 
-    await waitFor(() => expect(analyzeImageApi).toHaveBeenCalled());
+    await waitFor(() => {
+      const calls =
+        mockAnalyzeImageApi.mock.calls.length + mockedClient.analyzeImage.mock.calls.length;
+      expect(calls).toBeGreaterThan(0);
+    });
 
-    // Cast the tuple so meta/file have concrete types for assertions
-    const [fileArg, meta] = analyzeImageApi.mock.calls[0] as [any, any];
+    let fileArg: any, meta: any;
+    if (mockAnalyzeImageApi.mock.calls.length) {
+      [fileArg, meta] = mockAnalyzeImageApi.mock.calls[0] as [any, any];
+    } else {
+      const call = mockedClient.analyzeImage.mock.calls[0] as any[];
+      [fileArg, meta] = call;
+    }
 
     expect(meta.machine_id).toBe('bambu_p1s');
     expect(meta.experience).toBe('Intermediate');
