@@ -22,7 +22,7 @@ the pipeline can be demoed without a trained model.
    serve_api.bat        # Command Prompt
    ```
 3. **Configure environment variables**
-   - Copy `.env` to `.env.local` (or export variables in your shell) and update values as needed.
+   - Copy `.env.example` to `.env.local` (or export variables in your shell) and update values as needed.
    - For production builds set `ENVIRONMENT=production` and provide a comma-separated `ALLOWED_ORIGINS` list.
 
 4. **Start the Expo client in LAN mode**
@@ -42,6 +42,14 @@ the pipeline can be demoed without a trained model.
 
 See [`LOCAL_DEV.md`](LOCAL_DEV.md) for the full Windows + Miniforge walkthrough, including curl smoke
 tests and firewall notes.
+
+## Developer tooling
+
+Install the shared hooks locally so formatting and linting run before each commit:
+
+```bash
+pip install pre-commit && pre-commit install
+```
 
 ## Production deployment
 

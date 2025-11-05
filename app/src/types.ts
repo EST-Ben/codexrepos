@@ -122,6 +122,11 @@ export type SlicerProfileDiff = {
   markdown?: string;
 };
 
+export interface ExportProfileResponse {
+  profile: { name: string; params: Record<string, unknown> };
+  warnings: string[];
+}
+
 export interface AnalyzeResponse {
   image_id: string;
   version: string;
