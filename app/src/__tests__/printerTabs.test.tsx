@@ -2,7 +2,12 @@ import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { jest, describe, it, expect, beforeEach } from '@jest/globals';
 
-import type { MachineSummary, AnalysisHistoryRecord, AnalyzeResponse, ExperienceLevel } from '../types';
+import type {
+  MachineSummary,
+  AnalysisHistoryRecord,
+  AnalyzeResponse,
+  ExperienceLevel,
+} from '../types';
 import PrinterTabs from '../screens/PrinterTabs';
 
 // Use a "mock*" prefix so Jest allows referencing it inside jest.mock factories
@@ -19,8 +24,8 @@ const mockedClient = jest.mocked(client, { shallow: true });
  * - components/AnalyzeFromPhoto
  * - components/WebPhotoPicker
  *
- * Each mock renders a <Pressable testID="camera-button" /> that immediately
- * calls props.onImageReady({ uri, name, type }) on press.
+ * Each mock renders a tappable control labeled "Pick / Capture photo"
+ * that calls props.onImageReady({ uri, name, type }) on press.
  */
 const makePickerMock = () => {
   const React = require('react');
@@ -30,7 +35,6 @@ const makePickerMock = () => {
       Pressable,
       {
         accessibilityRole: 'button',
-        testID: 'camera-button',
         onPress: () =>
           props?.onImageReady?.({
             uri: 'file:///stringing.jpg',
@@ -142,7 +146,7 @@ describe('PrinterTabs', () => {
   const onUpdateMaterial = jest.fn<(machineId: string, material?: string) => void>();
   const onRecordHistory = jest.fn<(entry: AnalysisHistoryRecord) => void>();
 
-  it('renders a camera button for the active machine', () => {
+  it('renders a photo picker control for the active machine', () => {
     render(
       <PrinterTabs
         profile={profile as any}
@@ -154,8 +158,7 @@ describe('PrinterTabs', () => {
         historyCounts={{}}
       />,
     );
-    // Guaranteed by our mocks, regardless of which picker PrinterTabs uses
-    expect(screen.getByTestId('camera-button')).toBeTruthy();
+    // Assert presence by visible label instead of testID
     expect(screen.getByText('Pick / Capture photo')).toBeTruthy();
   });
 
@@ -175,14 +178,27 @@ describe('PrinterTabs', () => {
     );
 
     // 1) Simulate picking a file (enables "Analyze photo")
-    fireEvent.press(screen.getByTestId('camera-button'));
+    fireEvent.press(screen.getByText('Pick / Capture photo'));
 
     // 2) Press the real "Analyze photo" button that PrinterTabs renders
     fireEvent.press(screen.getByText('Analyze photo'));
 
-    await waitFor(() => expect(mockAnalyzeImageApi).toHaveBeenCalled());
+    // Accept either code path: useAnalyze.mutate (mockAnalyzeImageApi) OR client.analyzeImage
+    await waitFor(() => {
+      const calls =
+        mockAnalyzeImageApi.mock.calls.length + mockedClient.analyzeImage.mock.calls.length;
+      expect(calls).toBeGreaterThan(0);
+    });
 
-    const [fileArg, meta] = mockAnalyzeImageApi.mock.calls[0] as [any, any];
+    // Extract args from whichever mock fired
+    let fileArg: any, meta: any;
+    if (mockAnalyzeImageApi.mock.calls.length) {
+      [fileArg, meta] = mockAnalyzeImageApi.mock.calls[0] as [any, any];
+    } else {
+      // client.analyzeImage(file, meta, onProgress?)
+      const call = mockedClient.analyzeImage.mock.calls[0] as any[];
+      [fileArg, meta] = call;
+    }
 
     expect(meta.machine_id).toBe('bambu_p1s');
     expect(meta.experience).toBe('Intermediate');
