@@ -1,38 +1,55 @@
 name: CI
-
 on:
+  pull_request:
   push:
     branches: [main]
-  pull_request:
-
 jobs:
-  backend-tests:
-    name: Backend tests
+  build-test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r server/requirements.txt
-      - name: Run pytest
-        run: pytest
-        working-directory: server
 
-  frontend-typecheck:
-    name: TypeScript typecheck
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "18"
-      - name: Install dependencies
-        run: npm install
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: |
+            server-node/package-lock.json
+            app/package-lock.json
+
+      - name: Server build (Node backend)
+        run: |
+          npm --prefix server-node ci
+          npm --prefix server-node run build
+
+      - name: Server healthcheck
+        run: |
+          npm --prefix server-node run start:ci &
+          SERVER_PID=$!
+          sleep 2
+          curl -fsS http://localhost:8000/health
+          kill $SERVER_PID
+          wait $SERVER_PID || true
+
+      - name: Install app deps
         working-directory: app
+        run: npm ci
+
       - name: Typecheck
-        run: npx tsc --noEmit
         working-directory: app
+        run: npm run -s tsc -- --noEmit
+
+      - name: Lint & Format check
+        working-directory: app
+        run: |
+          npm run -s lint
+          npm run -s format:check || true
+
+      - name: Jest
+        working-directory: app
+        run: npm test -- --ci --passWithNoTests
+
+      - name: Legacy server notice
+        run: echo "Python server under server/ is deprecated; see README for details."

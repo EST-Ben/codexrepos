@@ -4,19 +4,14 @@ set "REPO_ROOT=%~dp0"
 if "%REPO_ROOT:~-1%"=="\" set "REPO_ROOT=%REPO_ROOT:~0,-1%"
 cd /d "%REPO_ROOT%"
 
-if not defined UPLOAD_DIR (
-    set "UPLOAD_DIR=C:\tmp\uploads"
-)
-if not exist "%UPLOAD_DIR%" (
-    mkdir "%UPLOAD_DIR%"
-)
-if not defined INFERENCE_MODE (
-    set "INFERENCE_MODE=stub"
-)
-if not defined ENVIRONMENT (
-    set "ENVIRONMENT=development"
-)
-set "PYTHONPATH=%REPO_ROOT%;%PYTHONPATH%"
+if not defined ENV set "ENV=development"
+if not defined ENVIRONMENT set "ENVIRONMENT=%ENV%"
+if not defined ALLOWED_ORIGINS set "ALLOWED_ORIGINS=http://localhost:19006,http://localhost:5173"
+if not defined RATE_LIMIT_REQUESTS set "RATE_LIMIT_REQUESTS=30"
+if not defined RATE_LIMIT_WINDOW_SECONDS set "RATE_LIMIT_WINDOW_SECONDS=60"
+if not defined UPLOAD_MAX_MB set "UPLOAD_MAX_MB=10"
 
-python -m uvicorn server.main:app --host 0.0.0.0 --port 8000 --reload
+echo === Node diagnostics API ===
+set "npm_config_loglevel=warn"
+npm --prefix server-node run dev
 endlocal

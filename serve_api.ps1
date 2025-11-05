@@ -4,22 +4,25 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $repoRoot
 
-if ([string]::IsNullOrWhiteSpace($env:UPLOAD_DIR)) {
-    $env:UPLOAD_DIR = "C:\tmp\uploads"
-}
-if (-not (Test-Path -Path $env:UPLOAD_DIR)) {
-    New-Item -ItemType Directory -Path $env:UPLOAD_DIR | Out-Null
-}
-if ([string]::IsNullOrWhiteSpace($env:INFERENCE_MODE)) {
-    $env:INFERENCE_MODE = "stub"
+if ([string]::IsNullOrWhiteSpace($env:ENV)) {
+    $env:ENV = "development"
 }
 if ([string]::IsNullOrWhiteSpace($env:ENVIRONMENT)) {
-    $env:ENVIRONMENT = "development"
+    $env:ENVIRONMENT = $env:ENV
 }
-if ([string]::IsNullOrWhiteSpace($env:PYTHONPATH)) {
-    $env:PYTHONPATH = $repoRoot
-} else {
-    $env:PYTHONPATH = "$repoRoot;$env:PYTHONPATH"
+if ([string]::IsNullOrWhiteSpace($env:ALLOWED_ORIGINS)) {
+    $env:ALLOWED_ORIGINS = "http://localhost:19006,http://localhost:5173"
+}
+if ([string]::IsNullOrWhiteSpace($env:RATE_LIMIT_REQUESTS)) {
+    $env:RATE_LIMIT_REQUESTS = "30"
+}
+if ([string]::IsNullOrWhiteSpace($env:RATE_LIMIT_WINDOW_SECONDS)) {
+    $env:RATE_LIMIT_WINDOW_SECONDS = "60"
+}
+if ([string]::IsNullOrWhiteSpace($env:UPLOAD_MAX_MB)) {
+    $env:UPLOAD_MAX_MB = "10"
 }
 
-python -m uvicorn server.main:app --host 0.0.0.0 --port 8000 --reload
+Write-Host "=== Node diagnostics API ==="
+$env:npm_config_loglevel = "warn"
+npm --prefix server-node run dev

@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
 
+import './src/debug/networkInterceptor';
+import { DebuggerHUD } from './src/debug/DebuggerHUD';
+import { ErrorBoundary } from './src/debug/ErrorBoundary';
+
 import OnboardingScreen from './src/screens/Onboarding';
 import ResultsScreen from './src/screens/Results';
 
@@ -43,28 +47,31 @@ export default function App() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" />
-      <View style={styles.container}>
-        {loading && <ActivityIndicator />}
+    <ErrorBoundary>
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar barStyle="light-content" />
+        <View style={styles.container}>
+          {loading && <ActivityIndicator />}
 
-        {!loading && showOnboarding && state && (
-          <OnboardingScreen
-            initialSelection={state.selectedMachines}
-            initialExperience={state.experience}
-            onComplete={handleComplete}
-          />
-        )}
+          {!loading && showOnboarding && state && (
+            <OnboardingScreen
+              initialSelection={state.selectedMachines}
+              initialExperience={state.experience}
+              onComplete={handleComplete}
+            />
+          )}
 
-        {!loading && !showOnboarding && state && (
-          <ResultsScreen
-            selectedMachines={state.selectedMachines}
-            experience={state.experience}
-            onBack={handleBackToOnboarding}
-          />
-        )}
-      </View>
-    </SafeAreaView>
+          {!loading && !showOnboarding && state && (
+            <ResultsScreen
+              selectedMachines={state.selectedMachines}
+              experience={state.experience}
+              onBack={handleBackToOnboarding}
+            />
+          )}
+        </View>
+        <DebuggerHUD />
+      </SafeAreaView>
+    </ErrorBoundary>
   );
 }
 
