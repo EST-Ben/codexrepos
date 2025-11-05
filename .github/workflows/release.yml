@@ -47,18 +47,10 @@ jobs:
         run: |
           docker build -t api:ci -f Dockerfile .
           docker run -d -p 8000:8000 --name api-ci api:ci
-          attempt=0
-          until curl -fsS http://localhost:8000/health; do
-            attempt=$((attempt+1))
-            if [ $attempt -ge 10 ]; then
-              echo "Health failed"
-              docker logs api-ci || true
-              docker rm -f api-ci || true
-              exit 1
-            fi
-            sleep 2
+          for i in {1..10}; do
+            curl -fsS http://localhost:8000/health && exit 0 || sleep 2
           done
-          docker rm -f api-ci
+          echo "Health failed"; docker logs api-ci; exit 1
 
       - name: Push API image
         run: docker push "$IMAGE"

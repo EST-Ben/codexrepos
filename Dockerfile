@@ -1,27 +1,20 @@
 # --- builder ---
-FROM node:20-slim AS builder
+FROM python:3.11-slim AS builder
 WORKDIR /app
-ENV npm_config_loglevel=warn
-COPY server-node/package.json server-node/package.json
-COPY server-node/package-lock.json server-node/package-lock.json
-RUN npm --prefix server-node ci
-COPY server-node server-node
-COPY types types
-COPY config config
-RUN npm --prefix server-node run build
+ENV PIP_NO_CACHE_DIR=1
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential curl && rm -rf /var/lib/apt/lists/*
+COPY server/requirements.txt server/requirements.txt
+RUN python -m venv /venv && /venv/bin/pip install -U pip && /venv/bin/pip install -r server/requirements.txt
 
 # --- runtime ---
-FROM node:20-slim
+FROM python:3.11-slim
+ENV PATH="/venv/bin:$PATH" PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 WORKDIR /app
-ENV NODE_ENV=production
-RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 RUN useradd -m appuser
-COPY --from=builder /app/server-node/package.json server-node/package.json
-COPY --from=builder /app/server-node/node_modules server-node/node_modules
-COPY --from=builder /app/server-node/dist server-node/dist
-COPY --from=builder /app/config config
-COPY --from=builder /app/types types
+COPY --from=builder /venv /venv
+COPY server/ server/
+COPY config/ config/
 USER appuser
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=3s --retries=3 CMD curl -fsS http://localhost:8000/health || exit 1
-CMD ["node", "server-node/dist/index.js"]
+CMD ["uvicorn", "server.main:app", "--host", "0.0.0.0", "--port", "8000"]
