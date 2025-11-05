@@ -1,5 +1,6 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+// Local minimal test helpers to avoid bringing in @testing-library/react-native.
+import { fireEvent, render, screen, waitFor } from '../test-utils/native-testing';
 import { jest, describe, it, expect, beforeEach } from '@jest/globals';
 
 import type {

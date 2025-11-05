@@ -9,7 +9,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "export:web": "expo export --platform web",
-    "test": "jest"
+    "test": "node ./node_modules/jest/bin/jest.js"
   },
   "dependencies": {
     "@expo/metro-runtime": "6.1.2",

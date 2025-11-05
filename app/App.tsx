@@ -5,7 +5,7 @@ import OnboardingScreen from './src/screens/Onboarding';
 import ResultsScreen from './src/screens/Results';
 
 import type { OnboardingState } from './src/types';
-import { loadOnboardingState } from './src/storage/onboarding';
+import { DEFAULT_ONBOARDING, loadOnboardingState } from './src/storage/onboarding';
 
 export default function App() {
   const [state, setState] = useState<OnboardingState | null>(null);
@@ -43,14 +43,14 @@ export default function App() {
       <StatusBar barStyle="light-content" />
       <View style={styles.container}>
         {loading && <ActivityIndicator />}
-        {!loading && showOnboarding && state && (
+        {!loading && showOnboarding && (
           <OnboardingScreen
             initialSelection={state.selectedMachines}
             initialExperience={state.experience}
             onComplete={handleComplete}
           />
         )}
-        {!loading && !showOnboarding && state && (
+        {!loading && !showOnboarding && (
           <ResultsScreen
             selectedMachines={state.selectedMachines}
             experience={state.experience}

@@ -19,8 +19,12 @@ const DEFAULT_PROFILE: ProfileState & { materialByMachine: Record<string, string
   materialByMachine: {},
 };
 
+type ProfileContextProfile = ProfileState & {
+  materialByMachine: Record<string, string | undefined>;
+};
+
 interface ProfileContextValue {
-  profile: ProfileState & { materialByMachine: Record<string, string | undefined> };
+  profile: ProfileContextProfile;
   loading: boolean;
   setProfile(profile: ProfileState): Promise<void>;
   setMaterial(machineId: string, material: string | undefined): Promise<void>;
@@ -28,6 +32,22 @@ interface ProfileContextValue {
 }
 
 const ProfileContext = createContext<ProfileContextValue | undefined>(undefined);
+
+function ensureProfile(input: ProfileState | null | undefined): ProfileContextProfile {
+  const machines: MachineRef[] = Array.isArray(input?.machines)
+    ? [...(input?.machines as MachineRef[])]
+    : [...(DEFAULT_PROFILE.machines ?? [])];
+
+  return {
+    experience: input?.experience ?? DEFAULT_PROFILE.experience,
+    machines,
+    material: input?.material ?? DEFAULT_PROFILE.material,
+    materialByMachine: {
+      ...(DEFAULT_PROFILE.materialByMachine ?? {}),
+      ...(input?.materialByMachine ?? {}),
+    },
+  };
+}
 
 export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [profile, setProfileState] = useState<ProfileContextValue['profile']>({ ...DEFAULT_PROFILE });
@@ -92,7 +112,7 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
   );
 
   const reset = useCallback<ProfileContextValue['reset']>(async () => {
-    await persist({ ...DEFAULT_PROFILE });
+    await persist(DEFAULT_PROFILE);
   }, [persist]);
 
   const value = useMemo<ProfileContextValue>(
