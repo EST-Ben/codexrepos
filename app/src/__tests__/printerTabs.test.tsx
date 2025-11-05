@@ -1,12 +1,13 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+// Local minimal test helpers to avoid bringing in @testing-library/react-native.
+import { fireEvent, render, screen, waitFor } from '../test-utils/native-testing';
 import { jest, describe, it, expect, beforeEach } from '@jest/globals';
 
 import type { MachineSummary, AnalysisHistoryRecord, AnalyzeResponse, ExperienceLevel } from '../types';
 import PrinterTabs from '../screens/PrinterTabs'; // default export
 
 // Spy we can assert against when uploads happen
-const analyzeImageApi = jest.fn();
+const mockAnalyzeImageApi = jest.fn();
 
 // ---- Mock API client (typed) ---------------------------------
 import * as client from '../api/client';
@@ -16,7 +17,7 @@ const mockedClient = jest.mocked(client, { shallow: true });
 // ---- Mock useAnalyze to route uploads to our spy --------------
 jest.mock('../hooks/useAnalyze', () => ({
   useAnalyze: () => ({
-    mutate: ({ file, meta }: any) => analyzeImageApi(file, meta),
+    mutate: ({ file, meta }: any) => mockAnalyzeImageApi(file, meta),
     isPending: false,
     isSuccess: false,
     data: null,
@@ -115,7 +116,7 @@ function minimalAnalyzeResponse(
 describe('PrinterTabs', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    analyzeImageApi.mockReset();
+    mockAnalyzeImageApi.mockReset();
 
     // exportProfile can return a legacy diff shape; minimal stub is fine
     mockedClient.exportProfile.mockResolvedValue({ diff: {} } as any);
@@ -169,12 +170,12 @@ describe('PrinterTabs', () => {
       />,
     );
 
-    fireEvent.press(screen.getByTestId('camera-button'));
+    await fireEvent.press(screen.getByTestId('camera-button'));
 
-    await waitFor(() => expect(analyzeImageApi).toHaveBeenCalled());
+    await waitFor(() => expect(mockAnalyzeImageApi).toHaveBeenCalled());
 
     // Cast the tuple so meta/file have concrete types for assertions
-    const [fileArg, meta] = analyzeImageApi.mock.calls[0] as [any, any];
+    const [fileArg, meta] = mockAnalyzeImageApi.mock.calls[0] as [any, any];
 
     expect(meta.machine_id).toBe('bambu_p1s');
     expect(meta.experience).toBe('Intermediate');

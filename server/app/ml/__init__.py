@@ -1,6 +1,8 @@
 """Machine learning stubs for diagnostics."""
 from __future__ import annotations
 
-from .pipeline import DiagnosticPipeline, Prediction
+from server.models.api import Prediction
+
+from .pipeline import DiagnosticPipeline
 
 __all__ = ["DiagnosticPipeline", "Prediction"]

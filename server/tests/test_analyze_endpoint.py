@@ -1,5 +1,8 @@
 """Tests for the analyze API endpoints."""
 import json
+import base64
+import json
+from pathlib import Path
 from typing import Dict, Tuple
 
 import pytest
@@ -9,8 +12,17 @@ from server import settings
 from server.models.api import BoundingBox, Prediction
 
 
+_SAMPLE_IMAGE = base64.b64decode(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII="
+)
+
+settings.LINEAR_MODEL_PATH = (
+    Path(__file__).resolve().parent.parent / "models" / "issues_linear_model.json"
+)
+
+
 def _multipart_payload(meta: Dict[str, object]) -> Tuple[Dict[str, object], Dict[str, Tuple[str, bytes, str]]]:
-    files = {"image": ("test.jpg", b"data", "image/jpeg")}
+    files = {"image": ("test.png", _SAMPLE_IMAGE, "image/png")}
     data = {"meta": json.dumps(meta)}
     return data, files
 
@@ -24,11 +36,14 @@ def test_analyze_endpoint_returns_expected_shape(client: TestClient) -> None:
     payload = response.json()
 
     assert payload["machine"]["id"] == "bambu_p1p"
-    assert isinstance(payload["issue_list"], list)
+    assert isinstance(payload["predictions"], list)
+    assert payload["predictions"] and "issue_id" in payload["predictions"][0]
     assert "parameter_targets" in payload
     assert payload["applied"]["experience_level"] == "Intermediate"
-    assert isinstance(payload["boxes"], list)
-    assert isinstance(payload["capability_notes"], list)
+    assert isinstance(payload["localization"], dict)
+    assert isinstance(payload["localization"].get("boxes", []), list)
+    assert isinstance(payload.get("capability_notes", []), list)
+    assert isinstance(payload.get("explanations", []), list)
 
 
 def test_analyze_uses_pipeline_targets(
@@ -70,7 +85,8 @@ def test_analyze_uses_pipeline_targets(
 
     assert payload["parameter_targets"]["nozzle_temp"] == 205.0
     assert payload["recommendations"][0] == "Test recommendation"
-    assert payload["heatmap"].startswith("data:image/svg+xml;base64,")
+    heatmap = payload["localization"]["heatmap"]
+    assert isinstance(heatmap, str) and heatmap.startswith("data:image/svg+xml;base64,")
 
 
 def test_analyze_rejects_large_images(client: TestClient) -> None:

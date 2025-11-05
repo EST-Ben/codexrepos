@@ -1,15 +1,20 @@
 // src/__tests__/analysisResult.test.tsx
-import { jest } from '@jest/globals';
-jest.mock('@react-native-community/slider', () => {
-  const React = require('react');
-  return function SliderMock(props: any) {
-    // Simple stand-in that renders a <div> with testID support
-    return React.createElement('div', { 'data-testid': props.testID ?? 'slider-mock' });
-  };
-});
+import { describe, expect, it, jest } from '@jest/globals';
+jest.mock(
+  '@react-native-community/slider',
+  () => {
+    const React = require('react');
+    return function SliderMock(props: any) {
+      // Simple stand-in that renders a <div> with testID support
+      return React.createElement('div', { 'data-testid': props.testID ?? 'slider-mock' });
+    };
+  },
+  { virtual: true },
+);
 
 import React, { useMemo } from 'react';
 import { View, Text, Image, Pressable, ScrollView } from 'react-native';
+import { render, screen } from '../test-utils/native-testing';
 import Slider from '@react-native-community/slider';
 
 import type { AnalyzeResponse, ExperienceLevel } from '../types';
@@ -202,3 +207,49 @@ const styles = {
 };
 
 export default AnalysisResult;
+
+describe('AnalysisResult', () => {
+  const baseResponse: AnalyzeResponse = {
+    image_id: 'img-1',
+    version: 'test',
+    machine: { id: 'machine', brand: 'Brand', model: 'Model' },
+    experience: 'Beginner',
+    material: 'PLA',
+    predictions: [],
+    explanations: [],
+    localization: { boxes: [], heatmap: null },
+    capability_notes: [],
+    recommendations: [],
+    suggestions: [],
+    slicer_profile_diff: undefined,
+    applied: {
+      parameters: {},
+      hidden_parameters: [],
+      experience_level: 'Beginner',
+      clamped_to_machine_limits: false,
+      explanations: [],
+    },
+    low_confidence: false,
+  };
+
+  it('renders the adjustment slider with range information', () => {
+    render(
+      <AnalysisResult
+        machine={{ id: 'bambu_p1s', brand: 'Bambu', model: 'P1S' }}
+        response={baseResponse}
+        experience="Intermediate"
+        image={{ uri: 'file://preview.jpg', width: 640, height: 480 }}
+        onClose={jest.fn()}
+        onRetake={jest.fn()}
+        machineSummary={{
+          id: 'bambu_p1s',
+          brand: 'Bambu',
+          model: 'P1S',
+          safe_speed_ranges: { print: [40, 300] },
+        }}
+      />,
+    );
+
+    expect(screen.getByTestId('adjustment-slider')).toBeTruthy();
+  });
+});

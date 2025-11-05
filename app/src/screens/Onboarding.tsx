@@ -1,139 +1,351 @@
-// app/src/types.ts
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
-// ---------- Core domain types ----------
+import { useMachineRegistry } from '../hooks/useMachineRegistry';
+import type {
+  ExperienceLevel,
+  MachineRef,
+  OnboardingState,
+} from '../types';
+import {
+  DEFAULT_PROFILE,
+  loadStoredProfile,
+  saveOnboardingState,
+  saveStoredProfile,
+} from '../storage/onboarding';
 
-export type ExperienceLevel = 'Beginner' | 'Intermediate' | 'Advanced';
-
-export interface MachineRef {
-  id: string;
-  brand: string;
-  model: string;
+interface OnboardingScreenProps {
+  initialSelection: string[];
+  initialExperience: ExperienceLevel;
+  onComplete(state: OnboardingState): void;
 }
 
-export interface MachineSummary {
-  id: string;
-  brand: string;
-  model: string;
-  capabilities?: string[];
-  // e.g. { speed: [80, 200], accel: [2000, 7000] }
-  safe_speed_ranges?: Record<string, number[]>;
-  max_nozzle_temp_c?: number;
-  max_bed_temp_c?: number;
-  spindle_rpm_range?: [number, number];
-  max_feed_mm_min?: number;
+const EXPERIENCE_OPTIONS: ExperienceLevel[] = ['Beginner', 'Intermediate', 'Advanced'];
+
+function normalizeProfileMachines(
+  machines: MachineRef[] | undefined,
+): MachineRef[] {
+  if (!machines) {
+    return [];
+  }
+  return machines.map((machine) => ({ ...machine }));
 }
 
-export interface ProfileState {
-  machines: MachineRef[];
-  experience: ExperienceLevel;
-  material?: string;
-}
+export default function OnboardingScreen({
+  initialSelection,
+  initialExperience,
+  onComplete,
+}: OnboardingScreenProps) {
+  const { machines, loading, error, refresh } = useMachineRegistry();
+  const [selected, setSelected] = useState<string[]>(() => [...initialSelection]);
+  const [experience, setExperience] = useState<ExperienceLevel>(initialExperience);
+  const [hydratedProfileMachines, setHydratedProfileMachines] = useState<MachineRef[]>(
+    () => normalizeProfileMachines(DEFAULT_PROFILE.machines),
+  );
+  const [saving, setSaving] = useState(false);
 
-// ---------- Analyze: request/response ----------
+  useEffect(() => {
+    setSelected([...initialSelection]);
+  }, [initialSelection]);
 
-export interface AnalyzeRequestMeta {
-  machine_id: string;
-  experience: ExperienceLevel;
-  material?: string;
-  app_version?: string;
-}
+  useEffect(() => {
+    setExperience(initialExperience);
+  }, [initialExperience]);
 
-export interface Prediction {
-  issue_id: string;
-  confidence: number; // 0..1
-}
+  useEffect(() => {
+    (async () => {
+      const stored = await loadStoredProfile();
+      setHydratedProfileMachines(normalizeProfileMachines(stored?.machines));
+    })();
+  }, []);
 
-export interface BoundingBox {
-  // support both legacy (x,y,w,h in 0..1) and new (x,y,width,height) shapes
-  x: number;
-  y: number;
-  w?: number;
-  h?: number;
-  width?: number;
-  height?: number;
-  issue_id?: string;
-  confidence?: number; // some payloads call this score/confidence
-  score?: number;      // legacy alias
-}
+  const toggleMachine = useCallback((machineId: string) => {
+    setSelected((prev) =>
+      prev.includes(machineId)
+        ? prev.filter((id) => id !== machineId)
+        : [...prev, machineId],
+    );
+  }, []);
 
-export interface SlicerProfileDiff {
-  // Minimal structure used by UI: a normalized diff map and optional markdown
-  diff: Record<string, string | number>;
-  markdown?: string;
-}
+  const selectedSummaries = useMemo(
+    () => machines.filter((machine) => selected.includes(machine.id)),
+    [machines, selected],
+  );
 
-export interface AnalyzeResponse {
-  image_id: string;
-  machine: MachineRef;
+  const allKnownMachines = useMemo(
+    () =>
+      selectedSummaries.length > 0
+        ? selectedSummaries
+        : hydratedProfileMachines.filter((machine) => selected.includes(machine.id)),
+    [hydratedProfileMachines, selected, selectedSummaries],
+  );
 
-  // New canonical fields
-  predictions: Prediction[];                // ← replaces legacy issue_list
-  recommendations: string[];
-  capability_notes: string[];
+  const canContinue = selected.length > 0 && !saving;
 
-  // Parameter guidance
-  parameter_targets?: Record<string, string | number>;
-  /**
-   * Servers may return either:
-   *   - a plain param map (legacy), or
-   *   - an object with richer details.
-   * Support both.
-   */
-  applied?:
-    | Record<string, string | number>
-    | {
-        parameters?: Record<string, string | number>;
-        hidden_parameters?: string[];
-        experience_level?: ExperienceLevel | string;
-        clamped_to_machine_limits?: boolean;
-        explanations?: string[];
+  const persistSelection = useCallback(
+    async (next: OnboardingState, machineRefs: MachineRef[]): Promise<void> => {
+      await saveOnboardingState(next);
+      const nextProfile = {
+        ...DEFAULT_PROFILE,
+        experience: next.experience,
+        machines: machineRefs,
+        materialByMachine: {
+          ...(DEFAULT_PROFILE.materialByMachine ?? {}),
+        },
       };
+      await saveStoredProfile(nextProfile);
+    },
+    [],
+  );
 
-  // General explanations / clamp notes (canonical)
-  explanations?: string[];
+  const handleContinue = useCallback(async () => {
+    if (!selected.length || saving) {
+      return;
+    }
+    const next: OnboardingState = {
+      selectedMachines: [...selected],
+      experience,
+    };
+    setSaving(true);
+    try {
+      const machineRefs = allKnownMachines.length
+        ? allKnownMachines
+        : normalizeProfileMachines(DEFAULT_PROFILE.machines);
+      await persistSelection(next, machineRefs);
+      onComplete(next);
+    } finally {
+      setSaving(false);
+    }
+  }, [allKnownMachines, experience, onComplete, persistSelection, saving, selected]);
 
-  // Optional localization block (canonical)
-  localization?: {
-    // Some responses send a bare data URL string; others wrap it.
-    heatmap?: string | { data_url: string };
-    boxes?: BoundingBox[];
-  };
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.hero}>
+        <Text style={styles.title}>Welcome to Codex</Text>
+        <Text style={styles.subtitle}>
+          Select your primary machines and tell us your experience level so we can
+          tailor the recommendations.
+        </Text>
+      </View>
 
-  // Optional slicer export diff
-  slicer_profile_diff?: SlicerProfileDiff;
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Experience level</Text>
+        <View style={styles.chipRow}>
+          {EXPERIENCE_OPTIONS.map((option) => {
+            const selectedOption = experience === option;
+            return (
+              <Pressable
+                key={option}
+                onPress={() => setExperience(option)}
+                accessibilityRole="button"
+                accessibilityState={{ selected: selectedOption }}
+                style={({ pressed }) => [
+                  styles.chip,
+                  selectedOption && styles.chipSelected,
+                  pressed && styles.chipPressed,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.chipLabel,
+                    selectedOption && styles.chipLabelSelected,
+                  ]}
+                >
+                  {option}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
 
-  // ---------- Backward-compat aliases (do not rely on these long-term) ----------
-  // Old top-level names some screens/hooks might still touch
-  top_issue?: string;                       // prefer deriving from predictions[0]
-  heatmap?: string;                         // prefer localization.heatmap
-  boxes?: BoundingBox[];                    // prefer localization.boxes
-  hidden_parameters?: string[];             // prefer applied.hidden_parameters
-  clamp_explanations?: string[];            // prefer explanations
-  issue_list?: Prediction[];                // prefer predictions
-  parameters?: Record<string, string | number>; // prefer parameter_targets
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Machines</Text>
+        {loading ? (
+          <ActivityIndicator />
+        ) : error ? (
+          <Pressable accessibilityRole="button" onPress={refresh} style={styles.retryBox}>
+            <Text style={styles.retryText}>
+              We could not load your machine list. Tap to retry.
+            </Text>
+          </Pressable>
+        ) : machines.length === 0 ? (
+          <Text style={styles.placeholder}>No machines available yet.</Text>
+        ) : (
+          machines.map((machine) => {
+            const isSelected = selected.includes(machine.id);
+            return (
+              <Pressable
+                key={machine.id}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: isSelected }}
+                onPress={() => toggleMachine(machine.id)}
+                style={({ pressed }) => [
+                  styles.machineRow,
+                  isSelected && styles.machineRowSelected,
+                  pressed && styles.machineRowPressed,
+                ]}
+              >
+                <View>
+                  <Text style={styles.machineName}>
+                    {machine.brand} {machine.model}
+                  </Text>
+                  {machine.type ? (
+                    <Text style={styles.machineMeta}>{machine.type}</Text>
+                  ) : null}
+                </View>
+                {isSelected ? <Text style={styles.machineSelected}>Selected</Text> : null}
+              </Pressable>
+            );
+          })
+        )}
+      </View>
+
+      <Pressable
+        accessibilityRole="button"
+        disabled={!canContinue}
+        onPress={handleContinue}
+        style={({ pressed }) => [
+          styles.primaryButton,
+          (!canContinue || pressed) && styles.primaryButtonDisabled,
+        ]}
+      >
+        {saving ? (
+          <ActivityIndicator color="#0f172a" />
+        ) : (
+          <Text style={styles.primaryLabel}>Continue</Text>
+        )}
+      </Pressable>
+    </ScrollView>
+  );
 }
 
-// ---------- History & UI contracts ----------
-
-export interface AnalysisHistoryRecord {
-  imageId: string;
-  machineId: string;
-  machine: MachineRef;
-  timestamp: number;
-  response: AnalyzeResponse;
-  material?: string;
-  localUri?: string;
-  summary?: MachineSummary;
-
-  // Backward-compat for legacy code that expected issues on the record:
-  issues?: Prediction[];       // deprecated — prefer response.predictions
-  // Convenience (optional) for quick display/search without digging into response:
-  predictions?: Prediction[];  // optional mirror of response.predictions
-}
-
-// ---------- Slicer export ----------
-
-export type SlicerId = 'cura' | 'prusaslicer' | 'bambu' | 'orca';
-
-// Optional: small helper type some components import
-export type Experience = ExperienceLevel;
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+    paddingVertical: 32,
+    gap: 32,
+    backgroundColor: '#F9FAFB',
+  },
+  hero: {
+    gap: 12,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#4B5563',
+  },
+  section: {
+    gap: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  chipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  chip: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    backgroundColor: '#FFFFFF',
+  },
+  chipSelected: {
+    backgroundColor: '#111827',
+    borderColor: '#111827',
+  },
+  chipPressed: {
+    opacity: 0.75,
+  },
+  chipLabel: {
+    fontSize: 14,
+    color: '#1F2937',
+    fontWeight: '600',
+  },
+  chipLabelSelected: {
+    color: '#FFFFFF',
+  },
+  placeholder: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  machineRow: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  machineRowSelected: {
+    borderColor: '#2563EB',
+    backgroundColor: '#DBEAFE',
+  },
+  machineRowPressed: {
+    opacity: 0.8,
+  },
+  machineName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  machineMeta: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 4,
+  },
+  machineSelected: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#2563EB',
+  },
+  retryBox: {
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: '#FEF3C7',
+    borderWidth: 1,
+    borderColor: '#FBBF24',
+  },
+  retryText: {
+    color: '#92400E',
+    fontSize: 14,
+  },
+  primaryButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    borderRadius: 12,
+    backgroundColor: '#FACC15',
+  },
+  primaryButtonDisabled: {
+    backgroundColor: '#FCD34D',
+    opacity: 0.7,
+  },
+  primaryLabel: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+});

@@ -1,7 +1,7 @@
 """Pydantic models shared between the API layers and inference utilities."""
 from __future__ import annotations
 
-from typing import Dict, List, Literal, Optional, Tuple
+from typing import Dict, List, Literal, Optional, Tuple, Union
 
 from pydantic import BaseModel, Field
 
@@ -49,7 +49,25 @@ class LocalizationPayload(BaseModel):
     """Container for bounding boxes and a coarse heatmap overlay."""
 
     boxes: List[BoundingBox] = Field(default_factory=list)
-    heatmap: Optional[HeatmapPayload] = None
+    heatmap: Optional[Union[str, HeatmapPayload]] = None
+
+
+class SlicerProfileParameter(BaseModel):
+    """Structured parameter descriptor used for slicer exports."""
+
+    value: Optional[float] = None
+    delta: Optional[float] = None
+    unit: Optional[str] = None
+    range_hint: Optional[Tuple[float, float]] = None
+    clamped: Optional[bool] = None
+
+
+class SlicerProfileDiff(BaseModel):
+    """Flexible slicer diff payload supporting structured and legacy maps."""
+
+    diff: Optional[Dict[str, Union[str, float, int, bool]]] = None
+    parameters: Optional[Dict[str, SlicerProfileParameter]] = None
+    markdown: Optional[str] = None
 
 
 class SuggestionChange(BaseModel):
@@ -94,14 +112,15 @@ class AnalyzeResponse(BaseModel):
     experience: str
     material: Optional[str] = None
     predictions: List[Prediction]
-    explanations: List[Dict[str, object]]
-    localization: LocalizationPayload
+    explanations: List[str] = Field(default_factory=list)
+    localization: LocalizationPayload = Field(default_factory=LocalizationPayload)
     capability_notes: List[str] = Field(default_factory=list)
     recommendations: List[str] = Field(default_factory=list)
-    suggestions: List[Suggestion]
-    slicer_profile_diff: Dict[str, object]
+    suggestions: List[Suggestion] = Field(default_factory=list)
+    slicer_profile_diff: Optional[SlicerProfileDiff] = None
     applied: AppliedClamp
     low_confidence: bool = False
+    parameter_targets: Dict[str, float] = Field(default_factory=dict)
 
 
 __all__ = [
@@ -112,6 +131,8 @@ __all__ = [
     "HeatmapPayload",
     "LocalizationPayload",
     "Prediction",
+    "SlicerProfileDiff",
+    "SlicerProfileParameter",
     "Suggestion",
     "SuggestionChange",
 ]
