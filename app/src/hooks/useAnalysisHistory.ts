@@ -1,33 +1,15 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
+import type { AnalysisHistoryRecord } from '../types';
+import { appendHistory, loadHistory } from '../storage/history';
 
-import type { AnalysisHistoryRecord, HistoryMap } from '../types';
-import { appendHistoryEntry, loadHistory } from '../storage/history';
-
-interface UseAnalysisHistoryResult {
-  history: HistoryMap;
-  record(entry: AnalysisHistoryRecord): Promise<void>;
-  refresh(): Promise<void>;
-}
-
-export function useAnalysisHistory(): UseAnalysisHistoryResult {
-  const [history, setHistory] = useState<HistoryMap>({});
-
-  const refresh = useCallback(async () => {
-    const next = await loadHistory();
-    setHistory(next);
+export function useAnalysisHistory() {
+  const add = useCallback(async (entry: AnalysisHistoryRecord) => {
+    await appendHistory(entry);
   }, []);
 
-  useEffect(() => {
-    void refresh();
-  }, [refresh]);
+  const load = useCallback(async () => {
+    return loadHistory();
+  }, []);
 
-  const record = useCallback(
-    async (entry: AnalysisHistoryRecord) => {
-      await appendHistoryEntry(entry);
-      await refresh();
-    },
-    [refresh],
-  );
-
-  return { history, record, refresh };
+  return { add, load };
 }

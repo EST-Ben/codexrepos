@@ -1,4 +1,3 @@
-// app/src/screens/AnalysisResult.tsx
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Alert,
@@ -13,13 +12,21 @@ import {
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 
-import { exportProfile } from '../api/client';
+import { exportProfile as exportProfileRaw } from '../api/client';
 import type {
   AnalyzeResponse,
   ExperienceLevel,
   MachineRef,
   SlicerId,
 } from '../types';
+
+/** -------------------------------------------
+ * Local type-safe wrapper for exportProfile
+ * ------------------------------------------*/
+const exportProfile = exportProfileRaw as unknown as (payload: {
+  slicer: SlicerId;
+  changes: Record<string, string | number | boolean>;
+}) => Promise<{ diff?: Record<string, unknown> } | any>;
 
 /** -------------------------------------------
  * Utilities

@@ -9,7 +9,15 @@ import React, {
 } from 'react';
 
 import type { MachineRef, ProfileState } from '../types';
-import { DEFAULT_PROFILE, loadStoredProfile, saveStoredProfile } from '../storage/onboarding';
+import { loadOnboardingState, saveOnboardingState } from '../storage/onboarding';
+
+// Local canonical default; always ensure materialByMachine exists
+const DEFAULT_PROFILE: ProfileState & { materialByMachine: Record<string, string | undefined> } = {
+  experience: 'Beginner',
+  machines: [],
+  material: undefined,
+  materialByMachine: {},
+};
 
 type ProfileContextProfile = ProfileState & {
   materialByMachine: Record<string, string | undefined>;
@@ -42,44 +50,53 @@ function ensureProfile(input: ProfileState | null | undefined): ProfileContextPr
 }
 
 export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [profile, setProfileState] = useState<ProfileContextProfile>(() =>
-    ensureProfile(DEFAULT_PROFILE),
-  );
+  const [profile, setProfileState] = useState<ProfileContextValue['profile']>({ ...DEFAULT_PROFILE });
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const hydrate = async () => {
-      const stored = await loadStoredProfile();
-      setProfileState(ensureProfile(stored));
+      const stored = await loadOnboardingState();
+      const normalized: ProfileContextValue['profile'] = {
+        experience: stored?.experience ?? DEFAULT_PROFILE.experience,
+        machines: (stored?.selectedMachines ?? []).map<MachineRef>((id) => ({ id, brand: '', model: '' })),
+        material: undefined,
+        materialByMachine: {}, // always present
+      };
+      setProfileState(normalized);
       setLoading(false);
     };
     hydrate();
   }, []);
 
-  const persist = useCallback(async (next: ProfileState) => {
-    const normalized = ensureProfile(next);
-    setProfileState(normalized);
-    await saveStoredProfile(normalized);
+  const persist = useCallback(async (next: ProfileContextValue['profile']) => {
+    setProfileState(next);
+    // mirror back to onboarding storage (just id list + experience)
+    const minimal = {
+      selectedMachines: next.machines.map((m) => m.id),
+      experience: next.experience,
+    };
+    await saveOnboardingState(minimal);
   }, []);
 
   const handleSetProfile = useCallback<ProfileContextValue['setProfile']>(
     async (incoming) => {
       const machines: MachineRef[] = incoming.machines ?? [];
-      const allowedIds = new Set(machines.map((machine) => machine.id));
+      const allowedIds = new Set(machines.map((m) => m.id));
+
+      // Normalize materialByMachine to {}
       const existingMap = incoming.materialByMachine ?? profile.materialByMachine ?? {};
       const filteredMaterial: Record<string, string | undefined> = {};
       for (const [key, value] of Object.entries(existingMap)) {
-        if (allowedIds.has(key)) {
-          filteredMaterial[key] = value;
-        }
+        if (allowedIds.has(key)) filteredMaterial[key] = value;
       }
-      const normalized = {
+
+      const next = {
         experience: incoming.experience,
         machines,
         material: incoming.material ?? profile.material,
         materialByMachine: filteredMaterial,
       };
-      await persist(normalized);
+      await persist(next);
     },
     [persist, profile.material, profile.materialByMachine],
   );
@@ -87,13 +104,9 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
   const setMaterial = useCallback<ProfileContextValue['setMaterial']>(
     async (machineId, material) => {
       const materialByMachine = { ...(profile.materialByMachine ?? {}) };
-      if (material) {
-        materialByMachine[machineId] = material;
-      } else {
-        delete materialByMachine[machineId];
-      }
-      const next = { ...profile, materialByMachine };
-      await persist(next);
+      if (material) materialByMachine[machineId] = material;
+      else delete materialByMachine[machineId];
+      await persist({ ...profile, materialByMachine });
     },
     [persist, profile],
   );
@@ -118,8 +131,6 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
 
 export function useProfile(): ProfileContextValue {
   const ctx = useContext(ProfileContext);
-  if (!ctx) {
-    throw new Error('useProfile must be used within a ProfileProvider');
-  }
+  if (!ctx) throw new Error('useProfile must be used within a ProfileProvider');
   return ctx;
 }

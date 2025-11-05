@@ -2,28 +2,29 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
 
 import OnboardingScreen from './src/screens/Onboarding';
-import { ResultsScreen } from './src/screens/Results';
+import ResultsScreen from './src/screens/Results';
+
 import type { OnboardingState } from './src/types';
 import { DEFAULT_ONBOARDING, loadOnboardingState } from './src/storage/onboarding';
 
 export default function App() {
-  const [state, setState] = useState<OnboardingState>(DEFAULT_ONBOARDING);
+  const [state, setState] = useState<OnboardingState | null>(null);
   const [showOnboarding, setShowOnboarding] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const hydrate = async () => {
-      try {
-        const saved = await loadOnboardingState();
-        setState(saved);
-        setShowOnboarding(saved.selectedMachines.length === 0);
-      } catch (err) {
-        console.warn('Failed to hydrate onboarding state', err);
-        setState(DEFAULT_ONBOARDING);
+      const saved = await loadOnboardingState();
+      if (!saved) {
+        // first run or no state saved yet
+        setState({ selectedMachines: [], experience: 'Beginner' });
         setShowOnboarding(true);
-      } finally {
         setLoading(false);
+        return;
       }
+      setState(saved);
+      setShowOnboarding((saved.selectedMachines ?? []).length === 0);
+      setLoading(false);
     };
     hydrate();
   }, []);
@@ -33,7 +34,7 @@ export default function App() {
     setShowOnboarding(false);
   };
 
-  const handleBack = () => {
+  const handleBackToOnboarding = () => {
     setShowOnboarding(true);
   };
 
@@ -53,7 +54,7 @@ export default function App() {
           <ResultsScreen
             selectedMachines={state.selectedMachines}
             experience={state.experience}
-            onBack={handleBack}
+            onBack={handleBackToOnboarding}
           />
         )}
       </View>

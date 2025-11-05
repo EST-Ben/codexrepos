@@ -1,87 +1,107 @@
 import React, { useCallback, useState } from 'react';
-import { ActivityIndicator, Platform, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 
 import { analyzeImage as analyzeWithClient } from '../api/client';
-import type { AnalyzeResponse, ExperienceLevel } from '../types';
-import type { PreparedImage } from './CameraButton';
-import { CameraButton } from './CameraButton';
-import { WebPhotoPicker } from './WebPhotoPicker';
+import type { AnalyzeRequestMeta, AnalyzeResponse, ExperienceLevel } from '../types';
 
-interface AnalyzeFromPhotoProps {
+type Props = {
   machineId: string;
-  experience: ExperienceLevel;
-  onResult(response: AnalyzeResponse): void;
-  onError(message: string): void;
   material?: string;
-  disabled?: boolean;
-  label?: string;
+  experience: ExperienceLevel;
   appVersion?: string;
-}
+  onResult(res: AnalyzeResponse): void;
+  onError(msg: string): void;
+};
 
-export const AnalyzeFromPhoto: React.FC<AnalyzeFromPhotoProps> = ({
+const AnalyzeFromPhoto: React.FC<Props> = ({
   machineId,
+  material,
   experience,
+  appVersion = 'analyze-from-photo',
   onResult,
   onError,
-  material,
-  disabled,
-  label = 'Take Photo',
-  appVersion = Platform.OS === 'web' ? 'web-analyze-from-photo' : 'native-analyze-from-photo',
 }) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState(0);
 
-  const handleNativeImage = useCallback(
-    async (image: PreparedImage) => {
-      try {
-        setIsSubmitting(true);
-        const response = await analyzeWithClient(
-          { uri: image.uri, name: image.name, type: image.type },
-          {
-            machine_id: machineId,
-            experience,
-            app_version: appVersion,
-            ...(material ? { material } : {}),
-          },
-        );
-        onResult(response);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        onError(message);
-      } finally {
-        setIsSubmitting(false);
+  const handlePick = useCallback(async () => {
+    try {
+      setBusy(true);
+      setProgress(0);
+
+      const perm = await ImagePicker.requestCameraPermissionsAsync();
+      if (!perm.granted) {
+        throw new Error('Camera permission not granted');
       }
-    },
-    [appVersion, experience, machineId, material, onError, onResult],
-  );
 
-  if (Platform.OS === 'web') {
-    return (
-      <WebPhotoPicker
-        machineId={machineId}
-        experience={experience}
-        material={material}
-        onResult={onResult}
-        onError={onError}
-        label={label}
-        appVersion={appVersion}
-      />
-    );
-  }
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: false,
+        quality: 1,
+      });
+
+      if (result.canceled || !result.assets?.[0]) {
+        setBusy(false);
+        return;
+      }
+
+      const asset = result.assets[0];
+      const file = {
+        uri: asset.uri,
+        name: asset.fileName ?? 'photo.jpg',
+        type: asset.mimeType ?? 'image/jpeg',
+      };
+
+      const meta: AnalyzeRequestMeta = {
+        machine_id: machineId,
+        experience,
+        material,
+        app_version: appVersion,
+      };
+
+      // NOTE: Pass 3rd arg (onProgress) to satisfy the updated client signature.
+      const response = await analyzeWithClient(file as any, meta, (p) => setProgress(p ?? 0));
+      onResult(response);
+    } catch (e: any) {
+      onError(e?.message ?? String(e));
+    } finally {
+      setBusy(false);
+      setProgress(0);
+    }
+  }, [appVersion, experience, machineId, material, onError, onResult]);
 
   return (
-    <View style={{ gap: 12 }}>
-      <CameraButton
-        disabled={disabled || isSubmitting}
-        label={isSubmitting ? 'Analyzing…' : label}
-        onImageReady={handleNativeImage}
-      />
-      {isSubmitting ? (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <ActivityIndicator color="#2563eb" />
-        </View>
-      ) : null}
+    <View style={styles.container}>
+      <Pressable onPress={handlePick} style={[styles.button, busy && styles.buttonDisabled]} disabled={busy}>
+        {busy ? (
+          <>
+            <ActivityIndicator color="#0f172a" />
+            <Text style={styles.buttonLabel}>
+              {Platform.OS === 'web' ? `Uploading… ${Math.round(progress * 100)}%` : 'Uploading…'}
+            </Text>
+          </>
+        ) : (
+          <Text style={styles.buttonLabel}>Analyze from Photo</Text>
+        )}
+      </Pressable>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: { alignItems: 'center' },
+  button: {
+    backgroundColor: '#38bdf8',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'center',
+  },
+  buttonDisabled: { opacity: 0.6 },
+  buttonLabel: { color: '#0f172a', fontWeight: '700' },
+});
 
 export default AnalyzeFromPhoto;
