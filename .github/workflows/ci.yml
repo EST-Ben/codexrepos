@@ -11,29 +11,41 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # ---------- Python ----------
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-${{ hashFiles('server/requirements.txt') }}
+
+      - name: Install Python deps
+        run: |
+          python -m pip install --upgrade pip wheel
+          pip install pip-tools
+          if [ -f server/requirements.in ]; then pip-compile --resolver=backtracking -o server/requirements.txt server/requirements.in; fi
+          pip install -r server/requirements.txt
+          pip install ruff black pytest pytest-cov
+
+      - name: Lint (ruff) & Format check (black)
+        run: |
+          ruff check server
+          black --check server
+
+      - name: Pytest
+        run: |
+          pytest -q --cov=server --cov-report=term-missing
+
+      # ---------- Node / Expo ----------
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
-          cache-dependency-path: |
-            server-node/package-lock.json
-            app/package-lock.json
+          cache-dependency-path: "app/package-lock.json"
 
-      - name: Server build (Node backend)
-        run: |
-          npm --prefix server-node ci
-          npm --prefix server-node run build
-
-      - name: Server healthcheck
-        run: |
-          npm --prefix server-node run start:ci &
-          SERVER_PID=$!
-          sleep 2
-          curl -fsS http://localhost:8000/health
-          kill $SERVER_PID
-          wait $SERVER_PID || true
-
-      - name: Install app deps
+      - name: Install Node deps
         working-directory: app
         run: npm ci
 
@@ -50,6 +62,3 @@ jobs:
       - name: Jest
         working-directory: app
         run: npm test -- --ci --passWithNoTests
-
-      - name: Legacy server notice
-        run: echo "Python server under server/ is deprecated; see README for details."

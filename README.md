@@ -1,6 +1,57 @@
-# codexrepo Diagnostics Suite
+# Machine Registry Scaffold
 
-A full-stack workflow for diagnosing print issues: the Expo client captures prints, the new Node.js/TypeScript backend serves the analysis APIs, and a shared machine registry keeps clamps and presets aligned.
+This project bootstraps a React Native (Expo) client, FastAPI backend, and
+data-driven machine registry.
+
+The Expo app provides an onboarding flow where operators can multi-select their
+machines, choose an experience level, and copy capability-aware tuning diffs for
+popular slicers. The FastAPI service loads generated machine profiles, exposes
+lookup and export endpoints, and ships with a deterministic diagnostics stub so
+the pipeline can be demoed without a trained model.
+
+## Quick start
+
+1. **Install dependencies**
+   - Python 3.11 (Miniforge recommended on Windows)
+   - Node.js 18 LTS and Yarn/NPM
+2. **Start the FastAPI backend**
+   ```powershell
+   # From the repo root
+   ./serve_api.ps1      # PowerShell
+   #   or
+   serve_api.bat        # Command Prompt
+   ```
+3. **Configure environment variables**
+   - Copy `.env.example` to `.env.local` (or export variables in your shell) and update values as needed.
+   - For production builds set `ENVIRONMENT=production` and provide a comma-separated `ALLOWED_ORIGINS` list.
+
+4. **Start the Expo client in LAN mode**
+   ```powershell
+   # Replace <LAN-IP> with your computer's LAN address
+   ./serve_app.ps1 -ApiUrl "http://<LAN-IP>:8000"
+   #   or (CMD)
+   set API_URL=http://<LAN-IP>:8000
+   serve_app.bat
+   ```
+   Pass `-DevClient` (or `--dev-client` on Windows CMD) if you're targeting an EAS development build
+   instead of Expo Go. The launchers now refuse to run if the placeholder `<LAN-IP>` string is left in
+   place, preventing the "Failed to parse URL" Expo error – swap in your actual LAN IP or
+   `http://localhost:8000` for local web testing.
+5. Scan the QR code with the Expo Go app, ensure `/api/machines` loads in the UI, then capture or pick
+   a photo to test `/api/analyze`.
+
+See [`LOCAL_DEV.md`](LOCAL_DEV.md) for the full Windows + Miniforge walkthrough, including curl smoke
+tests and firewall notes.
+
+## Developer tooling
+
+Install the shared hooks locally so formatting and linting run before each commit:
+
+```bash
+pip install pre-commit && pre-commit install
+```
+
+## Production deployment
 
 ## Running the App
 
