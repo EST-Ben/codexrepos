@@ -1,13 +1,16 @@
 """FastAPI entrypoint for the diagnostics service."""
 from __future__ import annotations
 
-import os
-
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import Limiter
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
+from starlette.middleware.base import BaseHTTPMiddleware
 
 try:
-    from . import settings
+    from .settings import settings
+    from .observability import attach_instrumentation, init_logging
     from .app.routers import (
         analyze as analyze_router,
         analyze_image as analyze_image_router,
@@ -24,7 +27,8 @@ except ImportError:  # pragma: no cover
     if str(parent_dir) not in sys.path:
         sys.path.append(str(parent_dir))
 
-    import settings  # type: ignore
+    from settings import settings  # type: ignore
+    from observability import attach_instrumentation, init_logging  # type: ignore
     from app.routers import (  # type: ignore
         analyze as analyze_router,
         analyze_image as analyze_image_router,
@@ -34,6 +38,45 @@ except ImportError:  # pragma: no cover
     from services import INFERENCE_ENGINE, LOCALIZATION_ENGINE  # type: ignore  # noqa: E402  pylint: disable=wrong-import-position
 
 app = FastAPI(title="3D Diagnostics API", version="0.1.0")
+
+# ---- Rate limiting ----
+_rate_limit = (
+    f"{settings.RATE_LIMIT_REQUESTS}/{settings.RATE_LIMIT_WINDOW_SECONDS} seconds"
+)
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=[_rate_limit],
+)
+app.state.limiter = limiter
+
+
+@app.middleware("http")
+async def _apply_limits(request: Request, call_next):
+    """Apply global request rate limits."""
+    try:
+        return await limiter.limit(_rate_limit)(call_next)(request)
+    except RateLimitExceeded as exc:  # pragma: no cover - handled as HTTP error
+        raise HTTPException(status_code=429, detail="Rate limit exceeded") from exc
+
+
+class UploadSizeLimitMiddleware(BaseHTTPMiddleware):
+    """Reject uploads larger than the configured cap."""
+
+    def __init__(self, app, max_mb: int):
+        super().__init__(app)
+        self.max_bytes = max_mb * 1024 * 1024
+
+    async def dispatch(self, request: Request, call_next):
+        cl = request.headers.get("content-length")
+        if cl and cl.isdigit() and int(cl) > self.max_bytes:
+            raise HTTPException(status_code=413, detail="Payload too large")
+        return await call_next(request)
+
+
+app.add_middleware(UploadSizeLimitMiddleware, max_mb=settings.UPLOAD_MAX_MB)
+
+init_logging()
+attach_instrumentation(app)
 
 # Configure CORS differently for production vs development.
 def _resolve_cors_origins() -> list[str]:
@@ -55,10 +98,15 @@ app.add_middleware(
 )
 
 
-@app.get("/health")
-def health() -> dict[str, str]:
+@app.get("/health", tags=["ops"])
+def health() -> dict[str, object]:
     """Simple readiness probe."""
-    return {"status": "ok", "mode": os.getenv("INFERENCE_MODE", "stub")}
+    mode = getattr(settings, "INFERENCE_MODE", "stub")
+    return {
+        "status": "ok",
+        "mode": mode,
+        "stub_inference": mode in {"stub", "linear"},
+    }
 
 
 # Mount routers under /api for the mobile app and tests.

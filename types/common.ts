@@ -1,18 +1,1 @@
-export type {
-  ExperienceLevel,
-  MachineRef,
-  MachineSummary,
-  AnalyzeRequestMeta,
-  AnalyzeResponse,
-  ProfileState,
-  OnboardingState,
-  SlicerProfileDiff,
-  SlicerProfileParameter,
-  LocalizationPayload,
-  HeatmapPayload,
-  Suggestion,
-  SuggestionChange,
-  AppliedClamp,
-  AnalysisHistoryRecord,
-  HistoryMap,
-} from '../app/src/types';
+export * from './api';

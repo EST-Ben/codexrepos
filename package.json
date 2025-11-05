@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "scripts": {
+    "doctor": "ts-node --compiler-options '{\"module\":\"commonjs\"}' scripts/doctor.ts || node scripts/doctor.ts",
+    "server:dev": "npm --prefix server-node run dev",
+    "server:build": "npm --prefix server-node run build",
+    "server:start": "npm --prefix server-node run start"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  }
+}
