@@ -52,7 +52,9 @@ const PrinterTabs: React.FC<PrinterTabsProps> = ({
   useEffect(() => {
     return () => {
       if (Platform.OS === 'web' && selectedImage?.uri?.startsWith('blob:')) {
-        try { URL.revokeObjectURL(selectedImage.uri); } catch {}
+        try {
+          URL.revokeObjectURL(selectedImage.uri);
+        } catch {}
       }
     };
   }, [selectedImage?.uri]);
@@ -66,6 +68,7 @@ const PrinterTabs: React.FC<PrinterTabsProps> = ({
     (prepared: PreparedImage) => {
       setErrorMessage(null);
       setUploading(true);
+
       const experienceLevel = (profile.experience ?? 'Intermediate') as ExperienceLevel;
       const meta = {
         machine_id: profile.machineId,
@@ -73,36 +76,46 @@ const PrinterTabs: React.FC<PrinterTabsProps> = ({
         material: material || profile.material,
         app_version: 'printer-page',
       };
+
       const fileArg =
         prepared.blob ?? ({ uri: prepared.uri, name: prepared.name, type: prepared.type } as const);
 
-      mutate(
-        { file: fileArg, meta },
-        {
-          onSuccess: (response) => {
-            onRecordHistory?.({
-              imageId: response.image_id,
-              machineId: profile.machineId,
-              material: material || profile.material,
-              response,
-              timestamp: Date.now(),
-            });
-            onShowAnalysis({
-              image: { uri: prepared.uri, width: prepared.width, height: prepared.height },
-              material: material || profile.material,
-            });
-          },
-          onError: (err) => {
-            const message = err instanceof Error ? err.message : String(err);
-            setErrorMessage(message);
-          },
-          onSettled: () => {
-            setUploading(false);
-          },
+      // useAnalyze().mutate expects a single payload object with callbacks inside
+      mutate({
+        file: fileArg as any,
+        meta,
+        onSuccess: (response: any) => {
+          onRecordHistory?.({
+            imageId: response?.image_id,
+            machineId: profile.machineId,
+            material: material || profile.material,
+            response,
+            timestamp: Date.now(),
+          });
+
+          onShowAnalysis({
+            image: { uri: prepared.uri, width: prepared.width, height: prepared.height },
+            material: material || profile.material,
+          });
         },
-      );
+        onError: (err: unknown) => {
+          const message = err instanceof Error ? err.message : String(err);
+          setErrorMessage(message);
+        },
+        onSettled: () => {
+          setUploading(false);
+        },
+      } as any);
     },
-    [material, mutate, onRecordHistory, onShowAnalysis, profile.experience, profile.machineId, profile.material],
+    [
+      material,
+      mutate,
+      onRecordHistory,
+      onShowAnalysis,
+      profile.experience,
+      profile.machineId,
+      profile.material,
+    ],
   );
 
   const handleImageReady = useCallback(
@@ -132,7 +145,8 @@ const PrinterTabs: React.FC<PrinterTabsProps> = ({
         <View>
           <Text style={styles.title}>{machineTitle}</Text>
           <Text style={styles.subtitle}>
-            ID: {profile.machineId}{profile.experience ? ` • ${profile.experience}` : ''}
+            ID: {profile.machineId}
+            {profile.experience ? ` • ${profile.experience}` : ''}
           </Text>
         </View>
         <View style={styles.headerActions}>
@@ -198,6 +212,7 @@ const PrinterTabs: React.FC<PrinterTabsProps> = ({
             </Text>
           </Pressable>
 
+          {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
         </View>
 
         {/* Optional: record to history */}
@@ -208,10 +223,12 @@ const PrinterTabs: React.FC<PrinterTabsProps> = ({
               You can record analysis results in your history after you run an analysis.
             </Text>
             <Pressable
-              onPress={() => onRecordHistory?.({
-                machineId: profile.machineId,
-                when: Date.now(),
-              })}
+              onPress={() =>
+                onRecordHistory?.({
+                  machineId: profile.machineId,
+                  when: Date.now(),
+                })
+              }
               style={[styles.button, styles.secondaryBtn, { alignSelf: 'flex-start' }]}
             >
               <Text style={styles.secondaryLabel}>Record placeholder</Text>

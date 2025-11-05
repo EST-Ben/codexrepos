@@ -5,7 +5,7 @@ import OnboardingScreen from './src/screens/Onboarding';
 import ResultsScreen from './src/screens/Results';
 
 import type { OnboardingState } from './src/types';
-import { DEFAULT_ONBOARDING, loadOnboardingState } from './src/storage/onboarding';
+import { loadOnboardingState } from './src/storage/onboarding';
 
 export default function App() {
   const [state, setState] = useState<OnboardingState | null>(null);
@@ -15,17 +15,21 @@ export default function App() {
   useEffect(() => {
     const hydrate = async () => {
       const saved = await loadOnboardingState();
+
       if (!saved) {
-        // first run or no state saved yet
-        setState({ selectedMachines: [], experience: 'Beginner' });
+        // First run or nothing persisted yet
+        const fallback: OnboardingState = { selectedMachines: [], experience: 'Beginner' };
+        setState(fallback);
         setShowOnboarding(true);
         setLoading(false);
         return;
       }
+
       setState(saved);
       setShowOnboarding((saved.selectedMachines ?? []).length === 0);
       setLoading(false);
     };
+
     hydrate();
   }, []);
 
@@ -43,14 +47,16 @@ export default function App() {
       <StatusBar barStyle="light-content" />
       <View style={styles.container}>
         {loading && <ActivityIndicator />}
-        {!loading && showOnboarding && (
+
+        {!loading && showOnboarding && state && (
           <OnboardingScreen
             initialSelection={state.selectedMachines}
             initialExperience={state.experience}
             onComplete={handleComplete}
           />
         )}
-        {!loading && !showOnboarding && (
+
+        {!loading && !showOnboarding && state && (
           <ResultsScreen
             selectedMachines={state.selectedMachines}
             experience={state.experience}

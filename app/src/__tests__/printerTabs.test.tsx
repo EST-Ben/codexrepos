@@ -1,6 +1,7 @@
+// app/src/__tests__/printerTabs.test.tsx
 import React from 'react';
 // Local minimal test helpers to avoid bringing in @testing-library/react-native.
-import { fireEvent, render, screen, waitFor } from '../test-utils/native-testing';
+import { fireEvent, render, waitFor } from '../test-utils/native-testing';
 import { jest, describe, it, expect, beforeEach } from '@jest/globals';
 
 import type {
@@ -148,7 +149,7 @@ describe('PrinterTabs', () => {
   const onRecordHistory = jest.fn<(entry: AnalysisHistoryRecord) => void>();
 
   it('renders a photo picker control for the active machine', () => {
-    render(
+    const { getByText } = render(
       <PrinterTabs
         profile={profile as any}
         onEditProfile={jest.fn()}
@@ -160,13 +161,13 @@ describe('PrinterTabs', () => {
       />,
     );
     // Assert presence by visible label instead of testID
-    expect(screen.getByText('Pick / Capture photo')).toBeTruthy();
+    expect(getByText('Pick / Capture photo')).toBeTruthy();
   });
 
   it('submits uploads with machine meta and experience', async () => {
     mockedClient.analyzeImage.mockResolvedValue(minimalAnalyzeResponse({ image_id: 'test-image' }));
 
-    render(
+    const { getByText } = render(
       <PrinterTabs
         profile={profile as any}
         onEditProfile={jest.fn()}
@@ -179,10 +180,10 @@ describe('PrinterTabs', () => {
     );
 
     // 1) Simulate picking a file (enables "Analyze photo")
-    fireEvent.press(screen.getByText('Pick / Capture photo'));
+    fireEvent.press(getByText('Pick / Capture photo'));
 
     // 2) Press the real "Analyze photo" button that PrinterTabs renders
-    fireEvent.press(screen.getByText('Analyze photo'));
+    fireEvent.press(getByText('Analyze photo'));
 
     // Accept either code path: useAnalyze.mutate (mockAnalyzeImageApi) OR client.analyzeImage
     await waitFor(() => {
