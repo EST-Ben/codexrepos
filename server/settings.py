@@ -1,9 +1,11 @@
 """Runtime settings for the diagnostics server."""
 from __future__ import annotations
 
+import math
 import os
 import tempfile
 from pathlib import Path
+from types import SimpleNamespace
 
 
 def _default_upload_dir() -> Path:
@@ -24,7 +26,8 @@ def _comma_separated_list(value: str | None) -> list[str]:
     return [item.strip() for item in value.split(",") if item.strip()]
 
 
-ENVIRONMENT = os.getenv("ENVIRONMENT", "development").strip().lower()
+ENV = os.getenv("ENV", os.getenv("ENVIRONMENT", "development")).strip().lower()
+ENVIRONMENT = os.getenv("ENVIRONMENT", ENV).strip().lower()
 ALLOWED_CORS_ORIGINS = _comma_separated_list(os.getenv("ALLOWED_ORIGINS"))
 
 UPLOAD_DIR = _compute_upload_dir()
@@ -41,11 +44,34 @@ LINEAR_MODEL_PATH = Path(
 ).resolve()
 INFERENCE_MODE = os.getenv("INFERENCE_MODE", "linear")  # "linear" | "torch" | "onnx"
 
-MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_BYTES", str(12 * 1024 * 1024)))
+UPLOAD_MAX_MB = int(os.getenv("UPLOAD_MAX_MB", "10"))
+MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_BYTES", str(UPLOAD_MAX_MB * 1024 * 1024)))
+if MAX_UPLOAD_BYTES < UPLOAD_MAX_MB * 1024 * 1024:
+    MAX_UPLOAD_BYTES = UPLOAD_MAX_MB * 1024 * 1024
+else:
+    UPLOAD_MAX_MB = max(UPLOAD_MAX_MB, math.ceil(MAX_UPLOAD_BYTES / (1024 * 1024)))
+
 RATE_LIMIT_REQUESTS = int(os.getenv("RATE_LIMIT_REQUESTS", "30"))
 RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
 
+settings = SimpleNamespace(
+    ENV=ENV,
+    ENVIRONMENT=ENVIRONMENT,
+    ALLOWED_ORIGINS=ALLOWED_CORS_ORIGINS,
+    ALLOWED_CORS_ORIGINS=ALLOWED_CORS_ORIGINS,
+    UPLOAD_DIR=UPLOAD_DIR,
+    MODEL_PATH=MODEL_PATH,
+    ONNX_MODEL_PATH=ONNX_MODEL_PATH,
+    LINEAR_MODEL_PATH=LINEAR_MODEL_PATH,
+    INFERENCE_MODE=INFERENCE_MODE,
+    UPLOAD_MAX_MB=UPLOAD_MAX_MB,
+    MAX_UPLOAD_BYTES=MAX_UPLOAD_BYTES,
+    RATE_LIMIT_REQUESTS=RATE_LIMIT_REQUESTS,
+    RATE_LIMIT_WINDOW_SECONDS=RATE_LIMIT_WINDOW_SECONDS,
+)
+
 __all__ = [
+    "ENV",
     "ENVIRONMENT",
     "ALLOWED_CORS_ORIGINS",
     "UPLOAD_DIR",
@@ -53,7 +79,9 @@ __all__ = [
     "ONNX_MODEL_PATH",
     "LINEAR_MODEL_PATH",
     "INFERENCE_MODE",
+    "UPLOAD_MAX_MB",
     "MAX_UPLOAD_BYTES",
     "RATE_LIMIT_REQUESTS",
     "RATE_LIMIT_WINDOW_SECONDS",
+    "settings",
 ]
