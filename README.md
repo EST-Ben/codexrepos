@@ -53,78 +53,120 @@ pip install pre-commit && pre-commit install
 
 ## Production deployment
 
-When you are ready to ship, follow the detailed checklist in [`DEPLOYMENT.md`](DEPLOYMENT.md). It covers
-containerizing the FastAPI service, exporting the Expo web bundle, publishing mobile binaries with EAS,
-and wiring up the GitHub Actions workflows that automate releases from version tags.
+## Running the App
 
-## Generating machine profiles
+### Requirements
+- Node.js >= 20 and npm
+- iOS: macOS with Xcode + simulators
+- Android: Android Studio + emulator or device (USB debugging)
+- Web: modern browser
+- (Optional) Expo Go on your device for quick runs
 
-Run `python scripts/build_machines.py` after editing the seed files under
-`config/seeds/` to regenerate the JSON machine profiles.
+### 1) Install dependencies
+```bash
+# App (Expo)
+cd app && npm ci && cd ..
+
+# Backend (Node/TS)
+cd server-node && npm ci && cd ..
+```
+
+### 2) Start the backend (Node/TS)
+```bash
+cd server-node
+# dev with TS + fast refresh
+npm run dev
+# server listens on http://localhost:8000
+```
+
+You can set API base for the app via environment:
+
+```bash
+# in repo root
+echo 'EXPO_PUBLIC_API_BASE=http://localhost:8000' > app/.env
+```
+
+### 3) Start the app (Expo)
+
+From repo root:
+
+```bash
+cd app
+# start Metro
+npx expo start
+```
+
+Run on iOS (Simulator)
+
+On macOS: press `i` in the Expo terminal, or run:
+
+```bash
+npx expo run:ios
+```
+
+Run on Android (Emulator/Device)
+
+Start an emulator from Android Studio, then:
+
+```bash
+npx expo run:android
+```
+
+Or, if Metro is running, press `a` in the Expo terminal.
+
+Run on Web
+
+```bash
+npx expo start --web
+```
+
+### 4) Debugging & Doctor
+
+On-device HUD: long-press the 🛠 floating button to open logs; tap Clear to reset.
+
+Network logs: all fetch calls are logged with status + latency.
+
+Error boundary: uncaught UI errors render a crash screen with **Try again**.
+
+Doctor: run end-to-end checks:
+
+```bash
+npm run doctor
+```
+
+Server diagnostics: curl `http://localhost:8000/_debug` for live rate-limit windows, memory usage, and request counters. `/health` remains the lightweight liveness probe consumed by CI and the Docker healthcheck.
+
+### 5) Notes
+
+The old Python backend under `server/` is deprecated. All endpoints are now served by `server-node/` with matching routes.
+
+Configure CORS via `ALLOWED_ORIGINS` and rate limits via `RATE_LIMIT_*` in `.env`.
+
+See [`MIGRATION_NOTES.md`](MIGRATION_NOTES.md) for a summary of parity between the FastAPI and Fastify stacks and forward-looking follow-ups.
 
 ## Repository layout
 
-This repository includes all assets discussed during the staged scaffold:
-
 - `app/` – Expo React Native client with onboarding, results, and Jest tests.
-- `server/` – FastAPI backend, machine registry, rules engine, and API tests.
-- `config/machines/` – Generated machine profiles plus `_schema.json`.
-- `config/seeds/` – Editable YAML seeds for families and registry entries.
-- `config/slicer_adapters/` – TypeScript maps for Cura, PrusaSlicer, Bambu Studio, and OrcaSlicer.
-- `scripts/` – Build, validation, and mock inference helpers (with offline fallbacks).
-- `types/` – Shared TypeScript contracts for machine profiles.
+- `server-node/` – Fastify + TypeScript backend (replacement for the legacy FastAPI service).
+- `server/` – Deprecated FastAPI backend retained temporarily for reference only.
+- `config/` – Machine registry data, slicer adapters, and taxonomy assets shared by both stacks.
+- `types/` – Shared TypeScript contracts consumed by the app and server-node backend.
+- `scripts/` – Automation helpers including the new `doctor` CLI.
 
-## AI Photo Diagnostics
+## Developer tooling
 
-The AI photo workflow is enabled end-to-end in this repository. Configure the
-following environment variables before starting the backend:
-
-- `UPLOAD_DIR` – directory where uploaded analysis photos are stored.
-  Defaults to `C:\tmp\uploads` on Windows or `<temp>/uploads` elsewhere and is created automatically if missing.
-- `MODEL_PATH` – path to a trained model checkpoint (e.g.,
-  `./server/models/best.pt`). When running in stub mode the file is not
-  required.
-- `INFERENCE_MODE` – choose between `"stub"` for the deterministic mock model
-  or `"torch"` to load the checkpoint referenced by `MODEL_PATH`.
-
-### Running the stack
-
-The provided scripts take care of environment variables and cache clearing, but you can still launch
-everything manually:
+Install the shared hooks locally so formatting and linting run before each commit:
 
 ```bash
-# Backend (from repo root)
-export UPLOAD_DIR=$(mktemp -d)/uploads  # or choose a persistent path
-python -m uvicorn server.main:app --host 0.0.0.0 --port 8000 --reload
-
-# Expo client (from app/)
-export EXPO_PUBLIC_API_URL="http://<LAN-IP>:8000"
-npm install
-npx expo start --lan -c
+pip install pre-commit && pre-commit install
 ```
 
-The client sends captured photos and metadata to `/api/analyze` as multipart form-data. Results include
-predictions, machine-aware suggestions, and slicer diffs that can be exported via the provided
-buttons.
+(Backend linting is now handled by ESLint/TypeScript in CI; the Python hook remains available for legacy scripts.)
 
-To replace the stub model, train your detector and export the checkpoint to the path specified by
-`MODEL_PATH`, then set `INFERENCE_MODE=torch`. Uploaded files will continue to be written to
-`UPLOAD_DIR`, which you can mount elsewhere for long-term storage if desired.
+## Production deployment
 
-Safety clamps in the rules engine ensure nozzle temperatures, bed temperatures,
-travel speeds, acceleration, and CNC spindle/feed parameters never exceed the
-selected machine’s declared capabilities. The operator’s experience level
-further widens or narrows the suggested deltas so beginners receive conservative
-guidance while advanced users unlock broader tuning ranges.
+See [`DEPLOYMENT.md`](DEPLOYMENT.md) for the full deployment checklist. The release workflow builds the Node backend container, runs a smoke test against `/health`, publishes to GHCR, exports the Expo web bundle, and optionally pushes mobile binaries via EAS.
 
-## How to add a new machine
+## Generating machine profiles
 
-1. Add or update the appropriate family entry in `config/seeds/families.yaml`
-   if the machine shares defaults with existing profiles.
-2. Append the machine definition to `config/seeds/registry.yaml` under the
-   relevant manufacturer block. You can override any defaults directly in the
-   registry entry.
-3. Regenerate the machine JSON by running `python scripts/build_machines.py`.
-4. Optionally run `python scripts/validate_machines.py` or the PyTest suite to
-   ensure the new profile validates against the schema.
-5. Commit the updated seeds and generated JSON files.
+Run `python scripts/build_machines.py` after editing the seed files under `config/seeds/` to regenerate the JSON machine profiles. These assets are consumed by the Node backend at runtime.

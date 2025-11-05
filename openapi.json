@@ -1,0 +1,1420 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Diagnostics API",
+    "version": "0.0.0"
+  },
+  "components": {
+    "schemas": {}
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "ops"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "ok"
+                      ]
+                    },
+                    "stub_inference": {
+                      "type": "boolean"
+                    },
+                    "uptime_ms": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "stub_inference",
+                    "uptime_ms"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/_debug": {
+      "get": {
+        "tags": [
+          "ops"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "ok"
+                      ]
+                    },
+                    "env": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "type": "string"
+                    },
+                    "uptime_ms": {
+                      "type": "number"
+                    },
+                    "rate_limit": {
+                      "type": "object",
+                      "properties": {
+                        "requests": {
+                          "type": "number"
+                        },
+                        "windowSeconds": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "requests",
+                        "windowSeconds"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "upload_max_mb": {
+                      "type": "number"
+                    },
+                    "memory": {
+                      "type": "object",
+                      "properties": {
+                        "rss": {
+                          "type": "number"
+                        },
+                        "heapUsed": {
+                          "type": "number"
+                        },
+                        "heapTotal": {
+                          "type": "number"
+                        },
+                        "external": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "rss",
+                        "heapUsed",
+                        "heapTotal",
+                        "external"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "request_counters": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "number"
+                        },
+                        "per_route": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "count": {
+                                "type": "number"
+                              },
+                              "last_request_ts": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "count",
+                              "last_request_ts"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "total",
+                        "per_route"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "env",
+                    "version",
+                    "timestamp",
+                    "uptime_ms",
+                    "rate_limit",
+                    "upload_max_mb",
+                    "memory",
+                    "request_counters"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analyze-image": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "image_id": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "string"
+                    },
+                    "machine": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "brand": {
+                          "type": "string"
+                        },
+                        "model": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "brand",
+                        "model"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "experience": {
+                      "type": "string",
+                      "enum": [
+                        "Beginner",
+                        "Intermediate",
+                        "Advanced"
+                      ]
+                    },
+                    "material": {
+                      "type": "string"
+                    },
+                    "predictions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "issue_id": {
+                            "type": "string"
+                          },
+                          "confidence": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "issue_id",
+                          "confidence"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "explanations": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "localization": {
+                      "type": "object",
+                      "properties": {
+                        "boxes": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "issue_id": {
+                                "type": "string"
+                              },
+                              "confidence": {
+                                "type": "number"
+                              },
+                              "x": {
+                                "type": "number"
+                              },
+                              "y": {
+                                "type": "number"
+                              },
+                              "width": {
+                                "type": "number"
+                              },
+                              "height": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "issue_id",
+                              "confidence",
+                              "x",
+                              "y",
+                              "width",
+                              "height"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "heatmap": {
+                          "nullable": true,
+                          "type": "object",
+                          "properties": {
+                            "encoding": {
+                              "type": "string",
+                              "enum": [
+                                "svg"
+                              ]
+                            },
+                            "width": {
+                              "type": "number"
+                            },
+                            "height": {
+                              "type": "number"
+                            },
+                            "data_url": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "encoding",
+                            "width",
+                            "height",
+                            "data_url"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "boxes"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "capability_notes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "recommendations": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "suggestions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "issue_id": {
+                            "type": "string"
+                          },
+                          "changes": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "param": {
+                                  "type": "string"
+                                },
+                                "delta": {
+                                  "nullable": true,
+                                  "type": "number"
+                                },
+                                "unit": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "new_target": {
+                                  "nullable": true,
+                                  "type": "number"
+                                },
+                                "range_hint": {
+                                  "nullable": true,
+                                  "type": "array",
+                                  "items": {
+                                    "anyOf": [
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "number"
+                                      }
+                                    ]
+                                  },
+                                  "minItems": 2,
+                                  "maxItems": 2
+                                }
+                              },
+                              "required": [
+                                "param"
+                              ],
+                              "additionalProperties": false
+                            }
+                          },
+                          "why": {
+                            "type": "string"
+                          },
+                          "risk": {
+                            "type": "string"
+                          },
+                          "confidence": {
+                            "type": "number"
+                          },
+                          "beginner_note": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "advanced_note": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "clamped_to_machine_limits": {
+                            "nullable": true,
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "issue_id",
+                          "changes",
+                          "why",
+                          "risk",
+                          "confidence"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "slicer_profile_diff": {
+                      "type": "object",
+                      "properties": {
+                        "diff": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "boolean"
+                              }
+                            ]
+                          }
+                        },
+                        "parameters": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "number"
+                              },
+                              "delta": {
+                                "type": "number"
+                              },
+                              "unit": {
+                                "type": "string"
+                              },
+                              "range_hint": {
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                              },
+                              "clamped": {
+                                "type": "boolean"
+                              }
+                            },
+                            "additionalProperties": false
+                          }
+                        },
+                        "markdown": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "applied": {
+                      "type": "object",
+                      "properties": {
+                        "parameters": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "hidden_parameters": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "experience_level": {
+                          "type": "string",
+                          "enum": [
+                            "Beginner",
+                            "Intermediate",
+                            "Advanced"
+                          ]
+                        },
+                        "clamped_to_machine_limits": {
+                          "type": "boolean"
+                        },
+                        "explanations": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": [
+                        "parameters",
+                        "hidden_parameters",
+                        "experience_level",
+                        "clamped_to_machine_limits",
+                        "explanations"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "low_confidence": {
+                      "type": "boolean"
+                    },
+                    "parameter_targets": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "number"
+                      }
+                    },
+                    "issues": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "confidence": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "confidence"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "issue_list": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "confidence": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "confidence"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "clamp_explanations": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "image_id",
+                    "version",
+                    "machine",
+                    "experience",
+                    "predictions",
+                    "explanations",
+                    "localization",
+                    "capability_notes",
+                    "recommendations",
+                    "suggestions",
+                    "applied",
+                    "low_confidence",
+                    "parameter_targets"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analyze-json": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "image_id": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "string"
+                    },
+                    "machine": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "brand": {
+                          "type": "string"
+                        },
+                        "model": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "brand",
+                        "model"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "experience": {
+                      "type": "string",
+                      "enum": [
+                        "Beginner",
+                        "Intermediate",
+                        "Advanced"
+                      ]
+                    },
+                    "material": {
+                      "type": "string"
+                    },
+                    "predictions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "issue_id": {
+                            "type": "string"
+                          },
+                          "confidence": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "issue_id",
+                          "confidence"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "explanations": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "localization": {
+                      "type": "object",
+                      "properties": {
+                        "boxes": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "issue_id": {
+                                "type": "string"
+                              },
+                              "confidence": {
+                                "type": "number"
+                              },
+                              "x": {
+                                "type": "number"
+                              },
+                              "y": {
+                                "type": "number"
+                              },
+                              "width": {
+                                "type": "number"
+                              },
+                              "height": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "issue_id",
+                              "confidence",
+                              "x",
+                              "y",
+                              "width",
+                              "height"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "heatmap": {
+                          "nullable": true,
+                          "type": "object",
+                          "properties": {
+                            "encoding": {
+                              "type": "string",
+                              "enum": [
+                                "svg"
+                              ]
+                            },
+                            "width": {
+                              "type": "number"
+                            },
+                            "height": {
+                              "type": "number"
+                            },
+                            "data_url": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "encoding",
+                            "width",
+                            "height",
+                            "data_url"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "boxes"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "capability_notes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "recommendations": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "suggestions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "issue_id": {
+                            "type": "string"
+                          },
+                          "changes": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "param": {
+                                  "type": "string"
+                                },
+                                "delta": {
+                                  "nullable": true,
+                                  "type": "number"
+                                },
+                                "unit": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "new_target": {
+                                  "nullable": true,
+                                  "type": "number"
+                                },
+                                "range_hint": {
+                                  "nullable": true,
+                                  "type": "array",
+                                  "items": {
+                                    "anyOf": [
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "number"
+                                      }
+                                    ]
+                                  },
+                                  "minItems": 2,
+                                  "maxItems": 2
+                                }
+                              },
+                              "required": [
+                                "param"
+                              ],
+                              "additionalProperties": false
+                            }
+                          },
+                          "why": {
+                            "type": "string"
+                          },
+                          "risk": {
+                            "type": "string"
+                          },
+                          "confidence": {
+                            "type": "number"
+                          },
+                          "beginner_note": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "advanced_note": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "clamped_to_machine_limits": {
+                            "nullable": true,
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "issue_id",
+                          "changes",
+                          "why",
+                          "risk",
+                          "confidence"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "slicer_profile_diff": {
+                      "type": "object",
+                      "properties": {
+                        "diff": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "boolean"
+                              }
+                            ]
+                          }
+                        },
+                        "parameters": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "number"
+                              },
+                              "delta": {
+                                "type": "number"
+                              },
+                              "unit": {
+                                "type": "string"
+                              },
+                              "range_hint": {
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                              },
+                              "clamped": {
+                                "type": "boolean"
+                              }
+                            },
+                            "additionalProperties": false
+                          }
+                        },
+                        "markdown": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "applied": {
+                      "type": "object",
+                      "properties": {
+                        "parameters": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "hidden_parameters": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "experience_level": {
+                          "type": "string",
+                          "enum": [
+                            "Beginner",
+                            "Intermediate",
+                            "Advanced"
+                          ]
+                        },
+                        "clamped_to_machine_limits": {
+                          "type": "boolean"
+                        },
+                        "explanations": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": [
+                        "parameters",
+                        "hidden_parameters",
+                        "experience_level",
+                        "clamped_to_machine_limits",
+                        "explanations"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "low_confidence": {
+                      "type": "boolean"
+                    },
+                    "parameter_targets": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "number"
+                      }
+                    },
+                    "issues": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "confidence": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "confidence"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "issue_list": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "confidence": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "confidence"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "clamp_explanations": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "image_id",
+                    "version",
+                    "machine",
+                    "experience",
+                    "predictions",
+                    "explanations",
+                    "localization",
+                    "capability_notes",
+                    "recommendations",
+                    "suggestions",
+                    "applied",
+                    "low_confidence",
+                    "parameter_targets"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/machines": {
+      "get": {
+        "tags": [
+          "machines"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "machines": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "brand": {
+                            "type": "string"
+                          },
+                          "model": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "aliases": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "capabilities": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "safe_speed_ranges": {
+                            "type": "object",
+                            "properties": {
+                              "print": {
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                              },
+                              "travel": {
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                              },
+                              "accel": {
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                              },
+                              "jerk": {
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          "max_nozzle_temp_c": {
+                            "type": "number"
+                          },
+                          "max_bed_temp_c": {
+                            "type": "number"
+                          },
+                          "spindle_rpm_range": {
+                            "type": "array",
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "number"
+                                }
+                              ]
+                            },
+                            "minItems": 2,
+                            "maxItems": 2
+                          },
+                          "max_feed_mm_min": {
+                            "type": "number"
+                          },
+                          "material_presets": {
+                            "type": "object",
+                            "additionalProperties": {}
+                          },
+                          "notes": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "brand",
+                          "model"
+                        ],
+                        "additionalProperties": {}
+                      }
+                    }
+                  },
+                  "required": [
+                    "machines"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/export-profile": {
+      "post": {
+        "tags": [
+          "export"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "slicer": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "changes": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    }
+                  },
+                  "base_profile": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "slicer",
+                  "changes"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "slicer": {
+                      "type": "string"
+                    },
+                    "diff": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      }
+                    },
+                    "markdown": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "slicer",
+                    "diff"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000"
+    }
+  ]
+}
