@@ -31,9 +31,6 @@ interface ResultsScreenProps {
  *  Calls the backend at /api/analyze-json relative to current origin or Metro dev server.
  */
 async function analyzeMachineJSON(payload: unknown): Promise<AnalyzeResponse> {
-  // Try to guess base URL for native/web dev:
-  // - Web: use window.location.origin
-  // - Native: Expo dev servers often proxy via localhost:8000; adjust if you have a different port.
   let base = '';
   if (Platform.OS === 'web') {
     base = typeof window !== 'undefined' ? window.location.origin : '';
@@ -72,8 +69,35 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
   material,
   onBack,
 }) => {
-  const { machines, loading, error, refresh } = useMachineRegistry();
-  const initialActive = selectedMachines[0] ?? machines[0]?.id ?? null;
+  // The hook currently returns a registry object like:
+  // { all: Machine[], ids: string[], byId(id): Machine|undefined, defaultId: string }
+  // It may not include loading/error/refresh. We derive safe helpers here.
+  const registry = useMachineRegistry() as unknown as {
+    all?: MachineSummary[];
+    ids?: string[];
+    byId?: (id: string) => MachineSummary | undefined;
+    defaultId?: string;
+    // Optional runtime states if provided by your hook:
+    loading?: boolean;
+    error?: string;
+    refresh?: () => void;
+  };
+
+  const all: MachineSummary[] = Array.isArray(registry.all) ? registry.all! : [];
+  const ids: string[] =
+    Array.isArray(registry.ids) ? registry.ids! : all.map((m) => m.id);
+  const byId =
+    typeof registry.byId === 'function'
+      ? registry.byId!
+      : (id: string) => all.find((m) => m.id === id);
+
+  const defaultId: string | undefined = registry.defaultId;
+  const loading: boolean = !!registry.loading;
+  const error: string | undefined = registry.error;
+  const refresh: (() => void) | undefined = registry.refresh;
+
+  const initialActive =
+    selectedMachines[0] ?? defaultId ?? ids[0] ?? null;
 
   const [activeMachineId, setActiveMachineId] = useState<string | null>(initialActive);
   const [busy, setBusy] = useState(false);
@@ -81,26 +105,27 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
   const [response, setResponse] = useState<AnalyzeResponse | null>(null);
 
   const activeMachine: MachineSummary | undefined = useMemo(
-    () => (activeMachineId ? machines.find((m) => m.id === activeMachineId) : undefined),
-    [activeMachineId, machines]
+    () => (activeMachineId ? byId(activeMachineId) : undefined),
+    [activeMachineId, byId]
   );
 
-  const visibleMachines: MachineSummary[] = useMemo(
-    () => machines.filter((m) => selectedMachines.includes(m.id)),
-    [machines, selectedMachines]
-  );
+  const visibleMachines: MachineSummary[] = useMemo(() => {
+    const set = new Set(selectedMachines);
+    // Prefer ids -> byId to respect registry ordering
+    const list = ids.map((id) => byId(id)).filter(Boolean) as MachineSummary[];
+    return list.filter((m) => set.has(m.id));
+  }, [ids, byId, selectedMachines]);
 
   const handleAnalyze = async () => {
     if (!activeMachine) return;
     try {
       setBusy(true);
       setResponse(null);
-      // Quick JSON-only analysis (no photo) using the current selections
       const res = await analyzeMachineJSON({
         machine: { id: activeMachine.id, brand: activeMachine.brand, model: activeMachine.model },
         experience,
         material,
-        issues: [], // leave empty; backend can still return predictions/recs based on metadata
+        issues: [],
       } as any);
       setResponse(res);
     } catch (e: any) {
@@ -140,7 +165,9 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
     }
     const text = response.slicer_profile_diff.markdown ?? jsonPayload;
     Clipboard.setStringAsync(text).then(() => {
-      setExportMessage(response.slicer_profile_diff?.markdown ? 'Markdown copied to clipboard' : 'JSON copied to clipboard');
+      setExportMessage(
+        response.slicer_profile_diff?.markdown ? 'Markdown copied to clipboard' : 'JSON copied to clipboard'
+      );
     });
   };
 
@@ -152,8 +179,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
     try {
       const result = await exportProfile({
         slicer,
-        // keep changes minimal — backend will translate to precise slicer keys
-        changes: response.slicer_profile_diff.diff ?? {}, // Record<string, number|string|boolean>
+        changes: (response.slicer_profile_diff as any).diff ?? {},
       });
       await Clipboard.setStringAsync(JSON.stringify((result as any).diff ?? result, null, 2));
       setExportMessage(`Copied diff for ${slicer}`);
@@ -175,14 +201,20 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
       {loading ? (
         <ActivityIndicator style={{ marginTop: 16 }} />
       ) : error ? (
-        <Pressable onPress={refresh} style={styles.errorBox}>
-          <Text style={styles.errorText}>Failed to load machines: {error}. Tap to retry.</Text>
-        </Pressable>
+        refresh ? (
+          <Pressable onPress={refresh} style={styles.errorBox}>
+            <Text style={styles.errorText}>Failed to load machines: {error}. Tap to retry.</Text>
+          </Pressable>
+        ) : (
+          <View style={styles.errorBox}>
+            <Text style={styles.errorText}>Failed to load machines: {error}</Text>
+          </View>
+        )
       ) : null}
 
       {/* Tabs for selected machines */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabBar}>
-        {visibleMachines.map((m) => {
+        {visibleMachines.map((m: MachineSummary) => {
           const active = m.id === activeMachineId;
           return (
             <Pressable
@@ -209,8 +241,15 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
               {material ? ` • Material: ${material}` : ''}
             </Text>
 
-            <Pressable onPress={handleAnalyze} style={[styles.primaryButton, busy && styles.primaryButtonDisabled]}>
-              {busy ? <ActivityIndicator color="#0f172a" /> : <Text style={styles.primaryLabel}>Analyze (no photo)</Text>}
+            <Pressable
+              onPress={handleAnalyze}
+              style={[styles.primaryButton, busy && styles.primaryButtonDisabled]}
+            >
+              {busy ? (
+                <ActivityIndicator color="#0f172a" />
+              ) : (
+                <Text style={styles.primaryLabel}>Analyze (no photo)</Text>
+              )}
             </Pressable>
 
             {response ? (
@@ -219,8 +258,8 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
                 <View>
                   <Text style={styles.sectionSubtitle}>Predicted issues</Text>
                   {response.predictions?.length ? (
-                    response.predictions.map((p) => (
-                      <View key={p.issue_id} style={styles.row}>
+                    response.predictions.map((p, idx) => (
+                      <View key={`${p.issue_id}-${idx}`} style={styles.row}>
                         <Text style={styles.rowLabel}>{p.issue_id}</Text>
                         <Text style={styles.rowValue}>{Math.round((p.confidence ?? 0) * 100)}%</Text>
                       </View>
@@ -235,7 +274,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
                   <Text style={styles.sectionSubtitle}>Recommendations</Text>
                   {response.recommendations?.length ? (
                     response.recommendations.map((rec, idx) => (
-                      <Text key={`${rec}-${idx}`} style={styles.bullet}>
+                      <Text key={`${idx}`} style={styles.bullet}>
                         • {rec}
                       </Text>
                     ))
@@ -249,7 +288,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
                   <Text style={styles.sectionSubtitle}>Capability notes</Text>
                   {response.capability_notes?.length ? (
                     response.capability_notes.map((note, idx) => (
-                      <Text key={`${note}-${idx}`} style={styles.bullet}>
+                      <Text key={`${idx}`} style={styles.bullet}>
                         • {note}
                       </Text>
                     ))

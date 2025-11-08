@@ -1,14 +1,22 @@
 {
-  "extends": "./tsconfig.json",
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
+    "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "outDir": "dist-scripts",
+    "rootDir": ".",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "types": ["node"],
     "skipLibCheck": true,
-    "esModuleInterop": true
+    "strict": false,
+    "noEmitOnError": false
   },
-  "include": ["scripts/**/*.ts"],
-  "exclude": ["node_modules", "dist-scripts"]
+  "include": [
+    "scripts/**/*.ts",
+    "scripts/**/*.mts",
+    "scripts/**/*.cts",
+    "scripts/types/**/*.d.ts"
+  ],
+  "exclude": ["node_modules"]
 }
