@@ -1,0 +1,19 @@
+{
+  "spindle_rpm_range": [
+    8000,
+    24000
+  ],
+  "rigidity_class": "hobby",
+  "id": "stepcraft_d840",
+  "brand": "STEPCRAFT",
+  "model": "STEPCRAFT D.840",
+  "type": "CNC_Router",
+  "material_presets": {},
+  "supports": {},
+  "safe_speed_ranges": {},
+  "workarea_mm": [
+    840,
+    600,
+    140
+  ]
+}

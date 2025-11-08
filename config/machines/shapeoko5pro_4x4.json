@@ -1,0 +1,24 @@
+{
+  "workarea_mm": [
+    1219,
+    1219,
+    100
+  ],
+  "spindle_rpm_range": [
+    10000,
+    24000
+  ],
+  "max_feed_mm_min": 8000,
+  "rigidity_class": "hobby_pro",
+  "capabilities": [
+    "bitsetter",
+    "touch_probe"
+  ],
+  "id": "shapeoko5pro_4x4",
+  "brand": "Carbide 3D",
+  "model": "Shapeoko 5 Pro (4x4)",
+  "type": "CNC_Router",
+  "material_presets": {},
+  "supports": {},
+  "safe_speed_ranges": {}
+}

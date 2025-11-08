@@ -1,0 +1,22 @@
+{
+  "motion_system": "BedSlinger",
+  "enclosed": false,
+  "build_volume_mm": [
+    420,
+    420,
+    500
+  ],
+  "nozzle_diameters": [
+    0.4,
+    0.6
+  ],
+  "max_nozzle_temp_c": 260,
+  "max_bed_temp_c": 100,
+  "safe_speed_ranges": {},
+  "id": "anycubic_kobra2_max",
+  "brand": "Anycubic",
+  "model": "Kobra 2 Max",
+  "type": "FDM",
+  "material_presets": {},
+  "supports": {}
+}

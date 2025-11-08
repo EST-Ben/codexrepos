@@ -1,0 +1,18 @@
+{
+  "build_volume_mm": [
+    200,
+    125,
+    210
+  ],
+  "enclosed": true,
+  "capabilities": [
+    "resin_heating"
+  ],
+  "id": "generic_msla_mid",
+  "brand": "Generic",
+  "model": "Generic Mid-volume MSLA",
+  "type": "MSLA",
+  "material_presets": {},
+  "supports": {},
+  "safe_speed_ranges": {}
+}

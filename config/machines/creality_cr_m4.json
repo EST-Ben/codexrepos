@@ -1,0 +1,22 @@
+{
+  "motion_system": "BedSlinger",
+  "enclosed": false,
+  "build_volume_mm": [
+    450,
+    450,
+    470
+  ],
+  "nozzle_diameters": [
+    0.4,
+    0.6
+  ],
+  "max_nozzle_temp_c": 285,
+  "max_bed_temp_c": 100,
+  "supports": {},
+  "safe_speed_ranges": {},
+  "material_presets": {},
+  "id": "creality_cr_m4",
+  "brand": "Creality",
+  "model": "CR-M4",
+  "type": "FDM"
+}
