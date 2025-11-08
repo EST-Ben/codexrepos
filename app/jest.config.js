@@ -1,5 +1,8 @@
 // jest.config.js
+const path = require('path');
+
 module.exports = {
+  rootDir: path.join(__dirname, '..'),
   preset: 'jest-expo',
   testEnvironment: 'jsdom',
   transformIgnorePatterns: [
