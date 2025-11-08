@@ -1,0 +1,13 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "Metro (LAN)", "type": "shell", "command": "cd app && npx expo start --host lan", "group": "build" },
+    { "label": "API (server-node)", "type": "shell", "command": "npm --prefix server-node run start", "group": "build" },
+    { "label": "Clean (preview)", "type": "shell", "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\\\scripts\\\\conservative-clean.ps1" },
+    { "label": "Clean (apply)", "type": "shell", "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\\\scripts\\\\conservative-clean.ps1 -Apply" },
+    { "label": "Kill 8081 & 8000", "type": "shell", "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\\\scripts\\\\kill-port.ps1 -Port 8081; powershell -NoProfile -ExecutionPolicy Bypass -File .\\\\scripts\\\\kill-port.ps1 -Port 8000" },
+    { "label": "Diagnostics", "type": "shell", "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\\\full-diagnostics.ps1" },
+    { "label": "Lint (app)", "type": "shell", "command": "npm --prefix app run lint" },
+    { "label": "Tests (app)", "type": "shell", "command": "npm --prefix app test -- --ci" }
+  ]
+}
