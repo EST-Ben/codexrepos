@@ -30,12 +30,3 @@ Keep local tooling and config
 !app/app.config.js
 !app/src/screens/DebugTools.tsx
 # -----------------------------------------------
-# --- local tooling guardrails (do not remove) ---
-!.vscode/
-!.vscode/tasks.json
-!scripts/
-!scripts/*.ps1
-!full-diagnostics.ps1
-!app/app.config.js
-!app/src/screens/PrinterTabs.tsx
-# -----------------------------------------------

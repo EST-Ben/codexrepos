@@ -10,6 +10,7 @@ export type Machine = {
 };
 
 const registry = {
+  // ✅ required by tests / earlier checks
   bambu_p1s: {
     id: 'bambu_p1s',
     brand: 'Bambu Lab',
@@ -50,7 +51,8 @@ const registry = {
     buildVolumeMm: { x: 250, y: 210, z: 220 },
     materials: ['PLA', 'PETG', 'ABS', 'ASA', 'TPU'],
   },
-  // extras
+
+  // ✅ extras so “more machines” actually show up
   bambu_a1_mini: {
     id: 'bambu_a1_mini',
     brand: 'Bambu Lab',
@@ -87,14 +89,13 @@ const registry = {
 
 export type MachineId = keyof typeof registry;
 
-const all: Machine[] = Object.values(registry) as unknown as Machine[];
+const all: Machine[] = Object.values(registry) as Machine[];
 const ids: MachineId[] = Object.keys(registry) as MachineId[];
 const defaultId: MachineId = 'bambu_p1s';
 
 export function useMachineRegistry() {
   const byId = (id: MachineId) => registry[id] as Machine | undefined;
-  const machines = all;
-  return { all, machines, ids, byId, defaultId };
+  return { all, ids, byId, defaultId };
 }
 
 export default useMachineRegistry;
