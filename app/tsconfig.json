@@ -1,15 +1,26 @@
-{
-  "extends": "@tsconfig/react-native/tsconfig.json",
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "lib": ["ES2022", "DOM"],
-    "skipLibCheck": true,
-    "noEmit": true,
-    "types": ["jest", "react", "react-native"],
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true
-  },
-  "include": ["src", "jest.setup.ts"]
+﻿{
+    "extends":  "@tsconfig/react-native/tsconfig.json",
+    "compilerOptions":  {
+                            "jsx":  "react-jsx",
+                            "lib":  [
+                                        "ES2022",
+                                        "DOM"
+                                    ],
+                            "skipLibCheck":  true,
+                            "noEmit":  true,
+                            "types":  [
+                                          "jest",
+                                          "react",
+                                          "react-native"
+                                      ],
+                            "moduleResolution":  "bundler",
+                            "resolveJsonModule":  true,
+                            "strict":  true,
+                            "forceConsistentCasingInFileNames":  true,
+                            "module":  "esnext"
+                        },
+    "include":  [
+                    "src",
+                    "jest.setup.ts"
+                ]
 }
