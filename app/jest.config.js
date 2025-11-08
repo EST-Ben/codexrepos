@@ -17,7 +17,7 @@ module.exports = {
     ')/)'
   ],
   setupFilesAfterEnv: [
-    '@testing-library/jest-native/extend-expect'
+    '<rootDir>/app/jest.setup.ts'
   ],
   moduleNameMapper: {
     // Map assets to identity-obj-proxy or a stub if needed later
