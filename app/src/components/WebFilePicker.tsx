@@ -1,25 +1,20 @@
 import * as React from 'react';
 import { Platform } from 'react-native';
 
-export type PickedImage = { uri: string; name: string; type: string };
+export type PickedImage = { uri: string; name: string; type: string; file?: File };
 
 type Props = {
   onPick(file: PickedImage): void;
-  accept?: string;
+  accept?: string; // default image/*
   children: (open: () => void) => React.ReactNode;
 };
 
-/**
- * Web-only <input type="file"> wrapper. On native, it no-ops and relies on existing flow.
- */
 export default function WebFilePicker({ onPick, accept = 'image/*', children }: Props) {
   const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   const open = React.useCallback(() => {
     if (Platform.OS !== 'web') return;
-    if (!inputRef.current) return;
-    inputRef.current.value = '';
-    inputRef.current.click();
+    inputRef.current?.click();
   }, []);
 
   const onChange = React.useCallback(
@@ -27,19 +22,12 @@ export default function WebFilePicker({ onPick, accept = 'image/*', children }: 
       const f = e.target.files?.[0];
       if (!f) return;
       const uri = URL.createObjectURL(f);
-      const file = {
-        uri,
-        name: f.name || 'photo.jpg',
-        type: f.type || 'image/jpeg',
-        file: f,
-      } as PickedImage & { file?: File };
-      onPick(file);
+      onPick({ uri, name: f.name || 'photo.jpg', type: f.type || 'image/jpeg', file: f });
     },
     [onPick]
   );
 
   if (Platform.OS !== 'web') {
-    // Render children with a no-op opener; native flow uses Camera/ImagePicker elsewhere
     return <>{children(() => {})}</>;
   }
 

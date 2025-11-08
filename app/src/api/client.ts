@@ -7,21 +7,18 @@ import type {
   SlicerProfileDiff,
 } from '../types';
 
+type AnalyzeFileLike = { uri: string; name: string; type: string; file?: File };
+
 function resolveApiBase(): string {
   const envBase =
-    process.env.EXPO_PUBLIC_API_BASE || process.env.EXPO_PUBLIC_API_BASE_URL || '';
+    process.env.API_BASE_URL ??
+    process.env.EXPO_PUBLIC_API_BASE ??
+    process.env.EXPO_PUBLIC_API_BASE_URL ??
+    (Constants?.expoConfig?.extra as { apiBaseUrl?: string } | undefined)?.apiBaseUrl ??
+    '';
+
   if (envBase) {
     return envBase.replace(/\/$/, '');
-  }
-
-  let extraBase: string | undefined;
-  try {
-    extraBase = (Constants?.expoConfig?.extra as { apiBaseUrl?: string } | undefined)?.apiBaseUrl;
-  } catch {
-    extraBase = undefined;
-  }
-  if (extraBase) {
-    return extraBase.replace(/\/$/, '');
   }
 
   if (typeof window !== 'undefined' && window.location?.origin) {
@@ -44,19 +41,28 @@ function json<T>(res: Response): Promise<T> {
 type MachinesResponse = { machines: MachineSummary[] };
 
 export async function analyzeImage(
-  file: File | { uri: string; name: string; type: string },
-  meta: AnalyzeRequestMeta,
+  fileLike: AnalyzeFileLike,
+  meta?: AnalyzeRequestMeta,
   onProgress?: (p: number) => void,
 ): Promise<AnalyzeResponse> {
   const form = new FormData();
-  // Web <input type="file"> gives File; native often gives { uri, name, type }
-  if (file instanceof File) {
-    form.append('image', file);
+
+  if (fileLike.file) {
+    form.append('image', fileLike.file, fileLike.file.name || fileLike.name);
+  } else if (fileLike.uri.startsWith('blob:') || fileLike.uri.startsWith('data:')) {
+    const blob = await fetch(fileLike.uri).then((r) => r.blob());
+    form.append('image', blob, fileLike.name);
   } else {
-    // @ts-expect-error RN FormData supports { uri, name, type }
-    form.append('image', file);
+    form.append('image', {
+      uri: fileLike.uri,
+      name: fileLike.name,
+      type: fileLike.type,
+    } as any);
   }
-  form.append('meta', JSON.stringify(meta));
+
+  if (meta) {
+    form.append('meta', JSON.stringify(meta));
+  }
 
   onProgress?.(0);
 

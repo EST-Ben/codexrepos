@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Platform, ScrollView, View, Text, Image } from 'react-native';
+import { Alert, Platform, Pressable, ScrollView, View, Text, Image } from 'react-native';
 import Constants from 'expo-constants';
 import CameraButton, { type PreparedImage } from '../components/CameraButton';
-import WebPhotoPicker from '../components/WebPhotoPicker';
+import WebFilePicker, { type PickedImage } from '../components/WebFilePicker';
 import { useMachineRegistry, type MachineId, type Machine } from '../hooks/useMachineRegistry';
 import { useAnalyze } from '../hooks/useAnalyze';
 import type { AnalyzeRequestMeta } from '../types';
@@ -13,6 +13,12 @@ export default function PrinterTabs() {
   const { ids, byId, defaultId, loading, error: registryError, refresh } = useMachineRegistry();
   const [selectedId, setSelectedId] = useState<MachineId | null>(defaultId);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [pendingImage, setPendingImage] = useState<{
+    uri: string;
+    name: string;
+    type: string;
+    file?: File;
+  } | null>(null);
   const { analyzeImage, status, error: analyzeError, data, progress } = useAnalyze();
 
   const apiBase =
@@ -36,25 +42,22 @@ export default function PrinterTabs() {
 
   const handleSelectMachine = useCallback((id: MachineId) => {
     setSelectedId(id);
+    setPendingImage(null);
   }, []);
 
-  const handleImageReady = useCallback(
-    async (image: PreparedImage) => {
+  const pushPreview = useCallback((uri: string) => {
+    setPreviews((prev) => {
+      const filtered = prev.filter((existing) => existing !== uri);
+      return [uri, ...filtered].slice(0, 6);
+    });
+  }, []);
+
+  const submitImage = useCallback(
+    async (file: { uri: string; name: string; type: string; file?: File }) => {
       if (!selectedMachine) {
         Alert.alert('Select a machine first', 'Choose a machine before uploading a photo.');
-        return;
+        return false;
       }
-
-      setPreviews((prev) => {
-        const filtered = prev.filter((uri) => uri !== image.uri);
-        return [image.uri, ...filtered].slice(0, 6);
-      });
-
-      const filePayload = image.blob ?? {
-        uri: image.uri,
-        name: image.name,
-        type: image.type,
-      };
 
       const meta: AnalyzeRequestMeta = {
         machine_id: selectedMachine.id,
@@ -64,14 +67,54 @@ export default function PrinterTabs() {
       };
 
       try {
-        await analyzeImage(filePayload as any, meta);
+        await analyzeImage(file, meta);
+        return true;
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         Alert.alert('Upload failed', message);
+        return false;
       }
     },
     [analyzeImage, selectedMachine]
   );
+
+  const handleImageReady = useCallback(
+    (image: PreparedImage) => {
+      pushPreview(image.uri);
+
+      const maybeFile =
+        typeof File !== 'undefined' && image.blob instanceof File ? (image.blob as File) : undefined;
+
+      void submitImage({
+        uri: image.uri,
+        name: image.name,
+        type: image.type,
+        file: maybeFile,
+      });
+    },
+    [pushPreview, submitImage]
+  );
+
+  const handleWebPick = useCallback(
+    (file: PickedImage) => {
+      if (!selectedMachine) {
+        Alert.alert('Select a machine first', 'Choose a machine before uploading a photo.');
+        return;
+      }
+
+      pushPreview(file.uri);
+      setPendingImage(file);
+    },
+    [pushPreview, selectedMachine]
+  );
+
+  const handleAnalyze = useCallback(async () => {
+    if (!pendingImage) return;
+    const success = await submitImage(pendingImage);
+    if (success) {
+      setPendingImage(null);
+    }
+  }, [pendingImage, submitImage]);
 
   const analysisStatusLabel = useMemo(() => {
     switch (status) {
@@ -165,12 +208,33 @@ export default function PrinterTabs() {
       <Text style={{ fontSize: 20, fontWeight: '600' }}>Add photo</Text>
 
       {Platform.OS === 'web' ? (
-        <WebPhotoPicker label="Add photo" onImageReady={handleImageReady} disabled={!selectedMachine || status === 'uploading'} />
+        <WebFilePicker onPick={handleWebPick}>
+          {(open) => (
+            <Pressable
+              testID="uploadAnalyzeCta"
+              onPress={pendingImage ? handleAnalyze : open}
+              disabled={!selectedMachine || status === 'uploading'}
+              style={{
+                paddingVertical: 12,
+                paddingHorizontal: 16,
+                borderRadius: 8,
+                backgroundColor:
+                  !selectedMachine || status === 'uploading' ? '#9ca3af' : '#2563eb',
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ color: 'white', fontWeight: '600', fontSize: 16 }}>
+                {pendingImage ? 'Analyze' : 'Upload Photo'}
+              </Text>
+            </Pressable>
+          )}
+        </WebFilePicker>
       ) : (
         <CameraButton
           label={status === 'uploading' ? 'Uploading…' : 'Take Photo'}
           onImageReady={handleImageReady}
           disabled={!selectedMachine || status === 'uploading'}
+          testID="uploadAnalyzeCta"
         />
       )}
 

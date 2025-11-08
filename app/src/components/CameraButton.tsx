@@ -18,6 +18,7 @@ interface CameraButtonProps {
   disabled?: boolean;
   label?: string;
   onImageReady(image: PreparedImage): void;
+  testID?: string;
 }
 
 const FALLBACK_NAME = 'photo.jpg';
@@ -55,6 +56,7 @@ export const CameraButton: React.FC<CameraButtonProps> = ({
   disabled,
   label = 'Take Photo',
   onImageReady,
+  testID,
 }) => {
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<PreparedImage | null>(null);
@@ -206,6 +208,7 @@ export const CameraButton: React.FC<CameraButtonProps> = ({
       <Pressable
         onPress={handlePress}
         disabled={disabled || busy}
+        testID={testID}
         style={[
           styles.button,
           (disabled || busy) && styles.buttonDisabled,
