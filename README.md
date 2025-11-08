@@ -167,6 +167,24 @@ pip install pre-commit && pre-commit install
 
 See [`DEPLOYMENT.md`](DEPLOYMENT.md) for the full deployment checklist. The release workflow builds the Node backend container, runs a smoke test against `/health`, publishes to GHCR, exports the Expo web bundle, and optionally pushes mobile binaries via EAS.
 
-## Generating machine profiles
+## TypeScript automation scripts
 
-Run `python scripts/build_machines.py` after editing the seed files under `config/seeds/` to regenerate the JSON machine profiles. These assets are consumed by the Node backend at runtime.
+All utility CLIs now live in TypeScript. Build them once:
+
+```bash
+npm run build:scripts
+```
+
+Then invoke the generated JavaScript under `dist-scripts/` (or use the accompanying npm scripts). Examples:
+
+| Task | macOS/Linux | Windows PowerShell |
+| --- | --- | --- |
+| Generate machine profiles | `npm run scripts:build-machines` | `node .\dist-scripts\scripts\build_machines.js` |
+| Validate profiles | `npm run scripts:validate-machines` | `node .\dist-scripts\scripts\validate_machines.js` |
+| Demo analyzer upload | `npm run scripts:demo-analyze` | `node .\dist-scripts\scripts\demo_analyze.js` |
+| Generate SDK types | `npm run scripts:generate-sdk` | `node .\dist-scripts\scripts\generate_sdk.js` |
+| Release helper | `npm run scripts:release` | `node .\dist-scripts\scripts\release.js` |
+| Mock inference stub | `node dist-scripts/scripts/mock_inference.js bambu_p1s --issues stringing` | `node .\dist-scripts\scripts\mock_inference.js bambu_p1s --issues stringing` |
+| Sync shared types | `node dist-scripts/scripts/sync-types.js` | `node .\dist-scripts\scripts\sync-types.js` |
+
+Optional tools such as Docker, Python, Expo CLI, and `openapi-typescript` are detected automatically; if they're missing, the scripts emit a warning with follow-up steps instead of crashing.
