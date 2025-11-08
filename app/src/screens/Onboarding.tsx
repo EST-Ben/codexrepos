@@ -1,5 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  FlatList,
+  Platform,
+  ViewStyle,
+} from 'react-native';
 import type { ExperienceLevel, OnboardingState } from '../types';
 import { saveOnboardingState } from '../storage/onboarding';
 import { useMachineRegistry } from '../hooks/useMachineRegistry';
@@ -11,6 +19,11 @@ type Props = {
 };
 
 const EXPERIENCES: ExperienceLevel[] = ['Beginner', 'Intermediate', 'Advanced'];
+
+// RN types only allow 'visible' | 'hidden', but RN-web supports 'auto'.
+// Use a runtime-only cast so TS stays happy while web gets a scrollbar.
+const WEB_LIST_OVERFLOW: ViewStyle | null =
+  Platform.OS === 'web' ? ({ overflow: 'auto' } as unknown as ViewStyle) : null;
 
 const OnboardingScreen: React.FC<Props> = ({
   initialSelection = [],
@@ -37,10 +50,8 @@ const OnboardingScreen: React.FC<Props> = ({
   }, [byId, ids]);
 
   useEffect(() => {
-    if (!machineChoices.length) {
-      return;
-    }
-    setSelected((prev) => prev.filter((id) => machineChoices.some((choice) => choice.id === id)));
+    if (!machineChoices.length) return;
+    setSelected((prev) => prev.filter((id) => machineChoices.some((c) => c.id === id)));
   }, [machineChoices]);
 
   const toggleMachine = useCallback(
@@ -52,7 +63,10 @@ const OnboardingScreen: React.FC<Props> = ({
   );
 
   const hasChoices = machineChoices.length > 0;
-  const canContinue = useMemo(() => selected.length > 0 && hasChoices && !loading, [hasChoices, loading, selected]);
+  const canContinue = useMemo(
+    () => selected.length > 0 && hasChoices && !loading,
+    [hasChoices, loading, selected]
+  );
 
   const handleContinue = useCallback(async () => {
     const payload: OnboardingState = {
@@ -84,52 +98,48 @@ const OnboardingScreen: React.FC<Props> = ({
   return (
     <View style={styles.root}>
       <Text style={styles.heading}>Choose your machine(s)</Text>
+
       {loading && <Text style={styles.statusText}>Loading machines…</Text>}
+
       {!!error && (
         <View style={styles.errorBox}>
           <Text style={styles.errorText}>
             Unable to load machines: {error.message ?? 'Unknown error'}
           </Text>
-          <Pressable onPress={() => { void refresh(); }} style={styles.retryButton} accessibilityRole="button">
+          <Pressable
+            onPress={() => {
+              void refresh();
+            }}
+            style={styles.retryButton}
+            accessibilityRole="button"
+          >
             <Text style={styles.retryText}>Retry</Text>
           </Pressable>
         </View>
       )}
-      {!loading && !error && machineChoices.length === 0 && (
-        <Text style={styles.statusText}>No machines available.</Text>
-      )}
-      {!loading && !error && machineChoices.map((machine) => {
-        const active = selected.includes(machine.id);
-        return (
-          <Pressable
-            key={machine.id}
-            onPress={() => toggleMachine(machine.id)}
-            style={[styles.row, active && styles.rowActive]}
-            accessibilityRole="button"
-            accessibilityState={{ selected: active }}
-          >
-            <Text style={styles.rowText}>{machine.label}</Text>
-            <Text style={styles.rowTick}>{active ? '✓' : ''}</Text>
-          </Pressable>
+
+      {!loading && !error && (
+        <View style={styles.listWrapper}>
+          {machineChoices.length === 0 ? (
+            <Text style={styles.statusText}>No machines available.</Text>
+          ) : (
+            <FlatList
+              data={machineChoices}
+              keyExtractor={(item) => item.id}
+              renderItem={renderMachine}
+              showsVerticalScrollIndicator
+              persistentScrollbar
+              style={[styles.list, WEB_LIST_OVERFLOW || undefined]}
+              contentContainerStyle={styles.listContent}
+              accessibilityRole="list"
+              initialNumToRender={12}
+              windowSize={10}
+              maxToRenderPerBatch={12}
+              removeClippedSubviews={Platform.OS !== 'web'}
+            />
+          )}
         </View>
       )}
-      {!loading && !error && machineChoices.length === 0 && (
-        <Text style={styles.statusText}>No machines available.</Text>
-      )}
-      <View style={styles.listWrapper}>
-        {!loading && !error && machineChoices.length > 0 && (
-          <FlatList
-            data={machineChoices}
-            keyExtractor={(item) => item.id}
-            renderItem={renderMachine}
-            showsVerticalScrollIndicator
-            persistentScrollbar
-            style={styles.list}
-            contentContainerStyle={styles.listContent}
-            accessibilityRole="list"
-          />
-        )}
-      </View>
 
       <Text style={[styles.heading, { marginTop: 24 }]}>Experience level</Text>
       <View style={styles.chips}>
@@ -167,6 +177,7 @@ const styles = StyleSheet.create({
   root: { flex: 1, padding: 16, backgroundColor: '#0f172a' },
   heading: { color: '#e2e8f0', fontSize: 18, fontWeight: '600', marginBottom: 8 },
   statusText: { color: '#94a3b8', marginBottom: 8 },
+
   errorBox: {
     borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
@@ -185,6 +196,11 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   retryText: { color: '#fee2e2', fontWeight: '600' },
+
+  listWrapper: { flex: 1, marginBottom: 12 },
+  list: {} as ViewStyle, // base; web overflow added at runtime via WEB_LIST_OVERFLOW
+  listContent: { paddingBottom: 24 },
+
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -196,6 +212,7 @@ const styles = StyleSheet.create({
   rowActive: { backgroundColor: '#334155' },
   rowText: { color: '#e5e7eb' },
   rowTick: { color: '#a7f3d0', fontWeight: '700' },
+
   chips: { flexDirection: 'row', gap: 8 },
   chip: {
     paddingHorizontal: 12,
@@ -206,6 +223,7 @@ const styles = StyleSheet.create({
   chipActive: { backgroundColor: '#2563eb' },
   chipText: { color: '#cbd5e1' },
   chipTextActive: { color: 'white', fontWeight: '700' },
+
   cta: {
     marginTop: 24,
     alignItems: 'center',
