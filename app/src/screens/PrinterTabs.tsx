@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Platform, Pressable, ScrollView, View, Text, Image } from 'react-native';
+import { Alert, Platform, ScrollView, View, Text, Image } from 'react-native';
 import Constants from 'expo-constants';
 import CameraButton, { type PreparedImage } from '../components/CameraButton';
-import WebFilePicker, { type PickedImage } from '../components/WebFilePicker';
+import WebPhotoPicker from '../components/WebPhotoPicker';
 import { useMachineRegistry, type MachineId, type Machine } from '../hooks/useMachineRegistry';
 import { useAnalyze } from '../hooks/useAnalyze';
 import type { AnalyzeRequestMeta } from '../types';
@@ -13,7 +13,6 @@ export default function PrinterTabs() {
   const { ids, byId, defaultId, loading, error: registryError, refresh } = useMachineRegistry();
   const [selectedId, setSelectedId] = useState<MachineId | null>(defaultId);
   const [previews, setPreviews] = useState<string[]>([]);
-  const [pendingImage, setPendingImage] = useState<PreparedImage | null>(null);
   const { analyzeImage, status, error: analyzeError, data, progress } = useAnalyze();
 
   const apiBase =
@@ -39,16 +38,17 @@ export default function PrinterTabs() {
     setSelectedId(id);
   }, []);
 
-  useEffect(() => {
-    setPendingImage(null);
-  }, [selectedId]);
-
-  const runAnalysis = useCallback(
+  const handleImageReady = useCallback(
     async (image: PreparedImage) => {
       if (!selectedMachine) {
         Alert.alert('Select a machine first', 'Choose a machine before uploading a photo.');
         return;
       }
+
+      setPreviews((prev) => {
+        const filtered = prev.filter((uri) => uri !== image.uri);
+        return [image.uri, ...filtered].slice(0, 6);
+      });
 
       const filePayload = image.blob ?? {
         uri: image.uri,
@@ -68,71 +68,10 @@ export default function PrinterTabs() {
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         Alert.alert('Upload failed', message);
-        throw err;
       }
     },
-    [analyzeImage, selectedMachine],
+    [analyzeImage, selectedMachine]
   );
-
-  const handleImageReady = useCallback(
-    async (image: PreparedImage) => {
-      if (!selectedMachine) {
-        Alert.alert('Select a machine first', 'Choose a machine before uploading a photo.');
-        return;
-      }
-
-      setPreviews((prev) => {
-        const filtered = prev.filter((uri) => uri !== image.uri);
-        return [image.uri, ...filtered].slice(0, 6);
-      });
-
-      if (Platform.OS === 'web') {
-        setPendingImage(image);
-        return;
-      }
-
-      setPendingImage(null);
-      try {
-        await runAnalysis(image);
-      } catch {
-        // runAnalysis surfaces errors; native flow can retry via another capture.
-      }
-    },
-    [runAnalysis, selectedMachine]
-  );
-
-  const handleWebPick = useCallback(
-    (file: PickedImage & { file?: File }) => {
-      const prepared: PreparedImage = {
-        uri: file.uri,
-        width: 0,
-        height: 0,
-        name: file.name,
-        type: file.type,
-        blob: file.file,
-      };
-      void handleImageReady(prepared);
-    },
-    [handleImageReady],
-  );
-
-  const handleAnalyze = useCallback(async () => {
-    if (!pendingImage) {
-      Alert.alert('Upload a photo first', 'Choose a photo before analyzing.');
-      return;
-    }
-
-    try {
-      await runAnalysis(pendingImage);
-      setPendingImage(null);
-    } catch {
-      // runAnalysis already alerts on error
-    }
-  }, [pendingImage, runAnalysis]);
-
-  const isUploading = status === 'uploading';
-  const uploadDisabled = !selectedMachine || isUploading;
-  const ctaLabel = isUploading ? 'Uploading…' : pendingImage ? 'Analyze' : 'Upload Photo';
 
   const analysisStatusLabel = useMemo(() => {
     switch (status) {
@@ -226,35 +165,7 @@ export default function PrinterTabs() {
       <Text style={{ fontSize: 20, fontWeight: '600' }}>Add photo</Text>
 
       {Platform.OS === 'web' ? (
-        <WebFilePicker onPick={handleWebPick}>
-          {(open) => (
-            <Pressable
-              accessibilityRole="button"
-              onPress={pendingImage ? () => void handleAnalyze() : open}
-              disabled={uploadDisabled}
-              style={({ pressed }) => [
-                {
-                  paddingVertical: 10,
-                  paddingHorizontal: 14,
-                  borderRadius: 10,
-                  borderWidth: 1,
-                  borderColor: '#ccc',
-                  backgroundColor: uploadDisabled
-                    ? '#1f2937'
-                    : pressed
-                    ? '#0f172a'
-                    : '#111',
-                  opacity: uploadDisabled ? 0.6 : 1,
-                },
-                Platform.OS === 'web'
-                  ? ({ cursor: uploadDisabled ? 'not-allowed' : 'pointer' } as any)
-                  : null,
-              ]}
-            >
-              <Text style={{ color: uploadDisabled ? '#9ca3af' : 'white', fontWeight: '600' }}>{ctaLabel}</Text>
-            </Pressable>
-          )}
-        </WebFilePicker>
+        <WebPhotoPicker label="Add photo" onImageReady={handleImageReady} disabled={!selectedMachine || status === 'uploading'} />
       ) : (
         <CameraButton
           label={status === 'uploading' ? 'Uploading…' : 'Take Photo'}

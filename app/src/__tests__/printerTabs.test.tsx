@@ -199,13 +199,7 @@ describe('PrinterTabs', () => {
       />,
     );
 
-    fireEvent.press(getByText('Upload Photo'));
-
-    await waitFor(() => {
-      expect(getByText('Analyze')).toBeTruthy();
-    });
-
-    fireEvent.press(getByText('Analyze'));
+    fireEvent.press(getByText('Pick / Capture photo'));
 
     await waitFor(() => {
       expect(mockAnalyzeImageApi).toHaveBeenCalled();
