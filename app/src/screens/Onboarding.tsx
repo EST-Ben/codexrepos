@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, Pressable, StyleSheet, FlatList, Platform } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import type { ExperienceLevel, OnboardingState } from '../types';
 import { saveOnboardingState } from '../storage/onboarding';
 import { useMachineRegistry } from '../hooks/useMachineRegistry';
@@ -98,6 +98,24 @@ const OnboardingScreen: React.FC<Props> = ({
       {!loading && !error && machineChoices.length === 0 && (
         <Text style={styles.statusText}>No machines available.</Text>
       )}
+      {!loading && !error && machineChoices.map((machine) => {
+        const active = selected.includes(machine.id);
+        return (
+          <Pressable
+            key={machine.id}
+            onPress={() => toggleMachine(machine.id)}
+            style={[styles.row, active && styles.rowActive]}
+            accessibilityRole="button"
+            accessibilityState={{ selected: active }}
+          >
+            <Text style={styles.rowText}>{machine.label}</Text>
+            <Text style={styles.rowTick}>{active ? '✓' : ''}</Text>
+          </Pressable>
+        </View>
+      )}
+      {!loading && !error && machineChoices.length === 0 && (
+        <Text style={styles.statusText}>No machines available.</Text>
+      )}
       <View style={styles.listWrapper}>
         {!loading && !error && machineChoices.length > 0 && (
           <FlatList
@@ -167,12 +185,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   retryText: { color: '#fee2e2', fontWeight: '600' },
-  listWrapper: { flex: 1, marginBottom: 8 },
-  list: {
-    alignSelf: 'stretch',
-    ...(Platform.OS === 'web' ? { overflow: 'auto' as const } : {}),
-  },
-  listContent: { paddingBottom: 24 },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
