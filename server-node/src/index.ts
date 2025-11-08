@@ -1,7 +1,6 @@
-// server-node/src/index.ts
 import { randomUUID } from "node:crypto";
 import Fastify from "fastify";
-import cors from "@fastify/cors";
+import fastifyCors from "@fastify/cors";
 import helmet from "@fastify/helmet";
 import multipart from "@fastify/multipart";
 import rateLimit from "@fastify/rate-limit";
@@ -22,66 +21,7 @@ import { settings } from "./settings.js";
 import { DebugSnapshotSchema, HealthResponseSchema } from "./schemas.js";
 import type { DebugSnapshot } from "types/api";
 
-export const PORT = Number(process.env.PORT ?? 8000);
-export const HOST = process.env.HOST ?? "0.0.0.0";
-
-// --------------------------- CORS helpers ---------------------------
-function normalizeOrigins(input: unknown): string[] {
-  if (!input) return [];
-  if (Array.isArray(input)) return input.map(String).map(s => s.trim()).filter(Boolean);
-  return String(input)
-    .split(",")
-    .map(s => s.trim())
-    .filter(Boolean);
-}
-
-/**
- * Build the effective CORS allowlist.
- * - Always includes common Expo web dev origins.
- * - Merges settings.allowedOrigins and env ALLOWED_ORIGINS (comma-separated).
- */
-function buildCorsAllowlist(): string[] {
-  const DEFAULT_DEV = [
-    "http://localhost:8081",   // Expo web
-    "http://127.0.0.1:8081",
-    "http://localhost:19006",  // Expo web (alternate)
-    "http://127.0.0.1:19006",
-  ];
-
-  const fromSettings = normalizeOrigins((settings as any).allowedOrigins);
-  const fromEnv = normalizeOrigins(process.env.ALLOWED_ORIGINS);
-
-  const lanExpoOrigins = new Set<string>();
-  const lanPorts = [19006, 8081];
-  const apiBaseCandidates = [
-    process.env.API_BASE_URL,
-    process.env.EXPO_PUBLIC_API_BASE,
-    process.env.EXPO_PUBLIC_API_BASE_URL,
-  ];
-  for (const candidate of apiBaseCandidates) {
-    if (!candidate) continue;
-    try {
-      const url = new URL(candidate);
-      if (!url.hostname) continue;
-      const protocol = url.protocol === "https:" ? "https" : "http";
-      for (const port of lanPorts) {
-        lanExpoOrigins.add(`${protocol}://${url.hostname}:${port}`);
-      }
-    } catch {
-      // ignore malformed URLs
-    }
-  }
-
-  // Also accept a dynamic WEB_PORT (if someone runs Expo with a different port)
-  const maybeWeb = process.env.WEB_PORT ? `http://localhost:${process.env.WEB_PORT}` : null;
-
-  const all = new Set<string>([...DEFAULT_DEV, ...lanExpoOrigins, ...fromSettings, ...fromEnv]);
-  if (maybeWeb) all.add(maybeWeb);
-
-  return Array.from(all);
-}
-
-// --------------------------- request stats ---------------------------
+/** ---------- Request stats (for /_debug) ---------- */
 const requestStats = {
   total: 0,
   perRoute: new Map<string, { count: number; last: number }>(),
@@ -98,6 +38,45 @@ function snapshotRoutes() {
   return perRoute;
 }
 
+/** ---------- Small helpers ---------- */
+function splitCsv(input?: string | null): string[] {
+  if (!input) return [];
+  return input.split(",").map((s) => s.trim()).filter(Boolean);
+}
+
+/** Build an ARRAY of allowed origins (strings/regex) to avoid function-typed CORS,
+ * which silences the TS overload error while still giving you flexible dev CORS. */
+function buildAllowedOriginValues(): (string | RegExp)[] {
+  const fromSettings = Array.isArray((settings as any).allowedOrigins)
+    ? ((settings as any).allowedOrigins as string[])
+    : [];
+
+  const fromEnv = splitCsv(process.env.ALLOWED_ORIGINS);
+
+  // Common dev hosts (Expo web uses 8081 by default)
+  const defaults = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:8081",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:8081",
+  ];
+
+  // If you pass a LAN host/port, add it explicitly
+  const lanHost = process.env.EXPO_DEV_SERVER_HOST || process.env.LAN_HOST;
+  const lanWebPort = process.env.WEB_PORT || "8081";
+  const lanExact = lanHost ? [`http://${lanHost}:${lanWebPort}`] : [];
+
+  // Allow any 192.168.x.x during dev
+  const lanRegex = [/^http:\/\/192\.168\.\d+\.\d+(?::\d+)?$/i];
+
+  // De-dup strings, then append regex
+  const strings = Array.from(new Set([...fromSettings, ...fromEnv, ...defaults, ...lanExact]));
+  return [...strings, ...lanRegex];
+}
+
+/** ---------- Server factory ---------- */
 export async function createServer() {
   const app = Fastify({
     logger: {
@@ -105,52 +84,45 @@ export async function createServer() {
       base: { service: "codexrepo-api" },
     },
     genReqId: () => randomUUID(),
+    trustProxy: true,
   }).withTypeProvider<ZodTypeProvider>();
 
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
 
-  // --------------------------- security & basics ---------------------------
+  /** Security headers (CSP off for dev/Swagger) */
   await app.register(helmet, {
     contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false,
   });
 
-  // CORS — allow Expo web localhost + configured allowlists.
-  const allowlist = buildCorsAllowlist();
-  await app.register(cors, {
-    // Dynamic function so we can allow native (no Origin) and exact allowlist matches.
-    origin: (origin, cb) => {
-      if (!origin) return cb(null, true); // native app / curl / server-to-server
-      if (allowlist.includes(origin)) return cb(null, true);
-      // Helpful log for local dev
-      app.log.warn({ origin }, "CORS blocked origin");
-      cb(new Error("CORS"), false);
-    },
+  /** CORS (array-based origin to satisfy types) */
+  const allowedOrigins = buildAllowedOriginValues();
+  await app.register(fastifyCors, {
+    origin: allowedOrigins, // <— array of string/RegExp, no function → no TS overload error
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+    exposedHeaders: ["Content-Length", "Content-Type"],
+    maxAge: 86400,
   });
-  app.log.info({ allowlist }, "CORS allowlist configured");
 
+  /** Multipart (uploads) */
   await app.register(multipart, {
-    limits: { fileSize: settings.uploadMaxBytes, files: 1 },
+    limits: { fileSize: settings.uploadMaxBytes },
   });
 
+  /** Rate limiting */
   await app.register(rateLimit, {
     max: settings.rateLimit.requests,
     timeWindow: `${settings.rateLimit.windowSeconds}s`,
   });
 
-  // --------------------------- Swagger / OpenAPI ---------------------------
-  const swaggerServer =
-    process.env.SWAGGER_SERVER ??
-    `http://${HOST}:${PORT}`;
-
+  /** OpenAPI/Swagger */
   await app.register(swagger, {
     openapi: {
       info: { title: "Diagnostics API", version: settings.version },
-      servers: [{ url: swaggerServer }],
+      servers: [{ url: "http://localhost:8000" }],
     },
     transform: jsonSchemaTransform,
   });
@@ -161,8 +133,8 @@ export async function createServer() {
     staticCSP: true,
   });
 
-  // --------------------------- instrumentation ---------------------------
-  app.addHook("onRequest", async (request, _reply) => {
+  /** Diagnostics hooks */
+  app.addHook("onRequest", async (request) => {
     (request as any)._diagnosticStart = performance.now();
     const cl = Number(request.headers["content-length"] ?? 0);
     if (cl && cl > settings.uploadMaxBytes) {
@@ -174,9 +146,10 @@ export async function createServer() {
 
   app.addHook("onResponse", (request, reply, done) => {
     const routeKey = request.routeOptions.url ?? request.raw.url ?? "unknown";
-    const start = (request as any)._diagnosticStart;
     const durationMs =
-      typeof start === "number" ? Number((performance.now() - start).toFixed(2)) : undefined;
+      typeof (request as any)._diagnosticStart === "number"
+        ? Number((performance.now() - (request as any)._diagnosticStart).toFixed(2))
+        : undefined;
 
     requestStats.total += 1;
     const entry = requestStats.perRoute.get(routeKey) ?? { count: 0, last: 0 };
@@ -184,28 +157,29 @@ export async function createServer() {
     entry.last = Date.now();
     requestStats.perRoute.set(routeKey, entry);
 
-    request.log.info({ route: routeKey, statusCode: reply.statusCode, durationMs }, "request completed");
+    request.log.info(
+      { route: routeKey, statusCode: reply.statusCode, durationMs },
+      "request completed",
+    );
     done();
   });
 
+  /** Error handler */
   app.setErrorHandler((error, request, reply) => {
     const statusCode = (error as any).statusCode ?? 500;
     if (statusCode >= 500) {
       request.log.error({ err: error }, "unhandled error");
     }
     const message =
-      statusCode >= 500 ? "Internal server error" : (error as any).message ?? "Request failed";
+      statusCode >= 500 ? "Internal server error" : (error.message ?? "Request failed");
     reply.status(statusCode).send({ error: message });
   });
 
-  // --------------------------- routes ---------------------------
+  /** Healthcheck */
   app.get(
     "/health",
     {
-      schema: {
-        tags: ["ops"],
-        response: { 200: HealthResponseSchema },
-      },
+      schema: { tags: ["ops"], response: { 200: HealthResponseSchema } },
     },
     async () => ({
       status: "ok",
@@ -214,13 +188,11 @@ export async function createServer() {
     }),
   );
 
+  /** Debug snapshot */
   app.get(
     "/_debug",
     {
-      schema: {
-        tags: ["ops"],
-        response: { 200: DebugSnapshotSchema },
-      },
+      schema: { tags: ["ops"], response: { 200: DebugSnapshotSchema } },
     },
     async () => {
       const memory = process.memoryUsage();
@@ -238,20 +210,35 @@ export async function createServer() {
           heapTotal: memory.heapTotal,
           external: memory.external,
         },
-        request_counters: {
-          total: requestStats.total,
-          per_route: snapshotRoutes(),
-        },
+        request_counters: { total: requestStats.total, per_route: snapshotRoutes() },
       };
       return snapshot;
     },
   );
 
-  // Existing feature routes (prefix /api)
+  /** API routes */
   await app.register(analyzeImageRoute, { prefix: "/api" });
   await app.register(analyzeJsonRoute, { prefix: "/api" });
   await app.register(machinesRoute, { prefix: "/api" });
   await app.register(exportProfileRoute, { prefix: "/api" });
+
+  /** Not found → JSON */
+  app.setNotFoundHandler((_req, reply) => {
+    reply.code(404).send({ error: "Not found" });
+  });
+
+  /** Ready log */
+  app.addHook("onReady", async () => {
+    const host = process.env.HOST ?? "0.0.0.0";
+    const port = Number(process.env.PORT ?? 8000);
+    app.log.info(
+      {
+        bind: { host, port },
+        allowedOrigins: allowedOrigins.map((o) => (o instanceof RegExp ? o.toString() : o)),
+      },
+      "API is configured; waiting for listen() in server entry",
+    );
+  });
 
   return app;
 }
