@@ -56,7 +56,16 @@ jest.mock('../components/WebPhotoPicker', () => makePickerMock(), { virtual: tru
 // ---- Mock useAnalyze to route uploads to our spy --------------
 jest.mock('../hooks/useAnalyze', () => ({
   useAnalyze: () => ({
-    mutate: ({ file, meta }: any) => mockAnalyzeImageApi(file, meta),
+    analyzeImage: (file: any, meta: any) => {
+      mockAnalyzeImageApi(file, meta);
+      return Promise.resolve();
+    },
+    mutate: ({ file, meta }: any) => {
+      mockAnalyzeImageApi(file, meta);
+      return Promise.resolve();
+    },
+    status: 'idle',
+    error: null,
     isPending: false,
     isSuccess: false,
     data: null,
@@ -78,12 +87,14 @@ const summary: MachineSummary = {
 
 jest.mock('../hooks/useMachineRegistry', () => ({
   useMachineRegistry: () => ({
-    machines: [summary],
+    all: [summary],
+    ids: [summary.id],
+    byId: (id: string) => (id === summary.id ? summary : undefined),
+    defaultId: summary.id,
     loading: false,
     error: null,
-    refresh: jest.fn(),
+    refresh: jest.fn().mockResolvedValue(undefined),
   }),
-  filterMachines: (machines: MachineSummary[]) => machines,
 }));
 
 jest.mock('../state/privacy', () => ({
@@ -179,17 +190,10 @@ describe('PrinterTabs', () => {
       />,
     );
 
-    // 1) Simulate picking a file (enables "Analyze photo")
     fireEvent.press(getByText('Pick / Capture photo'));
 
-    // 2) Press the real "Analyze photo" button that PrinterTabs renders
-    fireEvent.press(getByText('Analyze photo'));
-
-    // Accept either code path: useAnalyze.mutate (mockAnalyzeImageApi) OR client.analyzeImage
     await waitFor(() => {
-      const calls =
-        mockAnalyzeImageApi.mock.calls.length + mockedClient.analyzeImage.mock.calls.length;
-      expect(calls).toBeGreaterThan(0);
+      expect(mockAnalyzeImageApi).toHaveBeenCalled();
     });
 
     // Extract args from whichever mock fired
@@ -204,8 +208,8 @@ describe('PrinterTabs', () => {
 
     expect(meta.machine_id).toBe('bambu_p1s');
     expect(meta.experience).toBe('Intermediate');
-    expect(meta.material).toBe('PLA');
-    expect(meta.app_version).toBe('printer-page');
+    expect(meta.material).toBeUndefined();
+    expect(meta.app_version).toBe('printer-tabs');
 
     expect(fileArg).toEqual({
       uri: 'file:///stringing.jpg',

@@ -1,101 +1,85 @@
-export type BuildVolume = { x: number; y: number; z: number };
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { fetchMachineSummaries } from '../api/client';
+import type { MachineSummary } from '../types';
 
-export type Machine = {
-  id: MachineId;
-  brand: string;
-  model: string;
-  nozzleDiameterMm: number;
-  buildVolumeMm: BuildVolume;
-  materials: string[];
+export type Machine = MachineSummary;
+export type MachineId = MachineSummary['id'];
+
+const PREFERRED_DEFAULT_ID: MachineId = 'bambu_p1s';
+
+type MachineRegistryState = {
+  all: MachineSummary[];
+  ids: MachineId[];
+  byId(id: MachineId): MachineSummary | undefined;
+  defaultId: MachineId | null;
+  loading: boolean;
+  error: Error | null;
+  refresh(): Promise<void>;
 };
 
-const registry = {
-  // ✅ required by tests / earlier checks
-  bambu_p1s: {
-    id: 'bambu_p1s',
-    brand: 'Bambu Lab',
-    model: 'P1S',
-    nozzleDiameterMm: 0.4,
-    buildVolumeMm: { x: 256, y: 256, z: 256 },
-    materials: ['PLA', 'PETG', 'ABS', 'ASA', 'TPU', 'Nylon', 'CF-Nylon'],
-  },
-  bambu_a1: {
-    id: 'bambu_a1',
-    brand: 'Bambu Lab',
-    model: 'A1',
-    nozzleDiameterMm: 0.4,
-    buildVolumeMm: { x: 256, y: 256, z: 256 },
-    materials: ['PLA', 'PETG', 'TPU'],
-  },
-  bambu_x1c: {
-    id: 'bambu_x1c',
-    brand: 'Bambu Lab',
-    model: 'X1 Carbon',
-    nozzleDiameterMm: 0.4,
-    buildVolumeMm: { x: 256, y: 256, z: 256 },
-    materials: ['PLA', 'PETG', 'ABS', 'ASA', 'TPU', 'Nylon', 'CF-Nylon'],
-  },
-  creality_k1: {
-    id: 'creality_k1',
-    brand: 'Creality',
-    model: 'K1',
-    nozzleDiameterMm: 0.4,
-    buildVolumeMm: { x: 220, y: 220, z: 250 },
-    materials: ['PLA', 'PETG', 'ABS', 'TPU'],
-  },
-  prusa_mk4: {
-    id: 'prusa_mk4',
-    brand: 'Prusa',
-    model: 'MK4',
-    nozzleDiameterMm: 0.4,
-    buildVolumeMm: { x: 250, y: 210, z: 220 },
-    materials: ['PLA', 'PETG', 'ABS', 'ASA', 'TPU'],
-  },
+export function useMachineRegistry(): MachineRegistryState {
+  const [machines, setMachines] = useState<MachineSummary[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<Error | null>(null);
+  const isMountedRef = useRef(true);
 
-  // ✅ extras so “more machines” actually show up
-  bambu_a1_mini: {
-    id: 'bambu_a1_mini',
-    brand: 'Bambu Lab',
-    model: 'A1 mini',
-    nozzleDiameterMm: 0.4,
-    buildVolumeMm: { x: 180, y: 180, z: 180 },
-    materials: ['PLA', 'PETG', 'TPU'],
-  },
-  creality_ender3_v3_ke: {
-    id: 'creality_ender3_v3_ke',
-    brand: 'Creality',
-    model: 'Ender-3 V3 KE',
-    nozzleDiameterMm: 0.4,
-    buildVolumeMm: { x: 220, y: 220, z: 240 },
-    materials: ['PLA', 'PETG', 'ABS', 'TPU'],
-  },
-  anycubic_kobra2: {
-    id: 'anycubic_kobra2',
-    brand: 'Anycubic',
-    model: 'Kobra 2',
-    nozzleDiameterMm: 0.4,
-    buildVolumeMm: { x: 220, y: 220, z: 250 },
-    materials: ['PLA', 'PETG', 'TPU'],
-  },
-  prusa_mini: {
-    id: 'prusa_mini',
-    brand: 'Prusa',
-    model: 'MINI+',
-    nozzleDiameterMm: 0.4,
-    buildVolumeMm: { x: 180, y: 180, z: 180 },
-    materials: ['PLA', 'PETG', 'ABS', 'TPU'],
-  },
-} as const;
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
-export type MachineId = keyof typeof registry;
+  const loadMachines = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const payload = await fetchMachineSummaries();
+      if (!isMountedRef.current) return;
+      setMachines(payload);
+    } catch (err) {
+      if (!isMountedRef.current) return;
+      setError(err instanceof Error ? err : new Error(String(err)));
+    } finally {
+      if (!isMountedRef.current) return;
+      setLoading(false);
+    }
+  }, []);
 
-const all: Machine[] = Object.values(registry) as Machine[];
-const ids: MachineId[] = Object.keys(registry) as MachineId[];
-const defaultId: MachineId = 'bambu_p1s';
+  useEffect(() => {
+    void loadMachines();
+  }, [loadMachines]);
 
-export function useMachineRegistry() {
-  const byId = (id: MachineId) => registry[id] as Machine | undefined;
-  return { all, ids, byId, defaultId };
+  const ids = useMemo<MachineId[]>(() => machines.map((machine) => machine.id), [machines]);
+
+  const machineMap = useMemo(() => {
+    const map = new Map<MachineId, MachineSummary>();
+    for (const machine of machines) {
+      map.set(machine.id, machine);
+    }
+    return map;
+  }, [machines]);
+
+  const byId = useCallback<MachineRegistryState['byId']>(
+    (id) => machineMap.get(id),
+    [machineMap]
+  );
+
+  const defaultId = useMemo<MachineId | null>(() => {
+    if (machineMap.has(PREFERRED_DEFAULT_ID)) {
+      return PREFERRED_DEFAULT_ID;
+    }
+    return ids[0] ?? null;
+  }, [ids, machineMap]);
+
+  return {
+    all: machines,
+    ids,
+    byId,
+    defaultId,
+    loading,
+    error,
+    refresh: loadMachines,
+  };
 }
 
 export default useMachineRegistry;
