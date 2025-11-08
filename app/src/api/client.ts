@@ -60,6 +60,8 @@ export async function analyzeImage(
 
   onProgress?.(0);
 
+  console.debug('[API] POST /api/analyze-image ->', `${API_BASE}/analyze-image`);
+
   const res = await fetch(`${API_BASE}/analyze-image`, {
     method: 'POST',
     body: form,

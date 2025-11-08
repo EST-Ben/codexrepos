@@ -1,7 +1,7 @@
 // app/src/__tests__/printerTabs.test.tsx
 import React from 'react';
 // Local minimal test helpers to avoid bringing in @testing-library/react-native.
-import { fireEvent, render, waitFor } from '../test-utils/native-testing';
+import { fireEvent, render, waitFor, screen } from '../test-utils/native-testing';
 import { jest, describe, it, expect, beforeEach } from '@jest/globals';
 
 import type {
@@ -11,6 +11,23 @@ import type {
   ExperienceLevel,
 } from '../types';
 import PrinterTabs from '../screens/PrinterTabs';
+import { Platform } from 'react-native';
+
+const originalPlatform = Platform.OS;
+
+beforeEach(() => {
+  Object.defineProperty(Platform, 'OS', {
+    configurable: true,
+    value: 'ios',
+  });
+});
+
+afterAll(() => {
+  Object.defineProperty(Platform, 'OS', {
+    configurable: true,
+    value: originalPlatform,
+  });
+});
 
 // Use a "mock*" prefix so Jest allows referencing it inside jest.mock factories
 const mockAnalyzeImageApi = jest.fn();
@@ -37,6 +54,7 @@ const makePickerMock = () => {
       Pressable,
       {
         accessibilityRole: 'button',
+        testID: 'mockPicker',
         onPress: () =>
           props?.onImageReady?.({
             uri: 'file:///stringing.jpg',
@@ -49,7 +67,15 @@ const makePickerMock = () => {
   };
 };
 
-jest.mock('../components/CameraButton', () => ({ CameraButton: makePickerMock() }), { virtual: true });
+jest.mock(
+  '../components/CameraButton',
+  () => ({
+    __esModule: true,
+    default: makePickerMock(),
+    CameraButton: makePickerMock(),
+  }),
+  { virtual: true }
+);
 jest.mock('../components/AnalyzeFromPhoto', () => makePickerMock(), { virtual: true });
 jest.mock('../components/WebFilePicker', () => ({
   __esModule: true,
@@ -169,8 +195,8 @@ describe('PrinterTabs', () => {
   const onUpdateMaterial = jest.fn<(machineId: string, material?: string) => void>();
   const onRecordHistory = jest.fn<(entry: AnalysisHistoryRecord) => void>();
 
-  it('renders a photo picker control for the active machine', () => {
-    const { getByText } = render(
+  it('renders a photo picker control for the active machine', async () => {
+    render(
       <PrinterTabs
         profile={profile as any}
         onEditProfile={jest.fn()}
@@ -187,7 +213,7 @@ describe('PrinterTabs', () => {
   it('submits uploads with machine meta and experience', async () => {
     mockedClient.analyzeImage.mockResolvedValue(minimalAnalyzeResponse({ image_id: 'test-image' }));
 
-    const { getByText } = render(
+    render(
       <PrinterTabs
         profile={profile as any}
         onEditProfile={jest.fn()}

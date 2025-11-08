@@ -27,6 +27,7 @@ export const analyzeImageRoute: FastifyPluginCallback = (
       },
     },
     async (req: FastifyRequest, reply: FastifyReply) => {
+      req.log.info({ hasMultipart: req.isMultipart?.() }, 'analyze-image start');
       const parts = req.parts();
       let metaRaw: string | null = null;
       let fileBuffer: Buffer | null = null;
@@ -36,6 +37,10 @@ export const analyzeImageRoute: FastifyPluginCallback = (
       if (part.type === "file") {
         fileBuffer = await part.toBuffer();
         filename = part.filename || filename;
+        req.log.info(
+          { field: part.fieldname, filename: part.filename, mimetype: part.mimetype },
+          "analyze-image file received",
+        );
       } else if (part.type === "field" && part.fieldname === "meta") {
         metaRaw = String(part.value ?? "");
       }
