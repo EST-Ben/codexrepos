@@ -10,8 +10,8 @@ This checklist exercises the printer photo workflow across web and native platfo
 ## Web (Expo Web) Flow
 1. Start the web app: `cd app && npx expo start --web -c`.
 2. Navigate to the Printer page and ensure a machine is selected or imported.
-3. Use the **WebPhotoPicker** button to choose a local image (`.jpg`/`.png`).
-4. Confirm the upload triggers a POST to `/api/analyze` and resolves without errors.
+3. Click **Upload Photo** to open the file picker and choose a local image (`.jpg`/`.png`).
+4. Verify the CTA flips to **Analyze**, tap it, and confirm the upload triggers a POST to `/api/analyze` and resolves without errors.
 5. Verify the analysis drawer/modal shows:
    - The base image preview.
    - Heatmap overlay rendered from `localization.heatmap.data_url`.

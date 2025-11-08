@@ -24,7 +24,7 @@ const mockedClient = jest.mocked(client, { shallow: true });
  * Unify all potential picker components to a deterministic mock:
  * - components/CameraButton
  * - components/AnalyzeFromPhoto
- * - components/WebPhotoPicker
+ * - components/WebFilePicker
  *
  * Each mock renders a tappable control labeled "Pick / Capture photo"
  * that calls props.onImageReady({ uri, name, type }) on press.
@@ -51,7 +51,17 @@ const makePickerMock = () => {
 
 jest.mock('../components/CameraButton', () => ({ CameraButton: makePickerMock() }), { virtual: true });
 jest.mock('../components/AnalyzeFromPhoto', () => makePickerMock(), { virtual: true });
-jest.mock('../components/WebPhotoPicker', () => makePickerMock(), { virtual: true });
+jest.mock('../components/WebFilePicker', () => ({
+  __esModule: true,
+  default: ({ onPick, children }: any) =>
+    children?.(() =>
+      onPick?.({
+        uri: 'file:///stringing.jpg',
+        name: 'stringing.jpg',
+        type: 'image/jpeg',
+      })
+    ),
+}));
 
 // ---- Mock useAnalyze to route uploads to our spy --------------
 jest.mock('../hooks/useAnalyze', () => ({
@@ -171,8 +181,7 @@ describe('PrinterTabs', () => {
         historyCounts={{}}
       />,
     );
-    // Assert presence by visible label instead of testID
-    expect(getByText('Pick / Capture photo')).toBeTruthy();
+    expect(getByText('Upload Photo')).toBeTruthy();
   });
 
   it('submits uploads with machine meta and experience', async () => {
