@@ -63,6 +63,24 @@ const OnboardingScreen: React.FC<Props> = ({
     onComplete(payload);
   }, [experience, onComplete, selected]);
 
+  const renderMachine = useCallback(
+    ({ item }: { item: { id: string; label: string } }) => {
+      const active = selected.includes(item.id);
+      return (
+        <Pressable
+          onPress={() => toggleMachine(item.id)}
+          style={[styles.row, active && styles.rowActive]}
+          accessibilityRole="button"
+          accessibilityState={{ selected: active }}
+        >
+          <Text style={styles.rowText}>{item.label}</Text>
+          <Text style={styles.rowTick}>{active ? '✓' : ''}</Text>
+        </Pressable>
+      );
+    },
+    [selected, toggleMachine]
+  );
+
   return (
     <View style={styles.root}>
       <Text style={styles.heading}>Choose your machine(s)</Text>
@@ -93,8 +111,25 @@ const OnboardingScreen: React.FC<Props> = ({
             <Text style={styles.rowText}>{machine.label}</Text>
             <Text style={styles.rowTick}>{active ? '✓' : ''}</Text>
           </Pressable>
-        );
-      })}
+        </View>
+      )}
+      {!loading && !error && machineChoices.length === 0 && (
+        <Text style={styles.statusText}>No machines available.</Text>
+      )}
+      <View style={styles.listWrapper}>
+        {!loading && !error && machineChoices.length > 0 && (
+          <FlatList
+            data={machineChoices}
+            keyExtractor={(item) => item.id}
+            renderItem={renderMachine}
+            showsVerticalScrollIndicator
+            persistentScrollbar
+            style={styles.list}
+            contentContainerStyle={styles.listContent}
+            accessibilityRole="list"
+          />
+        )}
+      </View>
 
       <Text style={[styles.heading, { marginTop: 24 }]}>Experience level</Text>
       <View style={styles.chips}>
