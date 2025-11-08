@@ -4,7 +4,13 @@
     "doctor": "ts-node --compiler-options '{\"module\":\"commonjs\"}' scripts/doctor.ts || node scripts/doctor.ts",
     "server:dev": "npm --prefix server-node run dev",
     "server:build": "npm --prefix server-node run build",
-    "server:start": "npm --prefix server-node run start"
+    "server:start": "npm --prefix server-node run start",
+    "build:scripts": "tsc -p tsconfig.scripts.json",
+    "scripts:build-machines": "node dist-scripts/scripts/build_machines.js",
+    "scripts:validate-machines": "node dist-scripts/scripts/validate_machines.js",
+    "scripts:demo-analyze": "node dist-scripts/scripts/demo_analyze.js",
+    "scripts:generate-sdk": "node dist-scripts/scripts/generate_sdk.js",
+    "scripts:release": "node dist-scripts/scripts/release.js"
   },
   "devDependencies": {
     "ts-node": "^10.9.2",

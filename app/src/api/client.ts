@@ -18,7 +18,7 @@ function json<T>(res: Response): Promise<T> {
 export async function analyzeImage(
   file: File | { uri: string; name: string; type: string },
   meta: AnalyzeRequestMeta,
-  onProgress: ((p: number) => void) | undefined,
+  onProgress?: (p: number) => void,
 ): Promise<AnalyzeResponse> {
   const form = new FormData();
   // Web <input type="file"> gives File; native often gives { uri, name, type }
@@ -30,11 +30,15 @@ export async function analyzeImage(
   }
   form.append('meta', JSON.stringify(meta));
 
+  onProgress?.(0);
+
   const res = await fetch(`${API_BASE}/analyze-image`, {
     method: 'POST',
     body: form,
   });
-  return json<AnalyzeResponse>(res);
+  const result = await json<AnalyzeResponse>(res);
+  onProgress?.(100);
+  return result;
 }
 
 export async function analyzeJson(payload: AnalyzeRequestMeta & { issues?: string[] }): Promise<AnalyzeResponse> {
