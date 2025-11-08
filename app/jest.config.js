@@ -1,25 +1,9 @@
-// jest.config.js
+/** Minimal, RN-friendly config that loads our setup */
 module.exports = {
-  preset: 'jest-expo',
-  testEnvironment: 'jsdom',
+  preset: 'react-native',
+  testMatch: ['**/?(*.)+(test).[tj]sx?'],
+  setupFilesAfterEnv: ['<rootDir>/app/jest.setup.ts'],
   transformIgnorePatterns: [
-    // Allow these ESM modules from node_modules to be transformed by Babel
-    'node_modules/(?!(?:' +
-      'react-native' +
-      '|@react-native' +
-      '|react-native-web' +
-      '|expo' +
-      '|@expo' +
-      '|expo-clipboard' +
-      '|expo-image-picker' +
-      '|expo-status-bar' +
-      '|expo-modules-core' +
-    ')/)'
-  ],
-  setupFilesAfterEnv: [
-    '@testing-library/jest-native/extend-expect'
-  ],
-  moduleNameMapper: {
-    // Map assets to identity-obj-proxy or a stub if needed later
-  },
+    'node_modules/(?!(@react-native|react-native|react-native-gesture-handler|react-native-reanimated|@react-navigation)/)'
+  ]
 };
