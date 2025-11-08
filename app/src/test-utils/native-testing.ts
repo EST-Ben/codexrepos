@@ -8,35 +8,12 @@ type WaitForOptions = {
 
 let currentInstance: ReturnType<typeof create> | null = null;
 
-function getNodeText(children: unknown): string {
-  if (typeof children === 'string' || typeof children === 'number') {
-    return String(children);
-  }
-  if (Array.isArray(children)) {
-    return children.map(getNodeText).join('');
-  }
-  if (children && typeof children === 'object' && 'props' in (children as any)) {
-    return getNodeText((children as any).props?.children);
-  }
-  return '';
-}
-
 export function render(element: ReactElement) {
   act(() => {
     currentInstance = create(element);
   });
 
-  const getByText = (text: string | RegExp) => {
-    const matcher =
-      typeof text === 'string' ? (value: string) => value === text : (value: string) => text.test(value);
-    return requireRoot().find((node) => {
-      const value = getNodeText(node.props?.children);
-      return value !== '' && matcher(value);
-    });
-  };
-
   return {
-    getByText,
     rerender(next: ReactElement) {
       if (!currentInstance) return;
       act(() => {
@@ -62,14 +39,6 @@ function requireRoot() {
 export const screen = {
   getByTestId(testID: string) {
     return requireRoot().findByProps({ testID });
-  },
-  getByText(text: string | RegExp) {
-    const matcher =
-      typeof text === 'string' ? (value: string) => value === text : (value: string) => text.test(value);
-    return requireRoot().find((node) => {
-      const value = getNodeText(node.props?.children);
-      return value !== '' && matcher(value);
-    });
   },
 };
 
