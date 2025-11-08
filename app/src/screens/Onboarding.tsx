@@ -1,20 +1,14 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import type { ExperienceLevel, OnboardingState } from '../types';
 import { saveOnboardingState } from '../storage/onboarding';
+import { useMachineRegistry } from '../hooks/useMachineRegistry';
 
 type Props = {
   initialSelection?: string[];
   initialExperience?: ExperienceLevel;
   onComplete(state: OnboardingState): void;
 };
-
-// Minimal inline options; replace with real registry if you like
-const MACHINE_CHOICES = [
-  { id: 'bambu_p1s', label: 'Bambu Lab P1S' },
-  { id: 'ender_3', label: 'Creality Ender-3' },
-  { id: 'mk4', label: 'Prusa MK4' },
-];
 
 const EXPERIENCES: ExperienceLevel[] = ['Beginner', 'Intermediate', 'Advanced'];
 
@@ -23,14 +17,42 @@ const OnboardingScreen: React.FC<Props> = ({
   initialExperience = 'Beginner',
   onComplete,
 }) => {
+  const { ids, byId, loading, error, refresh } = useMachineRegistry();
   const [selected, setSelected] = useState<string[]>(initialSelection);
   const [experience, setExperience] = useState<ExperienceLevel>(initialExperience);
 
-  const toggleMachine = useCallback((id: string) => {
-    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
-  }, []);
+  const machineChoices = useMemo(() => {
+    return ids
+      .map((id) => byId(id))
+      .filter((machine): machine is NonNullable<ReturnType<typeof byId>> => !!machine)
+      .map((machine) => {
+        const brand = machine.brand?.trim() ?? '';
+        const model = machine.model?.trim() ?? '';
+        const label = [brand, model].filter(Boolean).join(' ');
+        return {
+          id: machine.id,
+          label: label.length > 0 ? label : machine.id,
+        };
+      });
+  }, [byId, ids]);
 
-  const canContinue = useMemo(() => selected.length > 0, [selected]);
+  useEffect(() => {
+    if (!machineChoices.length) {
+      return;
+    }
+    setSelected((prev) => prev.filter((id) => machineChoices.some((choice) => choice.id === id)));
+  }, [machineChoices]);
+
+  const toggleMachine = useCallback(
+    (id: string) => {
+      if (!byId(id)) return;
+      setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    },
+    [byId]
+  );
+
+  const hasChoices = machineChoices.length > 0;
+  const canContinue = useMemo(() => selected.length > 0 && hasChoices && !loading, [hasChoices, loading, selected]);
 
   const handleContinue = useCallback(async () => {
     const payload: OnboardingState = {
@@ -44,17 +66,31 @@ const OnboardingScreen: React.FC<Props> = ({
   return (
     <View style={styles.root}>
       <Text style={styles.heading}>Choose your machine(s)</Text>
-      {MACHINE_CHOICES.map((m) => {
-        const active = selected.includes(m.id);
+      {loading && <Text style={styles.statusText}>Loading machines…</Text>}
+      {!!error && (
+        <View style={styles.errorBox}>
+          <Text style={styles.errorText}>
+            Unable to load machines: {error.message ?? 'Unknown error'}
+          </Text>
+          <Pressable onPress={() => { void refresh(); }} style={styles.retryButton} accessibilityRole="button">
+            <Text style={styles.retryText}>Retry</Text>
+          </Pressable>
+        </View>
+      )}
+      {!loading && !error && machineChoices.length === 0 && (
+        <Text style={styles.statusText}>No machines available.</Text>
+      )}
+      {!loading && !error && machineChoices.map((machine) => {
+        const active = selected.includes(machine.id);
         return (
           <Pressable
-            key={m.id}
-            onPress={() => toggleMachine(m.id)}
+            key={machine.id}
+            onPress={() => toggleMachine(machine.id)}
             style={[styles.row, active && styles.rowActive]}
             accessibilityRole="button"
             accessibilityState={{ selected: active }}
           >
-            <Text style={styles.rowText}>{m.label}</Text>
+            <Text style={styles.rowText}>{machine.label}</Text>
             <Text style={styles.rowTick}>{active ? '✓' : ''}</Text>
           </Pressable>
         );
@@ -95,6 +131,25 @@ export default OnboardingScreen;
 const styles = StyleSheet.create({
   root: { flex: 1, padding: 16, backgroundColor: '#0f172a' },
   heading: { color: '#e2e8f0', fontSize: 18, fontWeight: '600', marginBottom: 8 },
+  statusText: { color: '#94a3b8', marginBottom: 8 },
+  errorBox: {
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#ef4444',
+    backgroundColor: '#450a0a',
+    padding: 12,
+    marginBottom: 12,
+  },
+  errorText: { color: '#fecaca' },
+  retryButton: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: '#b91c1c',
+    marginTop: 4,
+  },
+  retryText: { color: '#fee2e2', fontWeight: '600' },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',

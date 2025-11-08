@@ -1,11 +1,37 @@
+import Constants from 'expo-constants';
 import type {
   AnalyzeRequestMeta,
   AnalyzeResponse,
   ExportDiff,
+  MachineSummary,
   SlicerProfileDiff,
 } from '../types';
 
-const API_HOST = (process.env.EXPO_PUBLIC_API_BASE ?? 'http://localhost:8000').replace(/\/$/, '');
+function resolveApiBase(): string {
+  const envBase =
+    process.env.EXPO_PUBLIC_API_BASE || process.env.EXPO_PUBLIC_API_BASE_URL || '';
+  if (envBase) {
+    return envBase.replace(/\/$/, '');
+  }
+
+  let extraBase: string | undefined;
+  try {
+    extraBase = (Constants?.expoConfig?.extra as { apiBaseUrl?: string } | undefined)?.apiBaseUrl;
+  } catch {
+    extraBase = undefined;
+  }
+  if (extraBase) {
+    return extraBase.replace(/\/$/, '');
+  }
+
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return window.location.origin.replace(/\/$/, '');
+  }
+
+  return 'http://localhost:8000';
+}
+
+const API_HOST = resolveApiBase();
 const API_BASE = `${API_HOST}/api`;
 
 function json<T>(res: Response): Promise<T> {
@@ -14,6 +40,8 @@ function json<T>(res: Response): Promise<T> {
   }
   return res.json() as Promise<T>;
 }
+
+type MachinesResponse = { machines: MachineSummary[] };
 
 export async function analyzeImage(
   file: File | { uri: string; name: string; type: string },
@@ -39,6 +67,12 @@ export async function analyzeImage(
   const result = await json<AnalyzeResponse>(res);
   onProgress?.(100);
   return result;
+}
+
+export async function fetchMachineSummaries(): Promise<MachineSummary[]> {
+  const res = await fetch(`${API_BASE}/machines`);
+  const payload = await json<MachinesResponse>(res);
+  return payload.machines ?? [];
 }
 
 export async function analyzeJson(payload: AnalyzeRequestMeta & { issues?: string[] }): Promise<AnalyzeResponse> {
