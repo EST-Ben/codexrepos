@@ -13,7 +13,8 @@
     "paths": {
       "types/*": ["./src/_types/*.ts"]
     },
-    "types": ["node", "vitest"]
+    "types": ["node", "vitest", "jest"],
+    "isolatedModules": true
   },
-  "include": ["src"]
+  "include": ["src", "test"]
 }

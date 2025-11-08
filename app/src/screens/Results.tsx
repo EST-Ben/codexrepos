@@ -69,32 +69,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
   material,
   onBack,
 }) => {
-  // The hook currently returns a registry object like:
-  // { all: Machine[], ids: string[], byId(id): Machine|undefined, defaultId: string }
-  // It may not include loading/error/refresh. We derive safe helpers here.
-  const registry = useMachineRegistry() as unknown as {
-    all?: MachineSummary[];
-    ids?: string[];
-    byId?: (id: string) => MachineSummary | undefined;
-    defaultId?: string;
-    // Optional runtime states if provided by your hook:
-    loading?: boolean;
-    error?: string;
-    refresh?: () => void;
-  };
-
-  const all: MachineSummary[] = Array.isArray(registry.all) ? registry.all! : [];
-  const ids: string[] =
-    Array.isArray(registry.ids) ? registry.ids! : all.map((m) => m.id);
-  const byId =
-    typeof registry.byId === 'function'
-      ? registry.byId!
-      : (id: string) => all.find((m) => m.id === id);
-
-  const defaultId: string | undefined = registry.defaultId;
-  const loading: boolean = !!registry.loading;
-  const error: string | undefined = registry.error;
-  const refresh: (() => void) | undefined = registry.refresh;
+  const { all, ids, byId, defaultId, loading, error, refresh } = useMachineRegistry();
 
   const initialActive =
     selectedMachines[0] ?? defaultId ?? ids[0] ?? null;
@@ -201,15 +176,16 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
       {loading ? (
         <ActivityIndicator style={{ marginTop: 16 }} />
       ) : error ? (
-        refresh ? (
-          <Pressable onPress={refresh} style={styles.errorBox}>
-            <Text style={styles.errorText}>Failed to load machines: {error}. Tap to retry.</Text>
-          </Pressable>
-        ) : (
-          <View style={styles.errorBox}>
-            <Text style={styles.errorText}>Failed to load machines: {error}</Text>
-          </View>
-        )
+        <Pressable
+          onPress={() => {
+            void refresh();
+          }}
+          style={styles.errorBox}
+        >
+          <Text style={styles.errorText}>
+            Failed to load machines: {error?.message ?? 'Unknown error'}. Tap to retry.
+          </Text>
+        </Pressable>
       ) : null}
 
       {/* Tabs for selected machines */}

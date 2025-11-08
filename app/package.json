@@ -11,7 +11,7 @@
     "export:web": "expo export --platform web",
     "lint": "eslint --max-warnings=0 src",
     "format:check": "prettier -c .",
-    "test": "node ./node_modules/jest/bin/jest.js",
+    "test": "node node_modules/jest/bin/jest.js --passWithNoTests",
     "tsc": "tsc"
   },
   "dependencies": {
