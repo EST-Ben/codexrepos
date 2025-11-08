@@ -43,6 +43,21 @@ the pipeline can be demoed without a trained model.
 See [`LOCAL_DEV.md`](LOCAL_DEV.md) for the full Windows + Miniforge walkthrough, including curl smoke
 tests and firewall notes.
 
+## Managing machines
+
+1. Create or update a machine definition under `config/machines/` using the `_schema.json` contract as
+   a guide. Validate your edits with `npm run scripts:validate-machines` from the repo root.
+2. The Fastify service exposes summaries at `GET /api/machines`; the Expo client now fetches them via
+   `useMachineRegistry()`, so new entries appear automatically in onboarding and results.
+3. No manual edits to app constants are required—select labels are derived from the registry data.
+
+## Photo analysis workflow
+
+- The “Add photo” buttons (native camera and web picker) share a single handler that streams images to
+  `/api/analyze-image` with multipart form data.
+- Progress, errors, and the latest inference summary surface inline; verify `EXPO_PUBLIC_API_BASE` (or
+  `EXPO_PUBLIC_API_BASE_URL`) points at your backend so uploads reach the Fastify server.
+
 ## Developer tooling
 
 Install the shared hooks locally so formatting and linting run before each commit:
