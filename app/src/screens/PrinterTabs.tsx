@@ -1,300 +1,107 @@
-// app/src/screens/PrinterTabs.tsx
-import React, { useCallback, useMemo, useState, useEffect } from 'react';
-import {
-  Alert,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  Image,
-} from 'react-native';
-import type { ExperienceLevel } from '../types';
-import { CameraButton, type PreparedImage } from '../components/CameraButton';
-import { useAnalyze } from '../hooks/useAnalyze';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Platform, ScrollView, View, Text, Image } from 'react-native';
+import Constants from 'expo-constants';
+import CameraButton from '../components/CameraButton';
+import WebPhotoPicker from '../components/WebPhotoPicker';
+import { useMachineRegistry, type MachineId, type Machine } from '../hooks/useMachineRegistry';
 
-type HistoryCounts = Record<string, number>;
-type AnalysisPreview = { uri: string; width: number; height: number };
+type ExpoExtra = { apiBaseUrl?: string };
 
-interface PrinterTabsProps {
-  profile: {
-    machineId: string;
-    brand: string;
-    model: string;
-    experience?: string;
-    material?: string;
-  };
-  onEditProfile: () => void;
-  onShowAnalysis: (opts: { image?: AnalysisPreview; material?: string }) => void;
-  onUpdateMaterial: (material: string) => void;
-  onOpenHistory: () => void;
-  onRecordHistory?: (record: unknown) => void;
-  historyCounts?: HistoryCounts;
-}
+export default function PrinterTabs() {
+  const { ids, byId, defaultId } = useMachineRegistry();
+  const [selectedId, setSelectedId] = useState<MachineId>(defaultId);
+  const [previews, setPreviews] = useState<string[]>([]);
 
-const PrinterTabs: React.FC<PrinterTabsProps> = ({
-  profile,
-  onEditProfile,
-  onShowAnalysis,
-  onUpdateMaterial,
-  onOpenHistory,
-  onRecordHistory,
-  historyCounts,
-}) => {
-  const [material, setMaterial] = useState(profile.material ?? '');
-  const [selectedImage, setSelectedImage] = useState<PreparedImage | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const { mutate } = useAnalyze();
+  const apiBase =
+    (Constants?.expoConfig?.extra as ExpoExtra | undefined)?.apiBaseUrl ??
+    'http://localhost:8000';
 
-  // Revoke blob URL when changing / unmounting (web only)
-  useEffect(() => {
-    return () => {
-      if (Platform.OS === 'web' && selectedImage?.uri?.startsWith('blob:')) {
-        try {
-          URL.revokeObjectURL(selectedImage.uri);
-        } catch {}
-      }
-    };
-  }, [selectedImage?.uri]);
+  const selectedMachine: Machine | undefined = useMemo(() => byId(selectedId), [byId, selectedId]);
 
-  const machineTitle = useMemo(
-    () => `${profile.brand} ${profile.model}`,
-    [profile.brand, profile.model]
-  );
+  const onPickWeb = useCallback((_: File, objectUrl: string) => {
+    setPreviews((p) => [objectUrl, ...p].slice(0, 6));
+  }, []);
 
-  const performAnalysis = useCallback(
-    (prepared: PreparedImage) => {
-      setErrorMessage(null);
-      setUploading(true);
-
-      const experienceLevel = (profile.experience ?? 'Intermediate') as ExperienceLevel;
-      const meta = {
-        machine_id: profile.machineId,
-        experience: experienceLevel,
-        material: material || profile.material,
-        app_version: 'printer-page',
-      };
-
-      const fileArg =
-        prepared.blob ?? ({ uri: prepared.uri, name: prepared.name, type: prepared.type } as const);
-
-      // useAnalyze().mutate expects a single payload object with callbacks inside
-      mutate({
-        file: fileArg as any,
-        meta,
-        onSuccess: (response: any) => {
-          onRecordHistory?.({
-            imageId: response?.image_id,
-            machineId: profile.machineId,
-            material: material || profile.material,
-            response,
-            timestamp: Date.now(),
-          });
-
-          onShowAnalysis({
-            image: { uri: prepared.uri, width: prepared.width, height: prepared.height },
-            material: material || profile.material,
-          });
-        },
-        onError: (err: unknown) => {
-          const message = err instanceof Error ? err.message : String(err);
-          setErrorMessage(message);
-        },
-        onSettled: () => {
-          setUploading(false);
-        },
-      } as any);
-    },
-    [
-      material,
-      mutate,
-      onRecordHistory,
-      onShowAnalysis,
-      profile.experience,
-      profile.machineId,
-      profile.material,
-    ],
-  );
-
-  const handleImageReady = useCallback(
-    (image: PreparedImage) => {
-      setSelectedImage(image);
-      return performAnalysis(image);
-    },
-    [performAnalysis],
-  );
-
-  const analyzeDisabled = !selectedImage || uploading;
-
-  const handleAnalyze = useCallback(() => {
-    if (!selectedImage) {
-      Alert.alert('No photo selected', 'Please choose or capture a photo first.');
-      return;
-    }
-    return performAnalysis(selectedImage);
-  }, [performAnalysis, selectedImage]);
-
-  const historyCountForMachine = historyCounts?.[profile.machineId] ?? 0;
+  const onPhotoNative = useCallback((uri: string) => {
+    setPreviews((p) => [uri, ...p].slice(0, 6));
+  }, []);
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.title}>{machineTitle}</Text>
-          <Text style={styles.subtitle}>
-            ID: {profile.machineId}
-            {profile.experience ? ` • ${profile.experience}` : ''}
-          </Text>
-        </View>
-        <View style={styles.headerActions}>
-          <Pressable onPress={onEditProfile} style={[styles.button, styles.secondaryBtn]}>
-            <Text style={styles.secondaryLabel}>Edit</Text>
-          </Pressable>
-          <Pressable onPress={onOpenHistory} style={[styles.button, styles.primaryBtn]}>
-            <Text style={styles.primaryLabel}>History ({historyCountForMachine})</Text>
-          </Pressable>
-        </View>
-      </View>
+    <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
+      <Text style={{ fontSize: 20, fontWeight: '600' }}>Machines</Text>
 
-      {/* Body */}
-      <View style={styles.body}>
-        {/* Material field */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Material</Text>
-          <TextInput
-            value={material}
-            onChangeText={setMaterial}
-            placeholder="e.g., PLA, PETG"
-            placeholderTextColor="#64748b"
-            style={styles.input}
-          />
-          <Pressable
-            onPress={() => onUpdateMaterial(material)}
-            style={[styles.button, styles.secondaryBtn, { alignSelf: 'flex-start' }]}
-          >
-            <Text style={styles.secondaryLabel}>Save material</Text>
-          </Pressable>
-        </View>
-
-        {/* Photo & Analyze */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Photo</Text>
-
-          <View style={{ alignSelf: 'flex-start' }}>
-            <CameraButton
-              disabled={uploading}
-              label={Platform.OS === 'web' ? 'Choose photo' : 'Pick / Capture photo'}
-              onImageReady={handleImageReady}
-            />
-          </View>
-
-          {selectedImage ? (
-            <View style={styles.previewWrap}>
-              <Image source={{ uri: selectedImage.uri }} style={styles.preview} />
-              <Text style={styles.noteText}>
-                Selected {selectedImage.width}×{selectedImage.height}
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+        {ids.map((id) => {
+          const m = byId(id)!;
+          const active = id === selectedId;
+          return (
+            <View
+              key={id}
+              style={{
+                borderRadius: 10,
+                borderWidth: 1,
+                borderColor: active ? '#4ade80' : '#333',
+                paddingVertical: 8,
+                paddingHorizontal: 10,
+                backgroundColor: active ? '#052e16' : '#111',
+              }}
+            >
+              <Text
+                onPress={() => setSelectedId(id)}
+                style={{ color: 'white' }}
+              >
+                {m.brand} {m.model}
               </Text>
             </View>
-          ) : (
-            <Text style={styles.noteText}>No photo selected yet.</Text>
-          )}
-
-          <Pressable
-            disabled={analyzeDisabled}
-            onPress={handleAnalyze}
-            style={[styles.button, analyzeDisabled ? styles.disabledBtn : styles.primaryBtn]}
-          >
-            <Text style={analyzeDisabled ? styles.disabledLabel : styles.primaryLabel}>
-              {uploading ? 'Analyzing…' : 'Analyze photo'}
-            </Text>
-          </Pressable>
-
-          {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
-        </View>
-
-        {/* Optional: record to history */}
-        {onRecordHistory ? (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Record</Text>
-            <Text style={styles.noteText}>
-              You can record analysis results in your history after you run an analysis.
-            </Text>
-            <Pressable
-              onPress={() =>
-                onRecordHistory?.({
-                  machineId: profile.machineId,
-                  when: Date.now(),
-                })
-              }
-              style={[styles.button, styles.secondaryBtn, { alignSelf: 'flex-start' }]}
-            >
-              <Text style={styles.secondaryLabel}>Record placeholder</Text>
-            </Pressable>
-          </View>
-        ) : null}
+          );
+        })}
       </View>
-    </View>
+
+      {selectedMachine && (
+        <View style={{ gap: 4 }}>
+          <Text style={{ color: '#9ca3af' }}>
+            Nozzle {selectedMachine.nozzleDiameterMm}mm · Volume {selectedMachine.buildVolumeMm.x}×{selectedMachine.buildVolumeMm.y}×{selectedMachine.buildVolumeMm.z}mm
+          </Text>
+          <Text style={{ color: '#9ca3af' }}>
+            Materials: {selectedMachine.materials.join(', ')}
+          </Text>
+        </View>
+      )}
+
+      <View style={{ height: 1, backgroundColor: '#222', marginVertical: 8 }} />
+
+      <Text style={{ fontSize: 20, fontWeight: '600' }}>Add photo</Text>
+
+      {Platform.OS === 'web' ? (
+        <WebPhotoPicker label="Add photo" onPick={onPickWeb} />
+      ) : (
+        // CameraButton API varies across projects; use minimal, safe prop.
+        // If your component expects a different prop (e.g., onCapture/onImage),
+        // adapt here — but keep it typed.
+        <CameraButton onPhoto={onPhotoNative} />
+      )}
+
+      {previews.length > 0 && (
+        <>
+          <Text style={{ marginTop: 12, color: '#9ca3af' }}>Recent photos</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            {previews.map((src) => (
+              <Image
+                key={src}
+                source={{ uri: src }}
+                style={{ width: 96, height: 96, borderRadius: 8, backgroundColor: '#222' }}
+              />
+            ))}
+          </View>
+        </>
+      )}
+
+      <View style={{ height: 1, backgroundColor: '#222', marginVertical: 8 }} />
+
+      <View style={{ gap: 4 }}>
+        <Text style={{ fontSize: 20, fontWeight: '600' }}>API</Text>
+        <Text style={{ color: '#9ca3af' }}>Base URL: {apiBase}</Text>
+      </View>
+    </ScrollView>
   );
-};
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f172a' },
-  header: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1f2937',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 12,
-  },
-  headerActions: { flexDirection: 'row', gap: 8 },
-  title: { fontSize: 20, fontWeight: '700', color: '#f8fafc' },
-  subtitle: { color: '#cbd5f5', marginTop: 4 },
-
-  body: { padding: 16, gap: 16 },
-
-  card: { backgroundColor: '#111827', borderRadius: 12, padding: 16, gap: 12 },
-  cardTitle: { color: '#f8fafc', fontSize: 16, fontWeight: '600' },
-
-  input: {
-    backgroundColor: '#0b1220',
-    color: '#e2e8f0',
-    borderWidth: 1,
-    borderColor: '#1f2937',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
-
-  // Buttons
-  button: {
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  primaryBtn: { backgroundColor: '#38bdf8' },
-  primaryLabel: { color: '#0f172a', fontWeight: '700' },
-  secondaryBtn: { borderColor: '#38bdf8', borderWidth: 1, backgroundColor: 'transparent' },
-  secondaryLabel: { color: '#e0f2fe', fontWeight: '600' },
-  disabledBtn: { backgroundColor: '#1f2937' },
-  disabledLabel: { color: '#64748b', fontWeight: '600' },
-
-  // Preview
-  previewWrap: { gap: 8 },
-  preview: {
-    width: '100%',
-    aspectRatio: 4 / 3,
-    borderRadius: 12,
-    backgroundColor: '#0b1220',
-  },
-  noteText: { color: '#94a3b8' },
-  errorText: { color: '#ef4444' },
-});
-
-export default PrinterTabs;
+}
