@@ -207,10 +207,7 @@ describe('PrinterTabs', () => {
         historyCounts={{}}
       />,
     );
-    await waitFor(() => {
-      expect(() => screen.getByTestId('mockPicker')).not.toThrow();
-    });
-    expect(screen.getByTestId('mockPicker')).toBeTruthy();
+    expect(getByText('Upload Photo')).toBeTruthy();
   });
 
   it('submits uploads with machine meta and experience', async () => {
@@ -228,11 +225,7 @@ describe('PrinterTabs', () => {
       />,
     );
 
-    await waitFor(() => {
-      expect(() => screen.getByTestId('mockPicker')).not.toThrow();
-    });
-
-    await fireEvent.press(screen.getByTestId('mockPicker'));
+    fireEvent.press(getByText('Pick / Capture photo'));
 
     await waitFor(() => {
       expect(mockAnalyzeImageApi).toHaveBeenCalled();

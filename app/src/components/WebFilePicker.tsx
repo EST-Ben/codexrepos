@@ -1,11 +1,6 @@
 import * as React from 'react';
 import { Platform } from 'react-native';
 
-if (typeof URL !== 'undefined' && typeof URL.createObjectURL !== 'function') {
-  // Jest/jsdom shim for object URLs
-  (URL as any).createObjectURL = () => 'blob://test';
-}
-
 export type PickedImage = { uri: string; name: string; type: string };
 
 type Props = {
@@ -38,11 +33,6 @@ export default function WebFilePicker({ onPick, accept = 'image/*', children }: 
         type: f.type || 'image/jpeg',
         file: f,
       } as PickedImage & { file?: File };
-      console.debug('[WebFilePicker] picked:', {
-        name: f.name,
-        type: f.type,
-        size: f.size,
-      });
       onPick(file);
     },
     [onPick]
