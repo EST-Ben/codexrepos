@@ -1,5 +1,8 @@
 // jest.config.js
+const path = require('path');
+
 module.exports = {
+  rootDir: path.join(__dirname, '..'),
   preset: 'jest-expo',
   testEnvironment: 'jsdom',
   transformIgnorePatterns: [
@@ -17,7 +20,7 @@ module.exports = {
     ')/)'
   ],
   setupFilesAfterEnv: [
-    '@testing-library/jest-native/extend-expect'
+    '<rootDir>/app/jest.setup.ts'
   ],
   moduleNameMapper: {
     // Map assets to identity-obj-proxy or a stub if needed later
