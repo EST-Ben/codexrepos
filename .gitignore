@@ -12,3 +12,12 @@ __pycache__/
 app/.expo/
 app/.expo-shared/
 server/.venv/
+Keep local tooling and config
+
+!.vscode/
+!.vscode/tasks.json
+!scripts/
+!scripts/*.ps1
+!full-diagnostics.ps1
+!app/app.config.js
+!app/src/screens/DebugTools.tsx
