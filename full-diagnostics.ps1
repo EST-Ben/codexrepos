@@ -1,11 +1,17 @@
-Param([switch] $Md)
+Param(
+  [switch] $Md
+)
 $ErrorActionPreference = 'Stop'
 Write-Host "== Full Diagnostics ==" -ForegroundColor Cyan
 
 # [1/4] Force Expo LAN settings
 $expoSettings = Join-Path -Path "app\.expo" -ChildPath "settings.json"
 New-Item -ItemType Directory -Path (Split-Path $expoSettings) -Force | Out-Null
-@{ hostType="lan"; devClient=$true; https=$false } | ConvertTo-Json | Set-Content -Path $expoSettings -Encoding UTF8
+@{
+  hostType = "lan"
+  devClient = $true
+  https = $false
+} | ConvertTo-Json | Set-Content -Path $expoSettings -Encoding UTF8
 Write-Host "[1/4] Expo settings written: $expoSettings" -ForegroundColor Green
 
 # [2/4] Toolchain versions

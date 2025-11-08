@@ -27,7 +27,8 @@ export default function WebPhotoPicker({
         const url = URL.createObjectURL(f);
         onPick(f, url);
       });
-      e.currentTarget.value = ''; // allow re-pick of same file
+      // reset so picking the same file again re-fires change
+      e.currentTarget.value = '';
     },
     [onPick]
   );

@@ -8,15 +8,17 @@ global.TextEncoder = TextEncoder as unknown as typeof global.TextEncoder;
 // @ts-expect-error assign globals for tests
 global.TextDecoder = TextDecoder as unknown as typeof global.TextDecoder;
 
-// Optional: quiet reanimated in unit tests (if present)
+// JSI / reanimated is noisy in unit tests — if present, use their recommended mock.
+// If the module doesn't exist, this import will be tree-shaken by ts-jest.
 try {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const mockReanimated = require('react-native-reanimated/mock');
+  const reanimatedMock = require('react-native-reanimated/mock');
   // @ts-expect-error mock shapes differ
-  jest.mock('react-native-reanimated', () => mockReanimated);
+  jest.mock('react-native-reanimated', () => reanimatedMock);
 } catch { /* noop */ }
 
-// Stable Expo constants mock
+// Provide a stable Expo extra config for code that reads Constants.expoConfig.extra
+// so getString/get constants don't explode in test env.
 jest.mock('expo-constants', () => ({
   __esModule: true,
   default: {

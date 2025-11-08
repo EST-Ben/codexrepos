@@ -10,18 +10,18 @@ $targets = @(
   "node_modules",
   "app\node_modules",
   "server-node\node_modules",
-  "app\.expo\.web",
-  "app\.expo\devices",
-  "app\.expo\logs",
-  "app\.turbo",
-  "app\.parcel-cache",
-  "app\.jest",
-  "app\coverage",
-  "app\.cache",
-  "server-node\dist"
+  "app\\.expo\\.web",
+  "app\\.expo\\devices",
+  "app\\.expo\\logs",
+  "app\\.turbo",
+  "app\\.parcel-cache",
+  "app\\.jest",
+  "app\\coverage",
+  "app\\.cache",
+  "server-node\\dist"
 )
 if ($IncludeDiagnostics) {
-  $targets += @("diagnostics\*.json","diagnostics\*.md","diagnostics\quarantine")
+  $targets += @("diagnostics\\*.json","diagnostics\\*.md","diagnostics\\quarantine")
 }
 
 Write-Host "`nPlanned removals (preview):" -ForegroundColor DarkCyan
