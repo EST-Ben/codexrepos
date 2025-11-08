@@ -22,6 +22,9 @@ import { settings } from "./settings.js";
 import { DebugSnapshotSchema, HealthResponseSchema } from "./schemas.js";
 import type { DebugSnapshot } from "types/api";
 
+export const PORT = Number(process.env.PORT ?? 8000);
+export const HOST = process.env.HOST ?? "0.0.0.0";
+
 // --------------------------- CORS helpers ---------------------------
 function normalizeOrigins(input: unknown): string[] {
   if (!input) return [];
@@ -48,10 +51,31 @@ function buildCorsAllowlist(): string[] {
   const fromSettings = normalizeOrigins((settings as any).allowedOrigins);
   const fromEnv = normalizeOrigins(process.env.ALLOWED_ORIGINS);
 
+  const lanExpoOrigins = new Set<string>();
+  const lanPorts = [19006, 8081];
+  const apiBaseCandidates = [
+    process.env.API_BASE_URL,
+    process.env.EXPO_PUBLIC_API_BASE,
+    process.env.EXPO_PUBLIC_API_BASE_URL,
+  ];
+  for (const candidate of apiBaseCandidates) {
+    if (!candidate) continue;
+    try {
+      const url = new URL(candidate);
+      if (!url.hostname) continue;
+      const protocol = url.protocol === "https:" ? "https" : "http";
+      for (const port of lanPorts) {
+        lanExpoOrigins.add(`${protocol}://${url.hostname}:${port}`);
+      }
+    } catch {
+      // ignore malformed URLs
+    }
+  }
+
   // Also accept a dynamic WEB_PORT (if someone runs Expo with a different port)
   const maybeWeb = process.env.WEB_PORT ? `http://localhost:${process.env.WEB_PORT}` : null;
 
-  const all = new Set<string>([...DEFAULT_DEV, ...fromSettings, ...fromEnv]);
+  const all = new Set<string>([...DEFAULT_DEV, ...lanExpoOrigins, ...fromSettings, ...fromEnv]);
   if (maybeWeb) all.add(maybeWeb);
 
   return Array.from(all);
@@ -121,7 +145,7 @@ export async function createServer() {
   // --------------------------- Swagger / OpenAPI ---------------------------
   const swaggerServer =
     process.env.SWAGGER_SERVER ??
-    `http://localhost:${process.env.PORT ?? 8000}`;
+    `http://${HOST}:${PORT}`;
 
   await app.register(swagger, {
     openapi: {
