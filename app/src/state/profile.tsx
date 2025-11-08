@@ -33,6 +33,22 @@ interface ProfileContextValue {
 
 const ProfileContext = createContext<ProfileContextValue | undefined>(undefined);
 
+function ensureProfile(input: ProfileState | null | undefined): ProfileContextProfile {
+  const machines: MachineRef[] = Array.isArray(input?.machines)
+    ? [...(input?.machines as MachineRef[])]
+    : [...(DEFAULT_PROFILE.machines ?? [])];
+
+  return {
+    experience: input?.experience ?? DEFAULT_PROFILE.experience,
+    machines,
+    material: input?.material ?? DEFAULT_PROFILE.material,
+    materialByMachine: {
+      ...(DEFAULT_PROFILE.materialByMachine ?? {}),
+      ...(input?.materialByMachine ?? {}),
+    },
+  };
+}
+
 export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [profile, setProfileState] = useState<ProfileContextValue['profile']>({ ...DEFAULT_PROFILE });
   const [loading, setLoading] = useState<boolean>(true);
