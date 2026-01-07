@@ -1,0 +1,468 @@
+{
+  "version": "1.0.0",
+  "description": "NPC shop inventories and configurations for Realm of Eternity",
+
+  "shop_mechanics": {
+    "stock_system": {
+      "initial_stock": "defined_per_item",
+      "restock_rate": "1 per 60 seconds",
+      "max_stock_multiplier": 2,
+      "player_selling": true,
+      "price_scaling": {
+        "buy_above_stock": "price increases per item above normal",
+        "sell_below_stock": "price decreases per item below normal"
+      }
+    },
+    "currency_types": ["coins", "tokkul", "slayer_points", "dungeoneering_tokens", "loyalty_points", "marks_of_grace", "void_knight_commendations", "castle_wars_tickets", "nightmare_zone_points"],
+    "members_only_items": true,
+    "ironman_restrictions": true
+  },
+
+  "general_stores": [
+    {
+      "id": "lumbridge_general_store",
+      "name": "Lumbridge General Store",
+      "location": "Lumbridge",
+      "npc": "Shop keeper",
+      "coordinates": {"x": 3211, "y": 3247, "z": 0},
+      "currency": "coins",
+      "members_only": false,
+      "inventory": [
+        {"item_id": "pot", "stock": 5, "price": 1},
+        {"item_id": "jug", "stock": 2, "price": 1},
+        {"item_id": "shears", "stock": 2, "price": 1},
+        {"item_id": "bucket", "stock": 3, "price": 2},
+        {"item_id": "bowl", "stock": 2, "price": 5},
+        {"item_id": "cake_tin", "stock": 2, "price": 10},
+        {"item_id": "tinderbox", "stock": 2, "price": 1},
+        {"item_id": "chisel", "stock": 2, "price": 1},
+        {"item_id": "hammer", "stock": 5, "price": 1},
+        {"item_id": "newcomer_map", "stock": 5, "price": 1}
+      ]
+    },
+    {
+      "id": "varrock_general_store",
+      "name": "Varrock General Store",
+      "location": "Varrock",
+      "npc": "Shop keeper",
+      "coordinates": {"x": 3217, "y": 3414, "z": 0},
+      "currency": "coins",
+      "members_only": false,
+      "inventory": [
+        {"item_id": "pot", "stock": 5, "price": 1},
+        {"item_id": "jug", "stock": 2, "price": 1},
+        {"item_id": "shears", "stock": 2, "price": 1},
+        {"item_id": "bucket", "stock": 3, "price": 2},
+        {"item_id": "bowl", "stock": 2, "price": 5},
+        {"item_id": "cake_tin", "stock": 2, "price": 10},
+        {"item_id": "tinderbox", "stock": 2, "price": 1},
+        {"item_id": "chisel", "stock": 2, "price": 1},
+        {"item_id": "hammer", "stock": 5, "price": 1}
+      ]
+    }
+  ],
+
+  "weapon_shops": [
+    {
+      "id": "varrock_sword_shop",
+      "name": "Varrock Sword Shop",
+      "location": "Varrock",
+      "npc": "Zaff's Apprentice",
+      "coordinates": {"x": 3203, "y": 3434, "z": 0},
+      "currency": "coins",
+      "members_only": false,
+      "inventory": [
+        {"item_id": "bronze_sword", "stock": 5, "price": 26},
+        {"item_id": "bronze_longsword", "stock": 4, "price": 40},
+        {"item_id": "bronze_dagger", "stock": 10, "price": 10},
+        {"item_id": "iron_sword", "stock": 4, "price": 91},
+        {"item_id": "iron_longsword", "stock": 3, "price": 140},
+        {"item_id": "iron_dagger", "stock": 6, "price": 35},
+        {"item_id": "steel_sword", "stock": 3, "price": 325},
+        {"item_id": "steel_longsword", "stock": 2, "price": 500},
+        {"item_id": "steel_dagger", "stock": 4, "price": 125},
+        {"item_id": "mithril_sword", "stock": 2, "price": 845},
+        {"item_id": "mithril_longsword", "stock": 1, "price": 1300}
+      ]
+    },
+    {
+      "id": "falador_mace_shop",
+      "name": "Flynn's Mace Market",
+      "location": "Falador",
+      "npc": "Flynn",
+      "coordinates": {"x": 2950, "y": 3387, "z": 0},
+      "currency": "coins",
+      "members_only": false,
+      "inventory": [
+        {"item_id": "bronze_mace", "stock": 5, "price": 18},
+        {"item_id": "iron_mace", "stock": 4, "price": 63},
+        {"item_id": "steel_mace", "stock": 3, "price": 225},
+        {"item_id": "mithril_mace", "stock": 2, "price": 585},
+        {"item_id": "adamant_mace", "stock": 1, "price": 1430}
+      ]
+    },
+    {
+      "id": "champions_guild_armory",
+      "name": "Champions' Guild Armory",
+      "location": "Champions' Guild",
+      "npc": "Valaine",
+      "coordinates": {"x": 3191, "y": 3366, "z": 0},
+      "currency": "coins",
+      "members_only": false,
+      "requirements": {"quest_points": 32},
+      "inventory": [
+        {"item_id": "black_full_helm", "stock": 1, "price": 1372},
+        {"item_id": "black_platebody", "stock": 1, "price": 3840},
+        {"item_id": "black_platelegs", "stock": 1, "price": 1920},
+        {"item_id": "black_2h_sword", "stock": 1, "price": 3200},
+        {"item_id": "adamant_platebody", "stock": 1, "price": 16640},
+        {"item_id": "adamant_platelegs", "stock": 1, "price": 6400}
+      ]
+    }
+  ],
+
+  "armour_shops": [
+    {
+      "id": "varrock_platebody_shop",
+      "name": "Horvik's Armour Shop",
+      "location": "Varrock",
+      "npc": "Horvik",
+      "coordinates": {"x": 3229, "y": 3437, "z": 0},
+      "currency": "coins",
+      "members_only": false,
+      "inventory": [
+        {"item_id": "bronze_platebody", "stock": 3, "price": 160},
+        {"item_id": "iron_platebody", "stock": 2, "price": 560},
+        {"item_id": "steel_platebody", "stock": 2, "price": 2000},
+        {"item_id": "mithril_platebody", "stock": 1, "price": 5200},
+        {"item_id": "adamant_platebody", "stock": 1, "price": 12800},
+        {"item_id": "bronze_chainbody", "stock": 3, "price": 60},
+        {"item_id": "iron_chainbody", "stock": 2, "price": 210},
+        {"item_id": "steel_chainbody", "stock": 2, "price": 750}
+      ]
+    },
+    {
+      "id": "falador_shield_shop",
+      "name": "Cassie's Shield Shop",
+      "location": "Falador",
+      "npc": "Cassie",
+      "coordinates": {"x": 2976, "y": 3383, "z": 0},
+      "currency": "coins",
+      "members_only": false,
+      "inventory": [
+        {"item_id": "wooden_shield", "stock": 5, "price": 20},
+        {"item_id": "bronze_sq_shield", "stock": 3, "price": 32},
+        {"item_id": "bronze_kiteshield", "stock": 3, "price": 68},
+        {"item_id": "iron_sq_shield", "stock": 2, "price": 112},
+        {"item_id": "iron_kiteshield", "stock": 2, "price": 238},
+        {"item_id": "steel_sq_shield", "stock": 2, "price": 400},
+        {"item_id": "steel_kiteshield", "stock": 1, "price": 850},
+        {"item_id": "mithril_sq_shield", "stock": 1, "price": 1040}
+      ]
+    }
+  ],
+
+  "magic_shops": [
+    {
+      "id": "varrock_rune_shop",
+      "name": "Aubury's Rune Shop",
+      "location": "Varrock",
+      "npc": "Aubury",
+      "coordinates": {"x": 3253, "y": 3401, "z": 0},
+      "currency": "coins",
+      "members_only": false,
+      "inventory": [
+        {"item_id": "air_rune", "stock": 250, "price": 4},
+        {"item_id": "water_rune", "stock": 250, "price": 4},
+        {"item_id": "earth_rune", "stock": 250, "price": 4},
+        {"item_id": "fire_rune", "stock": 250, "price": 4},
+        {"item_id": "mind_rune", "stock": 250, "price": 3},
+        {"item_id": "body_rune", "stock": 250, "price": 3},
+        {"item_id": "chaos_rune", "stock": 50, "price": 90},
+        {"item_id": "death_rune", "stock": 25, "price": 180}
+      ]
+    },
+    {
+      "id": "wizards_tower_shop",
+      "name": "Betty's Magic Emporium",
+      "location": "Port Sarim",
+      "npc": "Betty",
+      "coordinates": {"x": 3013, "y": 3259, "z": 0},
+      "currency": "coins",
+      "members_only": false,
+      "inventory": [
+        {"item_id": "air_rune", "stock": 300, "price": 4},
+        {"item_id": "water_rune", "stock": 300, "price": 4},
+        {"item_id": "earth_rune", "stock": 300, "price": 4},
+        {"item_id": "fire_rune", "stock": 300, "price": 4},
+        {"item_id": "mind_rune", "stock": 300, "price": 3},
+        {"item_id": "eye_of_newt", "stock": 50, "price": 3},
+        {"item_id": "wizard_hat", "stock": 1, "price": 2},
+        {"item_id": "staff", "stock": 5, "price": 15}
+      ]
+    }
+  ],
+
+  "ranged_shops": [
+    {
+      "id": "varrock_archery",
+      "name": "Lowe's Archery Emporium",
+      "location": "Varrock",
+      "npc": "Lowe",
+      "coordinates": {"x": 3233, "y": 3421, "z": 0},
+      "currency": "coins",
+      "members_only": false,
+      "inventory": [
+        {"item_id": "swiftbow", "stock": 4, "price": 50},
+        {"item_id": "warbow", "stock": 3, "price": 80},
+        {"item_id": "oak_swiftbow", "stock": 3, "price": 200},
+        {"item_id": "oak_warbow", "stock": 2, "price": 320},
+        {"item_id": "willow_warbow", "stock": 2, "price": 800},
+        {"item_id": "bronze_arrow", "stock": 500, "price": 1},
+        {"item_id": "iron_arrow", "stock": 300, "price": 2},
+        {"item_id": "steel_arrow", "stock": 200, "price": 6},
+        {"item_id": "mithril_arrow", "stock": 100, "price": 16}
+      ]
+    },
+    {
+      "id": "ranging_guild_shop",
+      "name": "Ranging Guild Bowyer",
+      "location": "Ranging Guild",
+      "npc": "Aaron",
+      "coordinates": {"x": 2667, "y": 3430, "z": 0},
+      "currency": "coins",
+      "members_only": true,
+      "requirements": {"ranged": 40},
+      "inventory": [
+        {"item_id": "green_dhide_body", "stock": 5, "price": 7800},
+        {"item_id": "green_dhide_chaps", "stock": 5, "price": 4500},
+        {"item_id": "green_dhide_vambraces", "stock": 5, "price": 1560},
+        {"item_id": "studded_body", "stock": 3, "price": 850},
+        {"item_id": "studded_chaps", "stock": 3, "price": 750},
+        {"item_id": "coif", "stock": 5, "price": 200},
+        {"item_id": "maple_warbow", "stock": 2, "price": 1600},
+        {"item_id": "adamant_arrow", "stock": 150, "price": 32},
+        {"item_id": "rune_arrow", "stock": 50, "price": 160}
+      ]
+    }
+  ],
+
+  "food_shops": [
+    {
+      "id": "lumbridge_fishing_shop",
+      "name": "Lumbridge Fishing Supplies",
+      "location": "Lumbridge",
+      "npc": "Hank",
+      "coordinates": {"x": 3246, "y": 3202, "z": 0},
+      "currency": "coins",
+      "members_only": false,
+      "inventory": [
+        {"item_id": "fishing_net", "stock": 5, "price": 5},
+        {"item_id": "fishing_rod", "stock": 5, "price": 5},
+        {"item_id": "fly_fishing_rod", "stock": 5, "price": 5},
+        {"item_id": "fishing_bait", "stock": 500, "price": 3},
+        {"item_id": "feather", "stock": 1000, "price": 2}
+      ]
+    },
+    {
+      "id": "grand_exchange_food",
+      "name": "Grand Tree Groceries",
+      "location": "Tree Gnome Stronghold",
+      "npc": "Hudo",
+      "coordinates": {"x": 2449, "y": 3479, "z": 1},
+      "currency": "coins",
+      "members_only": true,
+      "inventory": [
+        {"item_id": "gianne_dough", "stock": 10, "price": 10},
+        {"item_id": "gnome_spice", "stock": 5, "price": 2},
+        {"item_id": "chocolate_bar", "stock": 10, "price": 10},
+        {"item_id": "equa_leaves", "stock": 10, "price": 2},
+        {"item_id": "pot_of_cream", "stock": 10, "price": 20}
+      ]
+    }
+  ],
+
+  "slayer_shops": [
+    {
+      "id": "slayer_equipment_shop",
+      "name": "Slayer Equipment",
+      "location": "All Slayer Masters",
+      "npc": "Any Slayer Master",
+      "currency": "slayer_points",
+      "inventory": [
+        {"item_id": "slayer_ring_8", "stock": "unlimited", "price": 75},
+        {"item_id": "broad_arrows_250", "stock": "unlimited", "price": 35},
+        {"item_id": "broad_bolts_250", "stock": "unlimited", "price": 35},
+        {"item_id": "slayer_respite_4", "stock": "unlimited", "price": 35},
+        {"item_id": "enchanted_gem", "stock": "unlimited", "price": 1},
+        {"item_id": "mirror_shield", "stock": "unlimited", "price": 3000},
+        {"item_id": "earmuffs", "stock": "unlimited", "price": 200},
+        {"item_id": "nose_peg", "stock": "unlimited", "price": 200},
+        {"item_id": "facemask", "stock": "unlimited", "price": 500},
+        {"item_id": "slayer_helmet", "stock": "unlimited", "price": 400, "unlock_required": "malevolent_masquerade"}
+      ]
+    },
+    {
+      "id": "slayer_consumables",
+      "name": "Slayer Consumables",
+      "location": "All Slayer Masters",
+      "npc": "Any Slayer Master",
+      "currency": "coins",
+      "inventory": [
+        {"item_id": "bag_of_salt", "stock": 1000, "price": 10},
+        {"item_id": "rock_hammer", "stock": 50, "price": 500},
+        {"item_id": "fungicide_spray_10", "stock": 50, "price": 300},
+        {"item_id": "ice_cooler", "stock": 250, "price": 1},
+        {"item_id": "insulated_boots", "stock": 10, "price": 200}
+      ]
+    }
+  ],
+
+  "specialty_shops": [
+    {
+      "id": "tzhaars_gem_shop",
+      "name": "TzHaar-Hur-Zal's Equipment Store",
+      "location": "TzHaar City",
+      "npc": "TzHaar-Hur-Zal",
+      "coordinates": {"x": 2463, "y": 5147, "z": 0},
+      "currency": "tokkul",
+      "members_only": true,
+      "inventory": [
+        {"item_id": "uncut_sapphire", "stock": 1, "price": 37},
+        {"item_id": "uncut_emerald", "stock": 1, "price": 75},
+        {"item_id": "uncut_ruby", "stock": 1, "price": 150},
+        {"item_id": "uncut_diamond", "stock": 1, "price": 300},
+        {"item_id": "uncut_dragonstone", "stock": 1, "price": 1500},
+        {"item_id": "uncut_onyx", "stock": 1, "price": 300000},
+        {"item_id": "obsidian_cape", "stock": 1, "price": 90000},
+        {"item_id": "toktz_xil_ul", "stock": 5, "price": 375},
+        {"item_id": "toktz_ket_xil", "stock": 2, "price": 67500},
+        {"item_id": "obsidian_maul", "stock": 1, "price": 75000}
+      ]
+    },
+    {
+      "id": "void_knight_shop",
+      "name": "Void Knight Rewards",
+      "location": "Void Knights' Outpost",
+      "npc": "Void Knight",
+      "currency": "void_knight_commendations",
+      "members_only": true,
+      "inventory": [
+        {"item_id": "void_knight_mace", "stock": "unlimited", "price": 250},
+        {"item_id": "void_knight_top", "stock": "unlimited", "price": 250},
+        {"item_id": "void_knight_robe", "stock": "unlimited", "price": 250},
+        {"item_id": "void_knight_gloves", "stock": "unlimited", "price": 150},
+        {"item_id": "void_melee_helm", "stock": "unlimited", "price": 200},
+        {"item_id": "void_ranger_helm", "stock": "unlimited", "price": 200},
+        {"item_id": "void_mage_helm", "stock": "unlimited", "price": 200},
+        {"item_id": "void_knight_deflector", "stock": "unlimited", "price": 150}
+      ]
+    },
+    {
+      "id": "marks_of_grace_shop",
+      "name": "Grace's Graceful Clothing",
+      "location": "Rogues' Den",
+      "npc": "Grace",
+      "currency": "marks_of_grace",
+      "members_only": true,
+      "inventory": [
+        {"item_id": "graceful_hood", "stock": "unlimited", "price": 35},
+        {"item_id": "graceful_top", "stock": "unlimited", "price": 55},
+        {"item_id": "graceful_legs", "stock": "unlimited", "price": 60},
+        {"item_id": "graceful_gloves", "stock": "unlimited", "price": 30},
+        {"item_id": "graceful_boots", "stock": "unlimited", "price": 40},
+        {"item_id": "graceful_cape", "stock": "unlimited", "price": 40},
+        {"item_id": "amylase_crystal", "stock": "unlimited", "price": 10}
+      ],
+      "recolor_options": {
+        "available": true,
+        "cost_per_piece": 15,
+        "colors": ["arceuus", "hosidius", "lovakengj", "piscarilius", "shayzien", "kourend"]
+      }
+    }
+  ],
+
+  "farming_shops": [
+    {
+      "id": "falador_farming_shop",
+      "name": "Sarah's Farming Shop",
+      "location": "Falador",
+      "npc": "Sarah",
+      "coordinates": {"x": 3039, "y": 3292, "z": 0},
+      "currency": "coins",
+      "members_only": true,
+      "inventory": [
+        {"item_id": "watering_can", "stock": 5, "price": 8},
+        {"item_id": "gardening_trowel", "stock": 5, "price": 12},
+        {"item_id": "seed_dibber", "stock": 5, "price": 6},
+        {"item_id": "rake", "stock": 5, "price": 6},
+        {"item_id": "secateurs", "stock": 5, "price": 5},
+        {"item_id": "plant_cure", "stock": 10, "price": 25},
+        {"item_id": "bucket", "stock": 10, "price": 2},
+        {"item_id": "compost", "stock": 30, "price": 35},
+        {"item_id": "supercompost", "stock": 20, "price": 85}
+      ]
+    }
+  ],
+
+  "construction_shops": [
+    {
+      "id": "sawmill_operator",
+      "name": "Sawmill",
+      "location": "North of Varrock",
+      "npc": "Sawmill Operator",
+      "currency": "coins",
+      "members_only": true,
+      "service_type": "conversion",
+      "services": [
+        {"input": "logs", "output": "plank", "cost": 100},
+        {"input": "oak_logs", "output": "oak_plank", "cost": 250},
+        {"input": "teak_logs", "output": "teak_plank", "cost": 500},
+        {"input": "mahogany_logs", "output": "mahogany_plank", "cost": 1500}
+      ]
+    },
+    {
+      "id": "construction_supplies",
+      "name": "Estate Agent",
+      "location": "Multiple cities",
+      "npc": "Estate Agent",
+      "currency": "coins",
+      "members_only": true,
+      "inventory": [
+        {"item_id": "saw", "stock": 5, "price": 13},
+        {"item_id": "bolt_of_cloth", "stock": 10, "price": 650},
+        {"item_id": "steel_bar", "stock": 10, "price": 500},
+        {"item_id": "limestone_brick", "stock": 20, "price": 21},
+        {"item_id": "soft_clay", "stock": 30, "price": 10}
+      ],
+      "house_services": [
+        {"service": "move_house", "cost": 5000},
+        {"service": "restyle_house", "cost": 5000},
+        {"service": "redecorate_house", "cost": 15000}
+      ]
+    }
+  ],
+
+  "ue5_implementation": {
+    "shop_interface": {
+      "panel_style": "medieval_parchment",
+      "item_grid": {"columns": 10, "rows": 4},
+      "item_preview": true,
+      "price_display": true,
+      "stock_display": true,
+      "compare_equipped": true
+    },
+    "npc_shopkeepers": {
+      "idle_animation": "shopkeeper_idle",
+      "greeting_voice": true,
+      "transaction_sounds": true,
+      "inventory_physics": true
+    },
+    "shop_buildings": {
+      "sign_hanging": true,
+      "interior_shelves": true,
+      "display_cases": true,
+      "ambient_sounds": true
+    }
+  }
+}
