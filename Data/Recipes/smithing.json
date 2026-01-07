@@ -1,386 +1,386 @@
 {
   "smelting": [
     {
-      "id": "smelt_bronze_bar",
-      "name": "Smelt Bronze Bar",
+      "id": "smelt_copperweave_bar",
+      "name": "Smelt Copperweave Bar",
       "skill": "smithing",
       "level": 1,
       "xp": 6,
       "duration": 3,
       "inputs": [
-        { "itemId": "copper_ore", "quantity": 1 },
+        { "itemId": "emberite_ore", "quantity": 1 },
         { "itemId": "tin_ore", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "bronze_bar", "quantity": 1 }],
+      "outputs": [{ "itemId": "copperweave_bar", "quantity": 1 }],
       "facility": "furnace"
     },
     {
-      "id": "smelt_iron_bar",
-      "name": "Smelt Iron Bar",
+      "id": "smelt_ironbark_bar",
+      "name": "Smelt Ironbark Bar",
       "skill": "smithing",
       "level": 15,
       "xp": 12,
       "duration": 4,
-      "inputs": [{ "itemId": "iron_ore", "quantity": 1 }],
-      "outputs": [{ "itemId": "iron_bar", "quantity": 1, "chance": 0.5 }],
+      "inputs": [{ "itemId": "ironbark_ore", "quantity": 1 }],
+      "outputs": [{ "itemId": "ironbark_bar", "quantity": 1, "chance": 0.5 }],
       "notes": "50% success rate until level 45"
     },
     {
-      "id": "smelt_steel_bar",
-      "name": "Smelt Steel Bar",
+      "id": "smelt_stormforged_bar",
+      "name": "Smelt Stormforged Bar",
       "skill": "smithing",
       "level": 30,
       "xp": 18,
       "duration": 5,
       "inputs": [
-        { "itemId": "iron_ore", "quantity": 1 },
+        { "itemId": "ironbark_ore", "quantity": 1 },
         { "itemId": "coal", "quantity": 2 }
       ],
-      "outputs": [{ "itemId": "steel_bar", "quantity": 1 }],
+      "outputs": [{ "itemId": "stormforged_bar", "quantity": 1 }],
       "facility": "furnace"
     },
     {
-      "id": "smelt_mithril_bar",
-      "name": "Smelt Mithril Bar",
+      "id": "smelt_moonveil_bar",
+      "name": "Smelt Moonveil Bar",
       "skill": "smithing",
       "level": 50,
       "xp": 30,
       "duration": 6,
       "inputs": [
-        { "itemId": "mithril_ore", "quantity": 1 },
+        { "itemId": "moonveil_ore", "quantity": 1 },
         { "itemId": "coal", "quantity": 4 }
       ],
-      "outputs": [{ "itemId": "mithril_bar", "quantity": 1 }],
+      "outputs": [{ "itemId": "moonveil_bar", "quantity": 1 }],
       "facility": "furnace"
     },
     {
-      "id": "smelt_adamant_bar",
-      "name": "Smelt Adamantite Bar",
+      "id": "smelt_voidstone_bar",
+      "name": "Smelt Voidstone Bar",
       "skill": "smithing",
       "level": 70,
       "xp": 40,
       "duration": 7,
       "inputs": [
-        { "itemId": "adamantite_ore", "quantity": 1 },
+        { "itemId": "voidstone_ore", "quantity": 1 },
         { "itemId": "coal", "quantity": 6 }
       ],
-      "outputs": [{ "itemId": "adamant_bar", "quantity": 1 }],
+      "outputs": [{ "itemId": "voidstone_bar", "quantity": 1 }],
       "facility": "furnace"
     },
     {
-      "id": "smelt_runite_bar",
-      "name": "Smelt Runite Bar",
+      "id": "smelt_eternium_bar",
+      "name": "Smelt Eternium Bar",
       "skill": "smithing",
       "level": 85,
       "xp": 50,
       "duration": 8,
       "inputs": [
-        { "itemId": "runite_ore", "quantity": 1 },
+        { "itemId": "eternium_ore", "quantity": 1 },
         { "itemId": "coal", "quantity": 8 }
       ],
-      "outputs": [{ "itemId": "runite_bar", "quantity": 1 }],
+      "outputs": [{ "itemId": "eternium_bar", "quantity": 1 }],
       "facility": "furnace"
     }
   ],
   "smithing": {
-    "bronze": [
+    "copperweave": [
       {
-        "id": "smith_bronze_dagger",
-        "name": "Bronze Dagger",
+        "id": "smith_copperweave_dagger",
+        "name": "Copperweave Dagger",
         "level": 1,
         "xp": 12,
         "bars": 1,
-        "output": "bronze_dagger"
+        "output": "copperweave_dagger"
       },
       {
-        "id": "smith_bronze_sword",
-        "name": "Bronze Sword",
+        "id": "smith_copperweave_sword",
+        "name": "Copperweave Sword",
         "level": 4,
         "xp": 12,
         "bars": 1,
-        "output": "bronze_sword"
+        "output": "copperweave_sword"
       },
       {
-        "id": "smith_bronze_scimitar",
-        "name": "Bronze Scimitar",
+        "id": "smith_copperweave_scimitar",
+        "name": "Copperweave Scimitar",
         "level": 5,
         "xp": 25,
         "bars": 2,
-        "output": "bronze_scimitar"
+        "output": "copperweave_scimitar"
       },
       {
-        "id": "smith_bronze_helm",
-        "name": "Bronze Helm",
+        "id": "smith_copperweave_helm",
+        "name": "Copperweave Helm",
         "level": 7,
         "xp": 12,
         "bars": 1,
-        "output": "bronze_helm"
+        "output": "copperweave_helm"
       },
       {
-        "id": "smith_bronze_platebody",
-        "name": "Bronze Platebody",
+        "id": "smith_copperweave_platebody",
+        "name": "Copperweave Platebody",
         "level": 18,
         "xp": 62,
         "bars": 5,
-        "output": "bronze_platebody"
+        "output": "copperweave_platebody"
       },
       {
-        "id": "smith_bronze_platelegs",
-        "name": "Bronze Platelegs",
+        "id": "smith_copperweave_platelegs",
+        "name": "Copperweave Platelegs",
         "level": 16,
         "xp": 37,
         "bars": 3,
-        "output": "bronze_platelegs"
+        "output": "copperweave_platelegs"
       },
       {
-        "id": "smith_bronze_pickaxe",
-        "name": "Bronze Pickaxe",
+        "id": "smith_copperweave_pickaxe",
+        "name": "Copperweave Pickaxe",
         "level": 5,
         "xp": 25,
         "bars": 2,
-        "output": "bronze_pickaxe"
+        "output": "copperweave_pickaxe"
       }
     ],
-    "iron": [
+    "ironbark": [
       {
-        "id": "smith_iron_dagger",
-        "name": "Iron Dagger",
+        "id": "smith_ironbark_dagger",
+        "name": "Ironbark Dagger",
         "level": 15,
         "xp": 25,
         "bars": 1,
-        "output": "iron_dagger"
+        "output": "ironbark_dagger"
       },
       {
-        "id": "smith_iron_sword",
-        "name": "Iron Sword",
+        "id": "smith_ironbark_sword",
+        "name": "Ironbark Sword",
         "level": 19,
         "xp": 25,
         "bars": 1,
-        "output": "iron_sword"
+        "output": "ironbark_sword"
       },
       {
-        "id": "smith_iron_scimitar",
-        "name": "Iron Scimitar",
+        "id": "smith_ironbark_scimitar",
+        "name": "Ironbark Scimitar",
         "level": 20,
         "xp": 50,
         "bars": 2,
-        "output": "iron_scimitar"
+        "output": "ironbark_scimitar"
       },
       {
-        "id": "smith_iron_helm",
-        "name": "Iron Helm",
+        "id": "smith_ironbark_helm",
+        "name": "Ironbark Helm",
         "level": 22,
         "xp": 25,
         "bars": 1,
-        "output": "iron_helm"
+        "output": "ironbark_helm"
       },
       {
-        "id": "smith_iron_platebody",
-        "name": "Iron Platebody",
+        "id": "smith_ironbark_platebody",
+        "name": "Ironbark Platebody",
         "level": 33,
         "xp": 125,
         "bars": 5,
-        "output": "iron_platebody"
+        "output": "ironbark_platebody"
       },
       {
-        "id": "smith_iron_platelegs",
-        "name": "Iron Platelegs",
+        "id": "smith_ironbark_platelegs",
+        "name": "Ironbark Platelegs",
         "level": 31,
         "xp": 75,
         "bars": 3,
-        "output": "iron_platelegs"
+        "output": "ironbark_platelegs"
       },
       {
-        "id": "smith_iron_pickaxe",
-        "name": "Iron Pickaxe",
+        "id": "smith_ironbark_pickaxe",
+        "name": "Ironbark Pickaxe",
         "level": 20,
         "xp": 50,
         "bars": 2,
-        "output": "iron_pickaxe"
+        "output": "ironbark_pickaxe"
       }
     ],
-    "steel": [
+    "stormforged": [
       {
-        "id": "smith_steel_dagger",
-        "name": "Steel Dagger",
+        "id": "smith_stormforged_dagger",
+        "name": "Stormforged Dagger",
         "level": 30,
         "xp": 37,
         "bars": 1,
-        "output": "steel_dagger"
+        "output": "stormforged_dagger"
       },
       {
-        "id": "smith_steel_sword",
-        "name": "Steel Sword",
+        "id": "smith_stormforged_sword",
+        "name": "Stormforged Sword",
         "level": 34,
         "xp": 37,
         "bars": 1,
-        "output": "steel_sword"
+        "output": "stormforged_sword"
       },
       {
-        "id": "smith_steel_scimitar",
-        "name": "Steel Scimitar",
+        "id": "smith_stormforged_scimitar",
+        "name": "Stormforged Scimitar",
         "level": 35,
         "xp": 75,
         "bars": 2,
-        "output": "steel_scimitar"
+        "output": "stormforged_scimitar"
       },
       {
-        "id": "smith_steel_helm",
-        "name": "Steel Helm",
+        "id": "smith_stormforged_helm",
+        "name": "Stormforged Helm",
         "level": 37,
         "xp": 37,
         "bars": 1,
-        "output": "steel_helm"
+        "output": "stormforged_helm"
       },
       {
-        "id": "smith_steel_platebody",
-        "name": "Steel Platebody",
+        "id": "smith_stormforged_platebody",
+        "name": "Stormforged Platebody",
         "level": 48,
         "xp": 187,
         "bars": 5,
-        "output": "steel_platebody"
+        "output": "stormforged_platebody"
       },
       {
-        "id": "smith_steel_platelegs",
-        "name": "Steel Platelegs",
+        "id": "smith_stormforged_platelegs",
+        "name": "Stormforged Platelegs",
         "level": 46,
         "xp": 112,
         "bars": 3,
-        "output": "steel_platelegs"
+        "output": "stormforged_platelegs"
       },
       {
-        "id": "smith_steel_pickaxe",
-        "name": "Steel Pickaxe",
+        "id": "smith_stormforged_pickaxe",
+        "name": "Stormforged Pickaxe",
         "level": 35,
         "xp": 75,
         "bars": 2,
-        "output": "steel_pickaxe"
+        "output": "stormforged_pickaxe"
       }
     ],
-    "mithril": [
+    "moonveil": [
       {
-        "id": "smith_mithril_dagger",
-        "name": "Mithril Dagger",
+        "id": "smith_moonveil_dagger",
+        "name": "Moonveil Dagger",
         "level": 50,
         "xp": 50,
         "bars": 1,
-        "output": "mithril_dagger"
+        "output": "moonveil_dagger"
       },
       {
-        "id": "smith_mithril_sword",
-        "name": "Mithril Sword",
+        "id": "smith_moonveil_sword",
+        "name": "Moonveil Sword",
         "level": 54,
         "xp": 50,
         "bars": 1,
-        "output": "mithril_sword"
+        "output": "moonveil_sword"
       },
       {
-        "id": "smith_mithril_scimitar",
-        "name": "Mithril Scimitar",
+        "id": "smith_moonveil_scimitar",
+        "name": "Moonveil Scimitar",
         "level": 55,
         "xp": 100,
         "bars": 2,
-        "output": "mithril_scimitar"
+        "output": "moonveil_scimitar"
       },
       {
-        "id": "smith_mithril_platebody",
-        "name": "Mithril Platebody",
+        "id": "smith_moonveil_platebody",
+        "name": "Moonveil Platebody",
         "level": 68,
         "xp": 250,
         "bars": 5,
-        "output": "mithril_platebody"
+        "output": "moonveil_platebody"
       },
       {
-        "id": "smith_mithril_pickaxe",
-        "name": "Mithril Pickaxe",
+        "id": "smith_moonveil_pickaxe",
+        "name": "Moonveil Pickaxe",
         "level": 55,
         "xp": 100,
         "bars": 2,
-        "output": "mithril_pickaxe"
+        "output": "moonveil_pickaxe"
       }
     ],
-    "adamant": [
+    "voidstone": [
       {
-        "id": "smith_adamant_dagger",
-        "name": "Adamant Dagger",
+        "id": "smith_voidstone_dagger",
+        "name": "Voidstone Dagger",
         "level": 70,
         "xp": 62,
         "bars": 1,
-        "output": "adamant_dagger"
+        "output": "voidstone_dagger"
       },
       {
-        "id": "smith_adamant_sword",
-        "name": "Adamant Sword",
+        "id": "smith_voidstone_sword",
+        "name": "Voidstone Sword",
         "level": 74,
         "xp": 62,
         "bars": 1,
-        "output": "adamant_sword"
+        "output": "voidstone_sword"
       },
       {
-        "id": "smith_adamant_scimitar",
-        "name": "Adamant Scimitar",
+        "id": "smith_voidstone_scimitar",
+        "name": "Voidstone Scimitar",
         "level": 75,
         "xp": 125,
         "bars": 2,
-        "output": "adamant_scimitar"
+        "output": "voidstone_scimitar"
       },
       {
-        "id": "smith_adamant_platebody",
-        "name": "Adamant Platebody",
+        "id": "smith_voidstone_platebody",
+        "name": "Voidstone Platebody",
         "level": 88,
         "xp": 312,
         "bars": 5,
-        "output": "adamant_platebody"
+        "output": "voidstone_platebody"
       },
       {
-        "id": "smith_adamant_pickaxe",
-        "name": "Adamant Pickaxe",
+        "id": "smith_voidstone_pickaxe",
+        "name": "Voidstone Pickaxe",
         "level": 75,
         "xp": 125,
         "bars": 2,
-        "output": "adamant_pickaxe"
+        "output": "voidstone_pickaxe"
       }
     ],
-    "runite": [
+    "eternium": [
       {
-        "id": "smith_runite_dagger",
-        "name": "Runite Dagger",
+        "id": "smith_eternium_dagger",
+        "name": "Eternium Dagger",
         "level": 85,
         "xp": 75,
         "bars": 1,
-        "output": "runite_dagger"
+        "output": "eternium_dagger"
       },
       {
-        "id": "smith_runite_sword",
-        "name": "Runite Sword",
+        "id": "smith_eternium_sword",
+        "name": "Eternium Sword",
         "level": 89,
         "xp": 75,
         "bars": 1,
-        "output": "runite_sword"
+        "output": "eternium_sword"
       },
       {
-        "id": "smith_runite_scimitar",
-        "name": "Runite Scimitar",
+        "id": "smith_eternium_scimitar",
+        "name": "Eternium Scimitar",
         "level": 90,
         "xp": 150,
         "bars": 2,
-        "output": "runite_scimitar"
+        "output": "eternium_scimitar"
       },
       {
-        "id": "smith_runite_platebody",
-        "name": "Runite Platebody",
+        "id": "smith_eternium_platebody",
+        "name": "Eternium Platebody",
         "level": 99,
         "xp": 375,
         "bars": 5,
-        "output": "runite_platebody"
+        "output": "eternium_platebody"
       },
       {
-        "id": "smith_runite_pickaxe",
-        "name": "Runite Pickaxe",
+        "id": "smith_eternium_pickaxe",
+        "name": "Eternium Pickaxe",
         "level": 90,
         "xp": 150,
         "bars": 2,
-        "output": "runite_pickaxe"
+        "output": "eternium_pickaxe"
       }
     ]
   }

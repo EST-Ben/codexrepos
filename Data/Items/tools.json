@@ -2,9 +2,9 @@
   "tools": {
     "pickaxes": [
       {
-        "id": "bronze_pickaxe",
-        "name": "Bronze Pickaxe",
-        "description": "A basic mining tool",
+        "id": "copperweave_pickaxe",
+        "name": "Copperweave Pickaxe",
+        "description": "A basic mining tool for novice miners",
         "type": "tool",
         "subtype": "pickaxe",
         "tier": 1,
@@ -13,9 +13,9 @@
         "stats": { "miningSpeed": 1.0 }
       },
       {
-        "id": "iron_pickaxe",
-        "name": "Iron Pickaxe",
-        "description": "An improved mining tool",
+        "id": "ironbark_pickaxe",
+        "name": "Ironbark Pickaxe",
+        "description": "A sturdy pickaxe infused with wood essence",
         "type": "tool",
         "subtype": "pickaxe",
         "tier": 2,
@@ -24,9 +24,9 @@
         "stats": { "miningSpeed": 1.2 }
       },
       {
-        "id": "steel_pickaxe",
-        "name": "Steel Pickaxe",
-        "description": "A reliable steel pickaxe",
+        "id": "stormforged_pickaxe",
+        "name": "Stormforged Pickaxe",
+        "description": "A pickaxe tempered by lightning",
         "type": "tool",
         "subtype": "pickaxe",
         "tier": 3,
@@ -35,9 +35,9 @@
         "stats": { "miningSpeed": 1.4 }
       },
       {
-        "id": "mithril_pickaxe",
-        "name": "Mithril Pickaxe",
-        "description": "A lightweight efficient pickaxe",
+        "id": "moonveil_pickaxe",
+        "name": "Moonveil Pickaxe",
+        "description": "A glowing pickaxe of ethereal metal",
         "type": "tool",
         "subtype": "pickaxe",
         "tier": 4,
@@ -46,9 +46,9 @@
         "stats": { "miningSpeed": 1.7 }
       },
       {
-        "id": "adamant_pickaxe",
-        "name": "Adamant Pickaxe",
-        "description": "A powerful adamantite pickaxe",
+        "id": "voidstone_pickaxe",
+        "name": "Voidstone Pickaxe",
+        "description": "A powerful pickaxe from the endless void",
         "type": "tool",
         "subtype": "pickaxe",
         "tier": 5,
@@ -57,9 +57,9 @@
         "stats": { "miningSpeed": 2.0 }
       },
       {
-        "id": "runite_pickaxe",
-        "name": "Runite Pickaxe",
-        "description": "The best non-magical pickaxe",
+        "id": "eternium_pickaxe",
+        "name": "Eternium Pickaxe",
+        "description": "The finest pickaxe forged from eternal metal",
         "type": "tool",
         "subtype": "pickaxe",
         "tier": 6,
@@ -68,23 +68,23 @@
         "stats": { "miningSpeed": 2.4 }
       },
       {
-        "id": "dragon_pickaxe",
-        "name": "Dragon Pickaxe",
-        "description": "A legendary pickaxe with a special ability",
+        "id": "wyrmbone_pickaxe",
+        "name": "Wyrmbone Pickaxe",
+        "description": "A legendary pickaxe crafted from wyrm bone",
         "type": "tool",
         "subtype": "pickaxe",
         "tier": 7,
         "value": 500000,
         "requirements": { "mining": 85 },
         "stats": { "miningSpeed": 2.8 },
-        "ability": { "name": "Rock Smash", "boostMining": 3, "duration": 30, "cooldown": 180 }
+        "ability": { "name": "Stone Shatter", "boostMining": 3, "duration": 30, "cooldown": 180 }
       }
     ],
     "axes": [
       {
-        "id": "bronze_axe",
-        "name": "Bronze Axe",
-        "description": "A basic woodcutting tool",
+        "id": "copperweave_axe",
+        "name": "Copperweave Axe",
+        "description": "A basic axe for novice woodcutters",
         "type": "tool",
         "subtype": "axe",
         "tier": 1,
@@ -93,9 +93,9 @@
         "stats": { "woodcuttingSpeed": 1.0 }
       },
       {
-        "id": "iron_axe",
-        "name": "Iron Axe",
-        "description": "An improved woodcutting tool",
+        "id": "ironbark_axe",
+        "name": "Ironbark Axe",
+        "description": "A sturdy axe with natural reinforcement",
         "type": "tool",
         "subtype": "axe",
         "tier": 2,
@@ -104,9 +104,9 @@
         "stats": { "woodcuttingSpeed": 1.2 }
       },
       {
-        "id": "steel_axe",
-        "name": "Steel Axe",
-        "description": "A reliable steel axe",
+        "id": "stormforged_axe",
+        "name": "Stormforged Axe",
+        "description": "An axe crackling with storm energy",
         "type": "tool",
         "subtype": "axe",
         "tier": 3,
@@ -115,9 +115,9 @@
         "stats": { "woodcuttingSpeed": 1.4 }
       },
       {
-        "id": "mithril_axe",
-        "name": "Mithril Axe",
-        "description": "A lightweight efficient axe",
+        "id": "moonveil_axe",
+        "name": "Moonveil Axe",
+        "description": "A gleaming axe of ethereal metal",
         "type": "tool",
         "subtype": "axe",
         "tier": 4,
@@ -126,9 +126,9 @@
         "stats": { "woodcuttingSpeed": 1.7 }
       },
       {
-        "id": "adamant_axe",
-        "name": "Adamant Axe",
-        "description": "A powerful adamantite axe",
+        "id": "voidstone_axe",
+        "name": "Voidstone Axe",
+        "description": "A powerful axe from the endless void",
         "type": "tool",
         "subtype": "axe",
         "tier": 5,
@@ -137,9 +137,9 @@
         "stats": { "woodcuttingSpeed": 2.0 }
       },
       {
-        "id": "runite_axe",
-        "name": "Runite Axe",
-        "description": "The best non-magical axe",
+        "id": "eternium_axe",
+        "name": "Eternium Axe",
+        "description": "The finest axe forged from eternal metal",
         "type": "tool",
         "subtype": "axe",
         "tier": 6,
@@ -148,79 +148,79 @@
         "stats": { "woodcuttingSpeed": 2.4 }
       },
       {
-        "id": "dragon_axe",
-        "name": "Dragon Axe",
-        "description": "A legendary axe with a special ability",
+        "id": "wyrmbone_axe",
+        "name": "Wyrmbone Axe",
+        "description": "A legendary axe crafted from wyrm bone",
         "type": "tool",
         "subtype": "axe",
         "tier": 7,
         "value": 500000,
         "requirements": { "woodcutting": 85 },
         "stats": { "woodcuttingSpeed": 2.8 },
-        "ability": { "name": "Timber!", "boostWoodcutting": 3, "duration": 30, "cooldown": 180 }
+        "ability": { "name": "Timber Fury", "boostWoodcutting": 3, "duration": 30, "cooldown": 180 }
       }
     ],
     "fishingRods": [
       {
-        "id": "fishing_rod",
-        "name": "Fishing Rod",
-        "description": "A basic fishing rod",
+        "id": "reed_rod",
+        "name": "Reed Rod",
+        "description": "A basic fishing rod woven from reeds",
         "type": "tool",
         "subtype": "fishing_rod",
         "tier": 1,
         "value": 25,
         "requirements": { "fishing": 1 },
         "stats": { "fishingSpeed": 1.0 },
-        "canCatch": ["shrimp", "sardine", "herring", "trout", "salmon"]
+        "canCatch": ["mudcrawler", "minnow", "streamperch"]
       },
       {
-        "id": "fly_fishing_rod",
-        "name": "Fly Fishing Rod",
-        "description": "For catching river fish",
+        "id": "feather_rod",
+        "name": "Feather Rod",
+        "description": "For fly fishing in rivers",
         "type": "tool",
         "subtype": "fishing_rod",
         "tier": 2,
         "value": 100,
         "requirements": { "fishing": 20 },
         "stats": { "fishingSpeed": 1.3 },
-        "canCatch": ["trout", "salmon", "pike"]
+        "canCatch": ["silverscale", "crimsonfish", "rivereel"]
       },
       {
-        "id": "harpoon",
-        "name": "Harpoon",
-        "description": "For catching large ocean fish",
+        "id": "deep_harpoon",
+        "name": "Deep Harpoon",
+        "description": "For hunting large ocean creatures",
         "type": "tool",
-        "subtype": "fishing_rod",
+        "subtype": "harpoon",
         "tier": 3,
         "value": 300,
         "requirements": { "fishing": 35 },
         "stats": { "fishingSpeed": 1.0 },
-        "canCatch": ["tuna", "swordfish", "shark"]
+        "canCatch": ["razorfin", "ironjaw", "seaserpent"]
       },
       {
-        "id": "dragon_harpoon",
-        "name": "Dragon Harpoon",
-        "description": "A legendary harpoon with enhanced speed",
+        "id": "wyrmbone_harpoon",
+        "name": "Wyrmbone Harpoon",
+        "description": "A legendary harpoon crafted from wyrm bone",
         "type": "tool",
-        "subtype": "fishing_rod",
+        "subtype": "harpoon",
         "tier": 7,
         "value": 400000,
         "requirements": { "fishing": 85 },
         "stats": { "fishingSpeed": 1.5 },
-        "canCatch": ["tuna", "swordfish", "shark", "rocktail"],
-        "ability": { "name": "Fish Frenzy", "boostFishing": 3, "duration": 30, "cooldown": 180 }
+        "canCatch": ["razorfin", "ironjaw", "abyssfin"],
+        "ability": { "name": "Ocean's Bounty", "boostFishing": 3, "duration": 30, "cooldown": 180 }
       },
       {
-        "id": "lobster_pot",
-        "name": "Lobster Pot",
-        "description": "A cage for catching lobsters",
+        "id": "claw_trap",
+        "name": "Claw Trap",
+        "description": "A cage for catching crustaceans",
         "type": "tool",
-        "subtype": "fishing_rod",
+        "subtype": "trap",
         "tier": 3,
         "value": 150,
         "requirements": { "fishing": 40 },
         "stats": { "fishingSpeed": 1.0 },
-        "canCatch": ["lobster", "crab"]
+        "canCatch": ["stoneclaw", "deepcrab"]
       }
     ],
     "other": [
@@ -236,9 +236,9 @@
         "useWith": ["logs"]
       },
       {
-        "id": "hammer",
-        "name": "Hammer",
-        "description": "Used for smithing",
+        "id": "smithing_hammer",
+        "name": "Smithing Hammer",
+        "description": "Essential for metalworking at an anvil",
         "type": "tool",
         "subtype": "utility",
         "tier": 1,
@@ -258,9 +258,9 @@
         "useWith": ["gems", "bones"]
       },
       {
-        "id": "knife",
-        "name": "Knife",
-        "description": "Used for fletching and cooking",
+        "id": "carving_knife",
+        "name": "Carving Knife",
+        "description": "Used for fletching and whittling",
         "type": "tool",
         "subtype": "utility",
         "tier": 1,
@@ -271,7 +271,7 @@
       {
         "id": "needle",
         "name": "Needle",
-        "description": "Used for leather crafting",
+        "description": "Used for leather and cloth crafting",
         "type": "tool",
         "subtype": "utility",
         "tier": 1,
@@ -293,7 +293,7 @@
       {
         "id": "saw",
         "name": "Saw",
-        "description": "Used for construction",
+        "description": "Used for construction projects",
         "type": "tool",
         "subtype": "utility",
         "tier": 1,
@@ -302,8 +302,8 @@
         "useWith": ["planks"]
       },
       {
-        "id": "pestle_and_mortar",
-        "name": "Pestle and Mortar",
+        "id": "mortar_pestle",
+        "name": "Mortar and Pestle",
         "description": "Used for grinding ingredients in alchemy",
         "type": "tool",
         "subtype": "utility",
@@ -316,9 +316,9 @@
   },
   "herbalism": [
     {
-      "id": "guam_leaf",
-      "name": "Guam Leaf",
-      "description": "A basic herb used in alchemy",
+      "id": "verdantleaf",
+      "name": "Verdantleaf",
+      "description": "A common herb used in basic potions",
       "type": "material",
       "subtype": "herb",
       "stackable": true,
@@ -327,9 +327,9 @@
       "source": { "skill": "foraging", "level": 1, "xp": 5 }
     },
     {
-      "id": "marrentill",
-      "name": "Marrentill",
-      "description": "An herb with antipoison properties",
+      "id": "thornroot",
+      "name": "Thornroot",
+      "description": "A prickly herb with antipoison properties",
       "type": "material",
       "subtype": "herb",
       "stackable": true,
@@ -338,9 +338,9 @@
       "source": { "skill": "foraging", "level": 9, "xp": 10 }
     },
     {
-      "id": "tarromin",
-      "name": "Tarromin",
-      "description": "An herb used in strength potions",
+      "id": "bittervine",
+      "name": "Bittervine",
+      "description": "A bitter herb used in strength potions",
       "type": "material",
       "subtype": "herb",
       "stackable": true,
@@ -349,9 +349,9 @@
       "source": { "skill": "foraging", "level": 14, "xp": 15 }
     },
     {
-      "id": "harralander",
-      "name": "Harralander",
-      "description": "A versatile herb for various potions",
+      "id": "sunpetal",
+      "name": "Sunpetal",
+      "description": "A golden herb for various potions",
       "type": "material",
       "subtype": "herb",
       "stackable": true,
@@ -360,9 +360,9 @@
       "source": { "skill": "foraging", "level": 22, "xp": 22 }
     },
     {
-      "id": "ranarr",
-      "name": "Ranarr",
-      "description": "A valuable herb for prayer potions",
+      "id": "moonbloom",
+      "name": "Moonbloom",
+      "description": "A valuable herb for spirit elixirs",
       "type": "material",
       "subtype": "herb",
       "stackable": true,
@@ -371,9 +371,9 @@
       "source": { "skill": "foraging", "level": 32, "xp": 35 }
     },
     {
-      "id": "irit_leaf",
-      "name": "Irit Leaf",
-      "description": "Used in super attack potions",
+      "id": "stormleaf",
+      "name": "Stormleaf",
+      "description": "Used in potent vigor draughts",
       "type": "material",
       "subtype": "herb",
       "stackable": true,
@@ -382,9 +382,9 @@
       "source": { "skill": "foraging", "level": 40, "xp": 45 }
     },
     {
-      "id": "kwuarm",
-      "name": "Kwuarm",
-      "description": "Used in super strength potions",
+      "id": "voidbloom",
+      "name": "Voidbloom",
+      "description": "Used in potent might draughts",
       "type": "material",
       "subtype": "herb",
       "stackable": true,
@@ -393,8 +393,8 @@
       "source": { "skill": "foraging", "level": 54, "xp": 55 }
     },
     {
-      "id": "snapdragon",
-      "name": "Snapdragon",
+      "id": "starfall_petal",
+      "name": "Starfall Petal",
       "description": "A rare herb for powerful potions",
       "type": "material",
       "subtype": "herb",
@@ -404,9 +404,9 @@
       "source": { "skill": "foraging", "level": 62, "xp": 70 }
     },
     {
-      "id": "torstol",
-      "name": "Torstol",
-      "description": "The most valuable herb, used in overloads",
+      "id": "eternitys_bloom",
+      "name": "Eternity's Bloom",
+      "description": "The most valuable herb, used in eternity elixirs",
       "type": "material",
       "subtype": "herb",
       "stackable": true,

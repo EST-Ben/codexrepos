@@ -2,202 +2,180 @@
   "bows": [
     {
       "id": "fletch_shortbow_u",
-      "name": "Shortbow (u)",
+      "name": "Ashwood Shortbow (u)",
       "skill": "fletching",
       "level": 5,
       "xp": 5,
       "duration": 2,
-      "inputs": [{ "itemId": "normal_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "shortbow_u", "quantity": 1 }],
-      "tool": "knife"
+      "inputs": [{ "itemId": "ashwood_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "ashwood_shortbow_u", "quantity": 1 }],
+      "tool": "carving_knife"
     },
     {
       "id": "fletch_longbow_u",
-      "name": "Longbow (u)",
+      "name": "Ashwood Longbow (u)",
       "skill": "fletching",
       "level": 10,
       "xp": 10,
       "duration": 2,
-      "inputs": [{ "itemId": "normal_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "longbow_u", "quantity": 1 }],
-      "tool": "knife"
+      "inputs": [{ "itemId": "ashwood_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "ashwood_longbow_u", "quantity": 1 }],
+      "tool": "carving_knife"
     },
     {
-      "id": "fletch_oak_shortbow_u",
-      "name": "Oak Shortbow (u)",
+      "id": "fletch_goldleaf_shortbow_u",
+      "name": "Goldleaf Shortbow (u)",
       "skill": "fletching",
       "level": 20,
       "xp": 16,
       "duration": 2,
-      "inputs": [{ "itemId": "oak_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "oak_shortbow_u", "quantity": 1 }],
-      "tool": "knife"
+      "inputs": [{ "itemId": "goldleaf_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "goldleaf_shortbow_u", "quantity": 1 }],
+      "tool": "carving_knife"
     },
     {
-      "id": "fletch_oak_longbow_u",
-      "name": "Oak Longbow (u)",
+      "id": "fletch_goldleaf_longbow_u",
+      "name": "Goldleaf Longbow (u)",
       "skill": "fletching",
       "level": 25,
       "xp": 25,
       "duration": 2,
-      "inputs": [{ "itemId": "oak_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "oak_longbow_u", "quantity": 1 }],
-      "tool": "knife"
+      "inputs": [{ "itemId": "goldleaf_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "goldleaf_longbow_u", "quantity": 1 }],
+      "tool": "carving_knife"
     },
     {
-      "id": "fletch_willow_shortbow_u",
-      "name": "Willow Shortbow (u)",
+      "id": "fletch_whisperwood_shortbow_u",
+      "name": "Whisperwood Shortbow (u)",
       "skill": "fletching",
       "level": 35,
       "xp": 33,
       "duration": 2,
-      "inputs": [{ "itemId": "willow_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "willow_shortbow_u", "quantity": 1 }],
-      "tool": "knife"
+      "inputs": [{ "itemId": "whisperwood_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "whisperwood_shortbow_u", "quantity": 1 }],
+      "tool": "carving_knife"
     },
     {
-      "id": "fletch_willow_longbow_u",
-      "name": "Willow Longbow (u)",
+      "id": "fletch_whisperwood_longbow_u",
+      "name": "Whisperwood Longbow (u)",
       "skill": "fletching",
       "level": 40,
       "xp": 41,
       "duration": 2,
-      "inputs": [{ "itemId": "willow_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "willow_longbow_u", "quantity": 1 }],
-      "tool": "knife"
+      "inputs": [{ "itemId": "whisperwood_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "whisperwood_longbow_u", "quantity": 1 }],
+      "tool": "carving_knife"
     },
     {
-      "id": "fletch_maple_shortbow_u",
-      "name": "Maple Shortbow (u)",
-      "skill": "fletching",
-      "level": 50,
-      "xp": 50,
-      "duration": 2,
-      "inputs": [{ "itemId": "maple_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "maple_shortbow_u", "quantity": 1 }],
-      "tool": "knife"
-    },
-    {
-      "id": "fletch_maple_longbow_u",
-      "name": "Maple Longbow (u)",
-      "skill": "fletching",
-      "level": 55,
-      "xp": 58,
-      "duration": 2,
-      "inputs": [{ "itemId": "maple_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "maple_longbow_u", "quantity": 1 }],
-      "tool": "knife"
-    },
-    {
-      "id": "fletch_yew_shortbow_u",
-      "name": "Yew Shortbow (u)",
+      "id": "fletch_ironwood_shortbow_u",
+      "name": "Ironwood Shortbow (u)",
       "skill": "fletching",
       "level": 65,
       "xp": 67,
       "duration": 2,
-      "inputs": [{ "itemId": "yew_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "yew_shortbow_u", "quantity": 1 }],
-      "tool": "knife"
+      "inputs": [{ "itemId": "ironwood_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "ironwood_shortbow_u", "quantity": 1 }],
+      "tool": "carving_knife"
     },
     {
-      "id": "fletch_yew_longbow_u",
-      "name": "Yew Longbow (u)",
+      "id": "fletch_ironwood_longbow_u",
+      "name": "Ironwood Longbow (u)",
       "skill": "fletching",
       "level": 70,
       "xp": 75,
       "duration": 2,
-      "inputs": [{ "itemId": "yew_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "yew_longbow_u", "quantity": 1 }],
-      "tool": "knife"
+      "inputs": [{ "itemId": "ironwood_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "ironwood_longbow_u", "quantity": 1 }],
+      "tool": "carving_knife"
     },
     {
-      "id": "fletch_magic_shortbow_u",
-      "name": "Magic Shortbow (u)",
+      "id": "fletch_spiritbark_shortbow_u",
+      "name": "Spiritbark Shortbow (u)",
       "skill": "fletching",
       "level": 80,
       "xp": 83,
       "duration": 2,
-      "inputs": [{ "itemId": "magic_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "magic_shortbow_u", "quantity": 1 }],
-      "tool": "knife"
+      "inputs": [{ "itemId": "spiritbark_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "spiritbark_shortbow_u", "quantity": 1 }],
+      "tool": "carving_knife"
     },
     {
-      "id": "fletch_magic_longbow_u",
-      "name": "Magic Longbow (u)",
+      "id": "fletch_spiritbark_longbow_u",
+      "name": "Spiritbark Longbow (u)",
       "skill": "fletching",
       "level": 85,
       "xp": 91,
       "duration": 2,
-      "inputs": [{ "itemId": "magic_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "magic_longbow_u", "quantity": 1 }],
-      "tool": "knife"
+      "inputs": [{ "itemId": "spiritbark_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "spiritbark_longbow_u", "quantity": 1 }],
+      "tool": "carving_knife"
     }
   ],
   "stringing": [
     {
-      "id": "string_shortbow",
-      "name": "String Shortbow",
+      "id": "string_ashwood_shortbow",
+      "name": "String Ashwood Shortbow",
       "skill": "fletching",
       "level": 5,
       "xp": 5,
       "duration": 1,
       "inputs": [
-        { "itemId": "shortbow_u", "quantity": 1 },
+        { "itemId": "ashwood_shortbow_u", "quantity": 1 },
         { "itemId": "bowstring", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "shortbow", "quantity": 1 }]
+      "outputs": [{ "itemId": "ashwood_shortbow", "quantity": 1 }]
     },
     {
-      "id": "string_longbow",
-      "name": "String Longbow",
+      "id": "string_ashwood_longbow",
+      "name": "String Ashwood Longbow",
       "skill": "fletching",
       "level": 10,
       "xp": 10,
       "duration": 1,
       "inputs": [
-        { "itemId": "longbow_u", "quantity": 1 },
+        { "itemId": "ashwood_longbow_u", "quantity": 1 },
         { "itemId": "bowstring", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "longbow", "quantity": 1 }]
+      "outputs": [{ "itemId": "ashwood_longbow", "quantity": 1 }]
     },
     {
-      "id": "string_oak_shortbow",
-      "name": "String Oak Shortbow",
+      "id": "string_goldleaf_shortbow",
+      "name": "String Goldleaf Shortbow",
       "skill": "fletching",
       "level": 20,
       "xp": 16,
       "duration": 1,
       "inputs": [
-        { "itemId": "oak_shortbow_u", "quantity": 1 },
+        { "itemId": "goldleaf_shortbow_u", "quantity": 1 },
         { "itemId": "bowstring", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "oak_shortbow", "quantity": 1 }]
+      "outputs": [{ "itemId": "goldleaf_shortbow", "quantity": 1 }]
     },
     {
-      "id": "string_yew_longbow",
-      "name": "String Yew Longbow",
+      "id": "string_ironwood_longbow",
+      "name": "String Ironwood Longbow",
       "skill": "fletching",
       "level": 70,
       "xp": 75,
       "duration": 1,
       "inputs": [
-        { "itemId": "yew_longbow_u", "quantity": 1 },
+        { "itemId": "ironwood_longbow_u", "quantity": 1 },
         { "itemId": "bowstring", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "yew_longbow", "quantity": 1 }]
+      "outputs": [{ "itemId": "ironwood_longbow", "quantity": 1 }]
     },
     {
-      "id": "string_magic_longbow",
-      "name": "String Magic Longbow",
+      "id": "string_spiritbark_longbow",
+      "name": "String Spiritbark Longbow",
       "skill": "fletching",
       "level": 85,
       "xp": 91,
       "duration": 1,
       "inputs": [
-        { "itemId": "magic_longbow_u", "quantity": 1 },
+        { "itemId": "spiritbark_longbow_u", "quantity": 1 },
         { "itemId": "bowstring", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "magic_longbow", "quantity": 1 }]
+      "outputs": [{ "itemId": "spiritbark_longbow", "quantity": 1 }]
     }
   ],
   "arrows": [
@@ -208,9 +186,9 @@
       "level": 1,
       "xp": 5,
       "duration": 2,
-      "inputs": [{ "itemId": "normal_log", "quantity": 1 }],
+      "inputs": [{ "itemId": "ashwood_log", "quantity": 1 }],
       "outputs": [{ "itemId": "arrow_shaft", "quantity": 15 }],
-      "tool": "knife"
+      "tool": "carving_knife"
     },
     {
       "id": "fletch_headless_arrows",
@@ -226,147 +204,147 @@
       "outputs": [{ "itemId": "headless_arrow", "quantity": 15 }]
     },
     {
-      "id": "fletch_bronze_arrows",
-      "name": "Bronze Arrows",
+      "id": "fletch_copperweave_arrows",
+      "name": "Copperweave Arrows",
       "skill": "fletching",
       "level": 1,
       "xp": 1,
       "duration": 1,
       "inputs": [
         { "itemId": "headless_arrow", "quantity": 15 },
-        { "itemId": "bronze_arrowhead", "quantity": 15 }
+        { "itemId": "copperweave_arrowhead", "quantity": 15 }
       ],
-      "outputs": [{ "itemId": "bronze_arrow", "quantity": 15 }]
+      "outputs": [{ "itemId": "copperweave_arrow", "quantity": 15 }]
     },
     {
-      "id": "fletch_iron_arrows",
-      "name": "Iron Arrows",
+      "id": "fletch_ironbark_arrows",
+      "name": "Ironbark Arrows",
       "skill": "fletching",
       "level": 15,
       "xp": 2,
       "duration": 1,
       "inputs": [
         { "itemId": "headless_arrow", "quantity": 15 },
-        { "itemId": "iron_arrowhead", "quantity": 15 }
+        { "itemId": "ironbark_arrowhead", "quantity": 15 }
       ],
-      "outputs": [{ "itemId": "iron_arrow", "quantity": 15 }]
+      "outputs": [{ "itemId": "ironbark_arrow", "quantity": 15 }]
     },
     {
-      "id": "fletch_steel_arrows",
-      "name": "Steel Arrows",
+      "id": "fletch_stormforged_arrows",
+      "name": "Stormforged Arrows",
       "skill": "fletching",
       "level": 30,
       "xp": 5,
       "duration": 1,
       "inputs": [
         { "itemId": "headless_arrow", "quantity": 15 },
-        { "itemId": "steel_arrowhead", "quantity": 15 }
+        { "itemId": "stormforged_arrowhead", "quantity": 15 }
       ],
-      "outputs": [{ "itemId": "steel_arrow", "quantity": 15 }]
+      "outputs": [{ "itemId": "stormforged_arrow", "quantity": 15 }]
     },
     {
-      "id": "fletch_mithril_arrows",
-      "name": "Mithril Arrows",
+      "id": "fletch_moonveil_arrows",
+      "name": "Moonveil Arrows",
       "skill": "fletching",
       "level": 45,
       "xp": 7,
       "duration": 1,
       "inputs": [
         { "itemId": "headless_arrow", "quantity": 15 },
-        { "itemId": "mithril_arrowhead", "quantity": 15 }
+        { "itemId": "moonveil_arrowhead", "quantity": 15 }
       ],
-      "outputs": [{ "itemId": "mithril_arrow", "quantity": 15 }]
+      "outputs": [{ "itemId": "moonveil_arrow", "quantity": 15 }]
     },
     {
-      "id": "fletch_adamant_arrows",
-      "name": "Adamant Arrows",
+      "id": "fletch_voidstone_arrows",
+      "name": "Voidstone Arrows",
       "skill": "fletching",
       "level": 60,
       "xp": 10,
       "duration": 1,
       "inputs": [
         { "itemId": "headless_arrow", "quantity": 15 },
-        { "itemId": "adamant_arrowhead", "quantity": 15 }
+        { "itemId": "voidstone_arrowhead", "quantity": 15 }
       ],
-      "outputs": [{ "itemId": "adamant_arrow", "quantity": 15 }]
+      "outputs": [{ "itemId": "voidstone_arrow", "quantity": 15 }]
     },
     {
-      "id": "fletch_runite_arrows",
-      "name": "Runite Arrows",
+      "id": "fletch_eternium_arrows",
+      "name": "Eternium Arrows",
       "skill": "fletching",
       "level": 75,
       "xp": 12,
       "duration": 1,
       "inputs": [
         { "itemId": "headless_arrow", "quantity": 15 },
-        { "itemId": "runite_arrowhead", "quantity": 15 }
+        { "itemId": "eternium_arrowhead", "quantity": 15 }
       ],
-      "outputs": [{ "itemId": "runite_arrow", "quantity": 15 }]
+      "outputs": [{ "itemId": "eternium_arrow", "quantity": 15 }]
     },
     {
-      "id": "fletch_dragon_arrows",
-      "name": "Dragon Arrows",
+      "id": "fletch_wyrmscale_arrows",
+      "name": "Wyrmscale Arrows",
       "skill": "fletching",
       "level": 90,
       "xp": 15,
       "duration": 1,
       "inputs": [
         { "itemId": "headless_arrow", "quantity": 15 },
-        { "itemId": "dragon_arrowhead", "quantity": 15 }
+        { "itemId": "wyrmscale_arrowhead", "quantity": 15 }
       ],
-      "outputs": [{ "itemId": "dragon_arrow", "quantity": 15 }]
+      "outputs": [{ "itemId": "wyrmscale_arrow", "quantity": 15 }]
     }
   ],
   "bolts": [
     {
-      "id": "fletch_bronze_bolts",
-      "name": "Bronze Bolts",
+      "id": "fletch_copperweave_bolts",
+      "name": "Copperweave Bolts",
       "skill": "fletching",
       "level": 9,
       "xp": 0.5,
       "duration": 1,
-      "inputs": [{ "itemId": "bronze_bolts_unf", "quantity": 10 }],
-      "outputs": [{ "itemId": "bronze_bolts", "quantity": 10 }]
+      "inputs": [{ "itemId": "copperweave_bolts_unf", "quantity": 10 }],
+      "outputs": [{ "itemId": "copperweave_bolts", "quantity": 10 }]
     },
     {
-      "id": "fletch_mithril_bolts",
-      "name": "Mithril Bolts",
+      "id": "fletch_moonveil_bolts",
+      "name": "Moonveil Bolts",
       "skill": "fletching",
       "level": 54,
       "xp": 5,
       "duration": 1,
-      "inputs": [{ "itemId": "mithril_bolts_unf", "quantity": 10 }],
-      "outputs": [{ "itemId": "mithril_bolts", "quantity": 10 }]
+      "inputs": [{ "itemId": "moonveil_bolts_unf", "quantity": 10 }],
+      "outputs": [{ "itemId": "moonveil_bolts", "quantity": 10 }]
     },
     {
-      "id": "fletch_adamant_bolts",
-      "name": "Adamant Bolts",
+      "id": "fletch_voidstone_bolts",
+      "name": "Voidstone Bolts",
       "skill": "fletching",
       "level": 61,
       "xp": 7,
       "duration": 1,
-      "inputs": [{ "itemId": "adamant_bolts_unf", "quantity": 10 }],
-      "outputs": [{ "itemId": "adamant_bolts", "quantity": 10 }]
+      "inputs": [{ "itemId": "voidstone_bolts_unf", "quantity": 10 }],
+      "outputs": [{ "itemId": "voidstone_bolts", "quantity": 10 }]
     },
     {
-      "id": "fletch_runite_bolts",
-      "name": "Runite Bolts",
+      "id": "fletch_eternium_bolts",
+      "name": "Eternium Bolts",
       "skill": "fletching",
       "level": 69,
       "xp": 10,
       "duration": 1,
-      "inputs": [{ "itemId": "runite_bolts_unf", "quantity": 10 }],
-      "outputs": [{ "itemId": "runite_bolts", "quantity": 10 }]
+      "inputs": [{ "itemId": "eternium_bolts_unf", "quantity": 10 }],
+      "outputs": [{ "itemId": "eternium_bolts", "quantity": 10 }]
     },
     {
-      "id": "fletch_dragon_bolts",
-      "name": "Dragon Bolts",
+      "id": "fletch_wyrmscale_bolts",
+      "name": "Wyrmscale Bolts",
       "skill": "fletching",
       "level": 84,
       "xp": 12,
       "duration": 1,
-      "inputs": [{ "itemId": "dragon_bolts_unf", "quantity": 10 }],
-      "outputs": [{ "itemId": "dragon_bolts", "quantity": 10 }]
+      "inputs": [{ "itemId": "wyrmscale_bolts_unf", "quantity": 10 }],
+      "outputs": [{ "itemId": "wyrmscale_bolts", "quantity": 10 }]
     }
   ]
 }
