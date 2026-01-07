@@ -1,181 +1,181 @@
 {
   "bows": [
     {
-      "id": "fletch_shortbow_u",
-      "name": "Ashwood Shortbow (u)",
+      "id": "fletch_swiftbow_u",
+      "name": "Ashwood Swiftbow (u)",
       "skill": "bowcraft",
       "level": 5,
       "xp": 5,
       "duration": 2,
       "inputs": [{ "itemId": "ashwood_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "ashwood_shortbow_u", "quantity": 1 }],
+      "outputs": [{ "itemId": "ashwood_swiftbow_u", "quantity": 1 }],
       "tool": "carving_knife"
     },
     {
-      "id": "fletch_longbow_u",
-      "name": "Ashwood Longbow (u)",
+      "id": "fletch_warbow_u",
+      "name": "Ashwood Warbow (u)",
       "skill": "bowcraft",
       "level": 10,
       "xp": 10,
       "duration": 2,
       "inputs": [{ "itemId": "ashwood_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "ashwood_longbow_u", "quantity": 1 }],
+      "outputs": [{ "itemId": "ashwood_warbow_u", "quantity": 1 }],
       "tool": "carving_knife"
     },
     {
-      "id": "fletch_goldleaf_shortbow_u",
-      "name": "Goldleaf Shortbow (u)",
+      "id": "fletch_goldleaf_swiftbow_u",
+      "name": "Goldleaf Swiftbow (u)",
       "skill": "bowcraft",
       "level": 20,
       "xp": 16,
       "duration": 2,
       "inputs": [{ "itemId": "goldleaf_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "goldleaf_shortbow_u", "quantity": 1 }],
+      "outputs": [{ "itemId": "goldleaf_swiftbow_u", "quantity": 1 }],
       "tool": "carving_knife"
     },
     {
-      "id": "fletch_goldleaf_longbow_u",
-      "name": "Goldleaf Longbow (u)",
+      "id": "fletch_goldleaf_warbow_u",
+      "name": "Goldleaf Warbow (u)",
       "skill": "bowcraft",
       "level": 25,
       "xp": 25,
       "duration": 2,
       "inputs": [{ "itemId": "goldleaf_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "goldleaf_longbow_u", "quantity": 1 }],
+      "outputs": [{ "itemId": "goldleaf_warbow_u", "quantity": 1 }],
       "tool": "carving_knife"
     },
     {
-      "id": "fletch_whisperwood_shortbow_u",
-      "name": "Whisperwood Shortbow (u)",
+      "id": "fletch_whisperwood_swiftbow_u",
+      "name": "Whisperwood Swiftbow (u)",
       "skill": "bowcraft",
       "level": 35,
       "xp": 33,
       "duration": 2,
       "inputs": [{ "itemId": "whisperwood_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "whisperwood_shortbow_u", "quantity": 1 }],
+      "outputs": [{ "itemId": "whisperwood_swiftbow_u", "quantity": 1 }],
       "tool": "carving_knife"
     },
     {
-      "id": "fletch_whisperwood_longbow_u",
-      "name": "Whisperwood Longbow (u)",
+      "id": "fletch_whisperwood_warbow_u",
+      "name": "Whisperwood Warbow (u)",
       "skill": "bowcraft",
       "level": 40,
       "xp": 41,
       "duration": 2,
       "inputs": [{ "itemId": "whisperwood_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "whisperwood_longbow_u", "quantity": 1 }],
+      "outputs": [{ "itemId": "whisperwood_warbow_u", "quantity": 1 }],
       "tool": "carving_knife"
     },
     {
-      "id": "fletch_ironwood_shortbow_u",
-      "name": "Ironwood Shortbow (u)",
+      "id": "fletch_ironwood_swiftbow_u",
+      "name": "Ironwood Swiftbow (u)",
       "skill": "bowcraft",
       "level": 65,
       "xp": 67,
       "duration": 2,
       "inputs": [{ "itemId": "ironwood_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "ironwood_shortbow_u", "quantity": 1 }],
+      "outputs": [{ "itemId": "ironwood_swiftbow_u", "quantity": 1 }],
       "tool": "carving_knife"
     },
     {
-      "id": "fletch_ironwood_longbow_u",
-      "name": "Ironwood Longbow (u)",
+      "id": "fletch_ironwood_warbow_u",
+      "name": "Ironwood Warbow (u)",
       "skill": "bowcraft",
       "level": 70,
       "xp": 75,
       "duration": 2,
       "inputs": [{ "itemId": "ironwood_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "ironwood_longbow_u", "quantity": 1 }],
+      "outputs": [{ "itemId": "ironwood_warbow_u", "quantity": 1 }],
       "tool": "carving_knife"
     },
     {
-      "id": "fletch_spiritbark_shortbow_u",
-      "name": "Spiritbark Shortbow (u)",
+      "id": "fletch_spiritbark_swiftbow_u",
+      "name": "Spiritbark Swiftbow (u)",
       "skill": "bowcraft",
       "level": 80,
       "xp": 83,
       "duration": 2,
       "inputs": [{ "itemId": "spiritbark_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "spiritbark_shortbow_u", "quantity": 1 }],
+      "outputs": [{ "itemId": "spiritbark_swiftbow_u", "quantity": 1 }],
       "tool": "carving_knife"
     },
     {
-      "id": "fletch_spiritbark_longbow_u",
-      "name": "Spiritbark Longbow (u)",
+      "id": "fletch_spiritbark_warbow_u",
+      "name": "Spiritbark Warbow (u)",
       "skill": "bowcraft",
       "level": 85,
       "xp": 91,
       "duration": 2,
       "inputs": [{ "itemId": "spiritbark_log", "quantity": 1 }],
-      "outputs": [{ "itemId": "spiritbark_longbow_u", "quantity": 1 }],
+      "outputs": [{ "itemId": "spiritbark_warbow_u", "quantity": 1 }],
       "tool": "carving_knife"
     }
   ],
   "stringing": [
     {
-      "id": "string_ashwood_shortbow",
-      "name": "String Ashwood Shortbow",
+      "id": "string_ashwood_swiftbow",
+      "name": "String Ashwood Swiftbow",
       "skill": "bowcraft",
       "level": 5,
       "xp": 5,
       "duration": 1,
       "inputs": [
-        { "itemId": "ashwood_shortbow_u", "quantity": 1 },
+        { "itemId": "ashwood_swiftbow_u", "quantity": 1 },
         { "itemId": "bowstring", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "ashwood_shortbow", "quantity": 1 }]
+      "outputs": [{ "itemId": "ashwood_swiftbow", "quantity": 1 }]
     },
     {
-      "id": "string_ashwood_longbow",
-      "name": "String Ashwood Longbow",
+      "id": "string_ashwood_warbow",
+      "name": "String Ashwood Warbow",
       "skill": "bowcraft",
       "level": 10,
       "xp": 10,
       "duration": 1,
       "inputs": [
-        { "itemId": "ashwood_longbow_u", "quantity": 1 },
+        { "itemId": "ashwood_warbow_u", "quantity": 1 },
         { "itemId": "bowstring", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "ashwood_longbow", "quantity": 1 }]
+      "outputs": [{ "itemId": "ashwood_warbow", "quantity": 1 }]
     },
     {
-      "id": "string_goldleaf_shortbow",
-      "name": "String Goldleaf Shortbow",
+      "id": "string_goldleaf_swiftbow",
+      "name": "String Goldleaf Swiftbow",
       "skill": "bowcraft",
       "level": 20,
       "xp": 16,
       "duration": 1,
       "inputs": [
-        { "itemId": "goldleaf_shortbow_u", "quantity": 1 },
+        { "itemId": "goldleaf_swiftbow_u", "quantity": 1 },
         { "itemId": "bowstring", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "goldleaf_shortbow", "quantity": 1 }]
+      "outputs": [{ "itemId": "goldleaf_swiftbow", "quantity": 1 }]
     },
     {
-      "id": "string_ironwood_longbow",
-      "name": "String Ironwood Longbow",
+      "id": "string_ironwood_warbow",
+      "name": "String Ironwood Warbow",
       "skill": "bowcraft",
       "level": 70,
       "xp": 75,
       "duration": 1,
       "inputs": [
-        { "itemId": "ironwood_longbow_u", "quantity": 1 },
+        { "itemId": "ironwood_warbow_u", "quantity": 1 },
         { "itemId": "bowstring", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "ironwood_longbow", "quantity": 1 }]
+      "outputs": [{ "itemId": "ironwood_warbow", "quantity": 1 }]
     },
     {
-      "id": "string_spiritbark_longbow",
-      "name": "String Spiritbark Longbow",
+      "id": "string_spiritbark_warbow",
+      "name": "String Spiritbark Warbow",
       "skill": "bowcraft",
       "level": 85,
       "xp": 91,
       "duration": 1,
       "inputs": [
-        { "itemId": "spiritbark_longbow_u", "quantity": 1 },
+        { "itemId": "spiritbark_warbow_u", "quantity": 1 },
         { "itemId": "bowstring", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "spiritbark_longbow", "quantity": 1 }]
+      "outputs": [{ "itemId": "spiritbark_warbow", "quantity": 1 }]
     }
   ],
   "arrows": [

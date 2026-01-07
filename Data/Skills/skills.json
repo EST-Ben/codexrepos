@@ -89,14 +89,14 @@
         "ammoConsumption": true
       },
       "milestones": [
-        { "level": 1, "unlock": "shortbow", "description": "Shortbows" },
-        { "level": 5, "unlock": "oak_bow", "description": "Oak bows" },
+        { "level": 1, "unlock": "swiftbow", "description": "Swiftbows" },
+        { "level": 5, "unlock": "goldleaf_bow", "description": "Goldleaf bows" },
         { "level": 10, "unlock": "crossbow", "description": "Crossbows" },
-        { "level": 20, "unlock": "willow_bow", "description": "Willow bows" },
-        { "level": 30, "unlock": "maple_bow", "description": "Maple bows" },
-        { "level": 40, "unlock": "yew_bow", "description": "Yew bows" },
-        { "level": 50, "unlock": "magic_bow", "description": "Magic bows" },
-        { "level": 60, "unlock": "elder_bow", "description": "Elder bows" },
+        { "level": 20, "unlock": "whisperwood_bow", "description": "Whisperwood bows" },
+        { "level": 30, "unlock": "ironwood_bow", "description": "Ironwood bows" },
+        { "level": 40, "unlock": "spiritbark_bow", "description": "Spiritbark bows" },
+        { "level": 50, "unlock": "starwood_bow", "description": "Starwood bows" },
+        { "level": 60, "unlock": "elderwood_bow", "description": "Elderwood bows" },
         { "level": 70, "unlock": "crystal_bow", "description": "Crystal bows" },
         { "level": 80, "unlock": "dark_bow", "description": "Dark bows" },
         { "level": 90, "unlock": "ascension_crossbow", "description": "Ascension crossbows" },
@@ -284,13 +284,13 @@
         "treeRespawnBase": 30
       },
       "milestones": [
-        { "level": 1, "unlock": "normal_tree", "description": "Chop Normal trees" },
-        { "level": 15, "unlock": "oak_tree", "description": "Chop Oak trees" },
-        { "level": 30, "unlock": "willow_tree", "description": "Chop Willow trees" },
-        { "level": 45, "unlock": "maple_tree", "description": "Chop Maple trees" },
-        { "level": 60, "unlock": "yew_tree", "description": "Chop Yew trees" },
-        { "level": 75, "unlock": "magic_tree", "description": "Chop Magic trees" },
-        { "level": 83, "unlock": "elder_tree", "description": "Chop Elder trees" },
+        { "level": 1, "unlock": "ashwood_tree", "description": "Chop Ashwood trees" },
+        { "level": 15, "unlock": "goldleaf_tree", "description": "Chop Goldleaf trees" },
+        { "level": 30, "unlock": "whisperwood_tree", "description": "Chop Whisperwood trees" },
+        { "level": 45, "unlock": "ironwood_tree", "description": "Chop Ironwood trees" },
+        { "level": 60, "unlock": "spiritbark_tree", "description": "Chop Spiritbark trees" },
+        { "level": 75, "unlock": "starwood_tree", "description": "Chop Starwood trees" },
+        { "level": 83, "unlock": "elderwood_tree", "description": "Chop Elderwood trees" },
         { "level": 90, "unlock": "crystal_tree", "description": "Chop Crystal trees" },
         { "level": 99, "unlock": "woodcutting_cape", "description": "Woodcutting Skillcape" }
       ]
@@ -311,13 +311,13 @@
         "bonfireBonus": 0.05
       },
       "milestones": [
-        { "level": 1, "unlock": "normal_logs", "description": "Burn Normal logs" },
-        { "level": 15, "unlock": "oak_logs", "description": "Burn Oak logs" },
-        { "level": 30, "unlock": "willow_logs", "description": "Burn Willow logs" },
-        { "level": 45, "unlock": "maple_logs", "description": "Burn Maple logs" },
-        { "level": 60, "unlock": "yew_logs", "description": "Burn Yew logs" },
-        { "level": 75, "unlock": "magic_logs", "description": "Burn Magic logs" },
-        { "level": 83, "unlock": "elder_logs", "description": "Burn Elder logs" },
+        { "level": 1, "unlock": "ashwood_logs", "description": "Burn Ashwood logs" },
+        { "level": 15, "unlock": "goldleaf_logs", "description": "Burn Goldleaf logs" },
+        { "level": 30, "unlock": "whisperwood_logs", "description": "Burn Whisperwood logs" },
+        { "level": 45, "unlock": "ironwood_logs", "description": "Burn Ironwood logs" },
+        { "level": 60, "unlock": "spiritbark_logs", "description": "Burn Spiritbark logs" },
+        { "level": 75, "unlock": "starwood_logs", "description": "Burn Starwood logs" },
+        { "level": 83, "unlock": "elderwood_logs", "description": "Burn Elderwood logs" },
         { "level": 95, "unlock": "incense_sticks", "description": "Create incense sticks" },
         { "level": 99, "unlock": "firemaking_cape", "description": "Firemaking Skillcape" }
       ]
@@ -394,7 +394,7 @@
       "milestones": [
         { "level": 1, "unlock": "potato_seed", "description": "Plant Potatoes" },
         { "level": 9, "unlock": "verdantleaf_seed", "description": "Plant Verdantleaf" },
-        { "level": 15, "unlock": "oak_sapling", "description": "Plant Oak trees" },
+        { "level": 15, "unlock": "goldleaf_sapling", "description": "Plant Goldleaf trees" },
         { "level": 26, "unlock": "thornroot_seed", "description": "Plant Thornroot" },
         { "level": 38, "unlock": "sunpetal_seed", "description": "Plant Sunpetal" },
         { "level": 50, "unlock": "moonbloom_seed", "description": "Plant Moonbloom" },
@@ -448,11 +448,11 @@
       },
       "milestones": [
         { "level": 1, "unlock": "copperweave_arrows", "description": "Copperweave arrows" },
-        { "level": 5, "unlock": "shortbow", "description": "Shortbows" },
+        { "level": 5, "unlock": "swiftbow", "description": "Swiftbows" },
         { "level": 15, "unlock": "ironbark_arrows", "description": "Ironbark arrows" },
-        { "level": 22, "unlock": "oak_shortbow", "description": "Oak bows" },
+        { "level": 22, "unlock": "goldleaf_swiftbow", "description": "Goldleaf bows" },
         { "level": 35, "unlock": "stormforged_bolts", "description": "Stormforged bolts" },
-        { "level": 50, "unlock": "mystic_shortbow", "description": "Mystic bows" },
+        { "level": 50, "unlock": "mystic_swiftbow", "description": "Mystic swiftbows" },
         { "level": 65, "unlock": "voidstone_bolts", "description": "Voidstone bolts" },
         { "level": 80, "unlock": "eternium_arrows", "description": "Eternium arrows" },
         { "level": 92, "unlock": "celestial_bolts", "description": "Celestial bolts" },

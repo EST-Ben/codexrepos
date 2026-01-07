@@ -97,9 +97,9 @@
       "stats": { "attackBonus": 72, "attackSpeed": 1.4 }
     },
     {
-      "id": "ashwood_shortbow",
-      "name": "Ashwood Shortbow",
-      "description": "A simple bow carved from ashwood",
+      "id": "ashwood_swiftbow",
+      "name": "Ashwood Swiftbow",
+      "description": "A nimble bow carved from ashwood for quick shots",
       "type": "weapon",
       "subtype": "bow",
       "tier": 1,
@@ -109,9 +109,9 @@
       "stats": { "attackBonus": 4, "attackSpeed": 1.2, "range": 20 }
     },
     {
-      "id": "goldleaf_longbow",
-      "name": "Goldleaf Longbow",
-      "description": "A powerful longbow made from rare goldleaf wood",
+      "id": "goldleaf_warbow",
+      "name": "Goldleaf Warbow",
+      "description": "A powerful warbow made from rare goldleaf wood",
       "type": "weapon",
       "subtype": "bow",
       "tier": 2,
@@ -121,9 +121,9 @@
       "stats": { "attackBonus": 18, "attackSpeed": 0.9, "range": 30 }
     },
     {
-      "id": "ironwood_longbow",
-      "name": "Ironwood Longbow",
-      "description": "A sturdy longbow from the hardest wood",
+      "id": "ironwood_warbow",
+      "name": "Ironwood Warbow",
+      "description": "A sturdy warbow from the hardest wood",
       "type": "weapon",
       "subtype": "bow",
       "tier": 4,
@@ -133,9 +133,9 @@
       "stats": { "attackBonus": 42, "attackSpeed": 0.85, "range": 40 }
     },
     {
-      "id": "spiritbark_longbow",
-      "name": "Spiritbark Longbow",
-      "description": "A mystical bow from enchanted spiritbark trees",
+      "id": "spiritbark_warbow",
+      "name": "Spiritbark Warbow",
+      "description": "A mystical warbow from enchanted spiritbark trees",
       "type": "weapon",
       "subtype": "bow",
       "tier": 6,

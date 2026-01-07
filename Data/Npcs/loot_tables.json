@@ -564,7 +564,7 @@
       "description": "Corrupted tree spirit in Verdant Highlands",
       "killRequirement": { "minPlayers": 8 },
       "guaranteedDrops": [
-        { "itemId": "magic_logs", "quantityMin": 50, "quantityMax": 100 },
+        { "itemId": "starwood_log", "quantityMin": 50, "quantityMax": 100 },
         { "itemId": "gold_coins", "quantityMin": 8000, "quantityMax": 18000 }
       ],
       "commonDrops": [
@@ -577,7 +577,7 @@
       ],
       "ultraRareDrops": [
         { "itemId": "ent_pet", "quantity": 1, "chance": 0.001 },
-        { "itemId": "elder_tree_seed", "quantity": 1, "chance": 0.003 }
+        { "itemId": "elderwood_tree_seed", "quantity": 1, "chance": 0.003 }
       ]
     },
     "shadow_lord_malachar": {
