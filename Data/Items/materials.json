@@ -1,0 +1,138 @@
+{
+  "materials": [
+    {
+      "id": "copper_ore",
+      "name": "Copper Ore",
+      "description": "Raw copper ore, can be smelted into bars",
+      "type": "material",
+      "subtype": "ore",
+      "tier": 1,
+      "stackable": true,
+      "maxStack": 100,
+      "value": 5,
+      "source": {
+        "skill": "mining",
+        "level": 1,
+        "xp": 10
+      }
+    },
+    {
+      "id": "iron_ore",
+      "name": "Iron Ore",
+      "description": "Raw iron ore, can be smelted into bars",
+      "type": "material",
+      "subtype": "ore",
+      "tier": 2,
+      "stackable": true,
+      "maxStack": 100,
+      "value": 15,
+      "source": {
+        "skill": "mining",
+        "level": 15,
+        "xp": 25
+      }
+    },
+    {
+      "id": "mithril_ore",
+      "name": "Mithril Ore",
+      "description": "Rare mithril ore with a faint blue glow",
+      "type": "material",
+      "subtype": "ore",
+      "tier": 4,
+      "stackable": true,
+      "maxStack": 100,
+      "value": 100,
+      "source": {
+        "skill": "mining",
+        "level": 55,
+        "xp": 80
+      }
+    },
+    {
+      "id": "oak_log",
+      "name": "Oak Log",
+      "description": "A sturdy oak log",
+      "type": "material",
+      "subtype": "log",
+      "tier": 1,
+      "stackable": true,
+      "maxStack": 100,
+      "value": 4,
+      "source": {
+        "skill": "woodcutting",
+        "level": 1,
+        "xp": 8
+      }
+    },
+    {
+      "id": "maple_log",
+      "name": "Maple Log",
+      "description": "Quality maple wood",
+      "type": "material",
+      "subtype": "log",
+      "tier": 2,
+      "stackable": true,
+      "maxStack": 100,
+      "value": 20,
+      "source": {
+        "skill": "woodcutting",
+        "level": 35,
+        "xp": 45
+      }
+    },
+    {
+      "id": "raw_trout",
+      "name": "Raw Trout",
+      "description": "A fresh trout, needs to be cooked",
+      "type": "material",
+      "subtype": "fish",
+      "tier": 2,
+      "stackable": true,
+      "maxStack": 100,
+      "value": 12,
+      "source": {
+        "skill": "fishing",
+        "level": 20,
+        "xp": 30
+      }
+    },
+    {
+      "id": "bronze_bar",
+      "name": "Bronze Bar",
+      "description": "A bar of bronze, ready for smithing",
+      "type": "material",
+      "subtype": "bar",
+      "tier": 1,
+      "stackable": true,
+      "maxStack": 100,
+      "value": 15,
+      "recipe": {
+        "skill": "smithing",
+        "level": 1,
+        "xp": 12,
+        "inputs": [
+          {"item": "copper_ore", "quantity": 1}
+        ]
+      }
+    },
+    {
+      "id": "iron_bar",
+      "name": "Iron Bar",
+      "description": "A bar of iron, ready for smithing",
+      "type": "material",
+      "subtype": "bar",
+      "tier": 2,
+      "stackable": true,
+      "maxStack": 100,
+      "value": 40,
+      "recipe": {
+        "skill": "smithing",
+        "level": 15,
+        "xp": 30,
+        "inputs": [
+          {"item": "iron_ore", "quantity": 1}
+        ]
+      }
+    }
+  ]
+}

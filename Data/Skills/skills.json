@@ -1,0 +1,98 @@
+{
+  "skills": [
+    {
+      "id": "melee",
+      "name": "Melee",
+      "category": "combat",
+      "description": "Proficiency with swords, axes, and maces",
+      "maxLevel": 99,
+      "masteryLevel": 120,
+      "icon": "skill_melee",
+      "primaryStat": "strength"
+    },
+    {
+      "id": "ranged",
+      "name": "Ranged",
+      "category": "combat",
+      "description": "Proficiency with bows, crossbows, and thrown weapons",
+      "maxLevel": 99,
+      "masteryLevel": 120,
+      "icon": "skill_ranged",
+      "primaryStat": "agility"
+    },
+    {
+      "id": "magic",
+      "name": "Magic",
+      "category": "combat",
+      "description": "Cast elemental spells and utility magic",
+      "maxLevel": 99,
+      "masteryLevel": 120,
+      "icon": "skill_magic",
+      "primaryStat": "intelligence"
+    },
+    {
+      "id": "mining",
+      "name": "Mining",
+      "category": "gathering",
+      "description": "Extract ores and gems from rock deposits",
+      "maxLevel": 99,
+      "masteryLevel": 120,
+      "icon": "skill_mining",
+      "primaryStat": "strength"
+    },
+    {
+      "id": "woodcutting",
+      "name": "Woodcutting",
+      "category": "gathering",
+      "description": "Harvest logs from trees",
+      "maxLevel": 99,
+      "masteryLevel": 120,
+      "icon": "skill_woodcutting",
+      "primaryStat": "strength"
+    },
+    {
+      "id": "fishing",
+      "name": "Fishing",
+      "category": "gathering",
+      "description": "Catch fish and sea creatures",
+      "maxLevel": 99,
+      "masteryLevel": 120,
+      "icon": "skill_fishing",
+      "primaryStat": "agility"
+    },
+    {
+      "id": "smithing",
+      "name": "Smithing",
+      "category": "crafting",
+      "description": "Forge weapons and armor from metal bars",
+      "maxLevel": 99,
+      "masteryLevel": 120,
+      "icon": "skill_smithing",
+      "primaryStat": "strength"
+    },
+    {
+      "id": "cooking",
+      "name": "Cooking",
+      "category": "crafting",
+      "description": "Prepare food that restores health and grants buffs",
+      "maxLevel": 99,
+      "masteryLevel": 120,
+      "icon": "skill_cooking",
+      "primaryStat": "wisdom"
+    },
+    {
+      "id": "alchemy",
+      "name": "Alchemy",
+      "category": "crafting",
+      "description": "Brew potions with various effects",
+      "maxLevel": 99,
+      "masteryLevel": 120,
+      "icon": "skill_alchemy",
+      "primaryStat": "intelligence"
+    }
+  ],
+  "xpTable": {
+    "formula": "level^2 * 100",
+    "milestones": [10, 20, 30, 40, 50, 60, 70, 80, 90, 99, 120]
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "weapons": [
+    {
+      "id": "bronze_sword",
+      "name": "Bronze Sword",
+      "description": "A basic sword made of bronze",
+      "type": "weapon",
+      "subtype": "sword",
+      "tier": 1,
+      "stackable": false,
+      "value": 50,
+      "requirements": {
+        "melee": 1
+      },
+      "stats": {
+        "attackBonus": 5,
+        "attackSpeed": 1.0
+      }
+    },
+    {
+      "id": "iron_sword",
+      "name": "Iron Sword",
+      "description": "A sturdy sword forged from iron",
+      "type": "weapon",
+      "subtype": "sword",
+      "tier": 2,
+      "stackable": false,
+      "value": 200,
+      "requirements": {
+        "melee": 10
+      },
+      "stats": {
+        "attackBonus": 12,
+        "attackSpeed": 1.0
+      }
+    },
+    {
+      "id": "steel_sword",
+      "name": "Steel Sword",
+      "description": "A well-balanced steel blade",
+      "type": "weapon",
+      "subtype": "sword",
+      "tier": 3,
+      "stackable": false,
+      "value": 500,
+      "requirements": {
+        "melee": 20
+      },
+      "stats": {
+        "attackBonus": 22,
+        "attackSpeed": 1.0
+      }
+    },
+    {
+      "id": "mithril_sword",
+      "name": "Mithril Sword",
+      "description": "A lightweight blade of rare mithril",
+      "type": "weapon",
+      "subtype": "sword",
+      "tier": 4,
+      "stackable": false,
+      "value": 2000,
+      "requirements": {
+        "melee": 40
+      },
+      "stats": {
+        "attackBonus": 38,
+        "attackSpeed": 1.1
+      }
+    },
+    {
+      "id": "oak_shortbow",
+      "name": "Oak Shortbow",
+      "description": "A simple bow carved from oak",
+      "type": "weapon",
+      "subtype": "bow",
+      "tier": 1,
+      "stackable": false,
+      "value": 40,
+      "requirements": {
+        "ranged": 1
+      },
+      "stats": {
+        "attackBonus": 4,
+        "attackSpeed": 1.2,
+        "range": 20
+      }
+    },
+    {
+      "id": "maple_longbow",
+      "name": "Maple Longbow",
+      "description": "A powerful longbow made from maple",
+      "type": "weapon",
+      "subtype": "bow",
+      "tier": 2,
+      "stackable": false,
+      "value": 300,
+      "requirements": {
+        "ranged": 20
+      },
+      "stats": {
+        "attackBonus": 18,
+        "attackSpeed": 0.9,
+        "range": 30
+      }
+    },
+    {
+      "id": "apprentice_staff",
+      "name": "Apprentice Staff",
+      "description": "A basic staff for novice mages",
+      "type": "weapon",
+      "subtype": "staff",
+      "tier": 1,
+      "stackable": false,
+      "value": 60,
+      "requirements": {
+        "magic": 1
+      },
+      "stats": {
+        "magicBonus": 5,
+        "attackSpeed": 0.8
+      }
+    },
+    {
+      "id": "elemental_staff",
+      "name": "Elemental Staff",
+      "description": "A staff imbued with elemental power",
+      "type": "weapon",
+      "subtype": "staff",
+      "tier": 3,
+      "stackable": false,
+      "value": 1500,
+      "requirements": {
+        "magic": 30
+      },
+      "stats": {
+        "magicBonus": 28,
+        "attackSpeed": 0.9,
+        "manaBonus": 20
+      }
+    }
+  ]
+}

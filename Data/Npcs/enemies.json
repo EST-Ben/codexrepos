@@ -1,0 +1,113 @@
+{
+  "enemies": [
+    {
+      "id": "goblin",
+      "name": "Goblin",
+      "description": "A small, green troublemaker",
+      "level": 2,
+      "health": 50,
+      "attackStyle": "melee",
+      "aggressive": false,
+      "respawnTime": 30,
+      "zones": [1],
+      "stats": {
+        "attack": 3,
+        "defense": 2,
+        "speed": 1.2
+      },
+      "drops": [
+        {"item": "gold_coins", "quantity": [5, 15], "chance": 1.0},
+        {"item": "bronze_sword", "quantity": 1, "chance": 0.05},
+        {"item": "goblin_mail", "quantity": 1, "chance": 0.02}
+      ]
+    },
+    {
+      "id": "giant_spider",
+      "name": "Giant Spider",
+      "description": "A venomous spider of unusual size",
+      "level": 8,
+      "health": 120,
+      "attackStyle": "melee",
+      "aggressive": true,
+      "respawnTime": 45,
+      "zones": [1, 2],
+      "stats": {
+        "attack": 8,
+        "defense": 4,
+        "speed": 1.5
+      },
+      "abilities": ["poison_bite"],
+      "drops": [
+        {"item": "gold_coins", "quantity": [20, 50], "chance": 1.0},
+        {"item": "spider_silk", "quantity": [1, 3], "chance": 0.8},
+        {"item": "spider_fang", "quantity": 1, "chance": 0.15}
+      ]
+    },
+    {
+      "id": "bandit",
+      "name": "Bandit",
+      "description": "A ruthless highway robber",
+      "level": 15,
+      "health": 200,
+      "attackStyle": "melee",
+      "aggressive": true,
+      "respawnTime": 60,
+      "zones": [2, 3],
+      "stats": {
+        "attack": 15,
+        "defense": 10,
+        "speed": 1.0
+      },
+      "abilities": ["quick_strike"],
+      "drops": [
+        {"item": "gold_coins", "quantity": [50, 150], "chance": 1.0},
+        {"item": "iron_sword", "quantity": 1, "chance": 0.1},
+        {"item": "bandit_mask", "quantity": 1, "chance": 0.05}
+      ]
+    },
+    {
+      "id": "desert_scorpion",
+      "name": "Desert Scorpion",
+      "description": "A deadly scorpion adapted to harsh desert conditions",
+      "level": 35,
+      "health": 450,
+      "attackStyle": "melee",
+      "aggressive": true,
+      "respawnTime": 90,
+      "zones": [3],
+      "stats": {
+        "attack": 30,
+        "defense": 25,
+        "speed": 0.9
+      },
+      "abilities": ["venomous_sting", "burrow"],
+      "drops": [
+        {"item": "gold_coins", "quantity": [100, 300], "chance": 1.0},
+        {"item": "scorpion_carapace", "quantity": [1, 2], "chance": 0.6},
+        {"item": "scorpion_stinger", "quantity": 1, "chance": 0.2}
+      ]
+    },
+    {
+      "id": "frost_troll",
+      "name": "Frost Troll",
+      "description": "A massive troll covered in ice and snow",
+      "level": 55,
+      "health": 1200,
+      "attackStyle": "melee",
+      "aggressive": true,
+      "respawnTime": 180,
+      "zones": [4],
+      "stats": {
+        "attack": 50,
+        "defense": 40,
+        "speed": 0.7
+      },
+      "abilities": ["ice_smash", "regeneration"],
+      "drops": [
+        {"item": "gold_coins", "quantity": [300, 800], "chance": 1.0},
+        {"item": "troll_hide", "quantity": [2, 4], "chance": 0.7},
+        {"item": "frozen_heart", "quantity": 1, "chance": 0.08}
+      ]
+    }
+  ]
+}
