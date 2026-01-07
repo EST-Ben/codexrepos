@@ -1,32 +1,67 @@
-node_modules/
-**/node_modules/
-.env
-.env.*
-!.env.example
-.env.local
-.env.*.local
-dist/
-__pycache__/
-*.pyc
-.DS_Store
-app/.expo/
-app/.expo-shared/
-server/.venv/
-Keep local tooling and config
+# Unreal Engine 5 Project
+Game/Binaries/
+Game/DerivedDataCache/
+Game/Intermediate/
+Game/Saved/
+Game/Build/
+Game/.vs/
+Game/.idea/
+Game/*.sln
+Game/*.xcworkspace
 
-!.vscode/
-!.vscode/tasks.json
-!scripts/
-!scripts/*.ps1
-!full-diagnostics.ps1
-!app/app.config.js
-!app/src/screens/DebugTools.tsx
-# --- local tooling guardrails (do not remove) ---
-!.vscode/
-!.vscode/tasks.json
-!scripts/
-!scripts/*.ps1
-!full-diagnostics.ps1
-!app/app.config.js
-!app/src/screens/DebugTools.tsx
-# -----------------------------------------------
+# Compiled files
+*.pdb
+*.exe
+*.dll
+*.lib
+*.so
+*.dylib
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Mac
+.DS_Store
+*.dSYM/
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Node.js (Server)
+Server/node_modules/
+Server/dist/
+Server/.env
+Server/*.log
+
+# Python tools
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Logs
+*.log
+logs/
+
+# Build artifacts
+*.pak
+*.uasset.bak
+*.umap.bak
+
+# IDE specific
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
