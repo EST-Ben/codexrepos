@@ -194,76 +194,76 @@
         "examine": "A dead tree, easier to cut."
       },
       {
-        "id": "oak_tree",
-        "name": "Oak Tree",
-        "log": "oak_logs",
+        "id": "goldleaf_tree",
+        "name": "Goldleaf Tree",
+        "log": "goldleaf_log",
         "level": 15,
         "xp": 37.5,
         "hardness": 20,
         "respawnTime": 15,
         "depletionChance": 0.125,
         "zones": ["dawnhaven_forest", "ironwood_forest"],
-        "examine": "A strong oak tree."
+        "examine": "A tree with shimmering golden leaves."
       },
       {
-        "id": "willow_tree",
-        "name": "Willow Tree",
-        "log": "willow_logs",
+        "id": "whisperwood_tree",
+        "name": "Whisperwood Tree",
+        "log": "whisperwood_log",
         "level": 30,
         "xp": 67.5,
         "hardness": 30,
         "respawnTime": 20,
         "depletionChance": 0.125,
-        "zones": ["riverbank", "willowvale"],
-        "examine": "A weeping willow tree."
+        "zones": ["riverbank", "whispervale"],
+        "examine": "A graceful tree whose leaves whisper in the wind."
       },
       {
-        "id": "maple_tree",
-        "name": "Maple Tree",
-        "log": "maple_logs",
+        "id": "ironwood_tree",
+        "name": "Ironwood Tree",
+        "log": "ironwood_log",
         "level": 45,
         "xp": 100,
         "hardness": 40,
         "respawnTime": 30,
         "depletionChance": 0.125,
         "zones": ["oraclestead", "tempest_isle"],
-        "examine": "A maple tree with distinctive leaves."
+        "examine": "A tree with bark as strong as iron."
       },
       {
-        "id": "yew_tree",
-        "name": "Yew Tree",
-        "log": "yew_logs",
+        "id": "spiritbark_tree",
+        "name": "Spiritbark Tree",
+        "log": "spiritbark_log",
         "level": 60,
         "xp": 175,
         "hardness": 60,
         "respawnTime": 60,
         "depletionChance": 0.125,
-        "zones": ["behind_chapel", "borderton"],
-        "examine": "An ancient yew tree."
+        "zones": ["spirit_grove", "borderton"],
+        "examine": "An ethereal tree with glowing bark."
       },
       {
-        "id": "magic_tree",
-        "name": "Magic Tree",
-        "log": "magic_logs",
+        "id": "starwood_tree",
+        "name": "Starwood Tree",
+        "log": "starwood_log",
         "level": 75,
         "xp": 250,
         "hardness": 80,
         "respawnTime": 120,
         "depletionChance": 0.125,
         "zones": ["arcane_academy", "champion_hall"],
-        "examine": "A mystical magic tree."
+        "examine": "A mystical tree that glows with starlight."
       },
       {
-        "id": "elder_tree",
-        "name": "Elder Tree",
-        "log": "elder_logs",
+        "id": "elderwood_tree",
+        "name": "Elderwood Tree",
+        "log": "elderwood_log",
         "level": 83,
         "xp": 325,
         "hardness": 90,
         "respawnTime": 300,
         "depletionChance": 0.125,
         "zones": ["prismatic_forest", "verdant_highlands"],
-        "examine": "An ancient elder tree."
+        "examine": "An ancient elderwood tree of immense age."
       },
       {
         "id": "crystal_tree",
@@ -544,7 +544,7 @@
         "id": "tree",
         "name": "Tree Patch",
         "size": "3x3",
-        "produces": ["oak_tree", "willow_tree", "maple_tree", "yew_tree", "magic_tree", "elder_tree"],
+        "produces": ["goldleaf_tree", "whisperwood_tree", "ironwood_tree", "spiritbark_tree", "starwood_tree", "elderwood_tree"],
         "locations": [
           { "zone": "dawnhaven", "count": 1 },
           { "zone": "ironhold", "count": 1 },
