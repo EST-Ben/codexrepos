@@ -310,7 +310,7 @@
       "region": "ironwood_forest",
       "type": "town",
       "levelRange": { "min": 20, "max": 35 },
-      "description": "Peaceful druid village known for alchemy and herblore",
+      "description": "Peaceful druid village known for potion-brewing and herbalism",
       "bounds": { "minX": 2850, "minY": 3400, "maxX": 2950, "maxY": 3500 },
       "connections": [
         { "targetZone": "ironhold_road", "type": "path", "position": { "x": 2950, "y": 3450 } }

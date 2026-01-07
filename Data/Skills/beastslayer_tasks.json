@@ -5,8 +5,8 @@
   },
   "masters": [
     {
-      "id": "turael",
-      "name": "Turael",
+      "id": "aldric",
+      "name": "Aldric",
       "title": "Beginner Beastslayer Master",
       "location": "dawnhaven",
       "combatRequirement": 3,
@@ -21,10 +21,10 @@
       "dialogue": "Welcome, young adventurer. I can assign you basic beastslaying tasks to get you started."
     },
     {
-      "id": "mazchna",
-      "name": "Mazchna",
+      "id": "vexrath",
+      "name": "Vexrath",
       "title": "Intermediate Beastslayer Master",
-      "location": "morytania",
+      "location": "shadowfen",
       "combatRequirement": 20,
       "beastslayerRequirement": 1,
       "taskRange": { "min": 30, "max": 80 },
@@ -34,16 +34,16 @@
       "pointsPerStreak100": 50,
       "pointsPerStreak250": 70,
       "canResetStreak": false,
-      "dialogue": "Morytania is full of horrors. Let me assign you something to hunt."
+      "dialogue": "The Shadowfen is full of horrors. Let me assign you something to hunt."
     },
     {
-      "id": "chaeldar",
-      "name": "Chaeldar",
+      "id": "sylara",
+      "name": "Sylara",
       "title": "Advanced Beastslayer Master",
       "location": "verdant_highlands",
       "combatRequirement": 70,
       "beastslayerRequirement": 1,
-      "questRequirement": "lost_city",
+      "questRequirement": "hidden_grove",
       "taskRange": { "min": 50, "max": 130 },
       "pointsPerTask": 10,
       "pointsPerStreak10": 30,
@@ -51,13 +51,13 @@
       "pointsPerStreak100": 200,
       "pointsPerStreak250": 300,
       "canResetStreak": false,
-      "dialogue": "The fey realm has many creatures that need culling."
+      "dialogue": "The wild lands have many creatures that need culling."
     },
     {
-      "id": "konar",
-      "name": "Konar",
+      "id": "kazari",
+      "name": "Kazari",
       "title": "Expert Beastslayer Master",
-      "location": "karamja",
+      "location": "tropicana_isle",
       "combatRequirement": 75,
       "beastslayerRequirement": 1,
       "taskRange": { "min": 60, "max": 150 },
@@ -71,10 +71,10 @@
       "dialogue": "I assign tasks in specific locations. More dangerous, but more rewarding."
     },
     {
-      "id": "nieve",
-      "name": "Nieve",
+      "id": "seraphine",
+      "name": "Seraphine",
       "title": "Master Beastslayer",
-      "location": "gnome_stronghold",
+      "location": "sylvan_haven",
       "combatRequirement": 85,
       "beastslayerRequirement": 1,
       "taskRange": { "min": 70, "max": 185 },
@@ -87,13 +87,13 @@
       "dialogue": "Only the strongest adventurers can handle my tasks."
     },
     {
-      "id": "duradel",
-      "name": "Duradel",
+      "id": "theron",
+      "name": "Theron",
       "title": "Grandmaster Beastslayer",
-      "location": "shilo_village",
+      "location": "sunspire_village",
       "combatRequirement": 100,
       "beastslayerRequirement": 50,
-      "questRequirement": "shilo_village",
+      "questRequirement": "sunspire_expedition",
       "taskRange": { "min": 80, "max": 200 },
       "pointsPerTask": 15,
       "pointsPerStreak10": 75,
@@ -111,7 +111,7 @@
       "monster": "chicken",
       "beastslayerLevel": 1,
       "combatLevel": 1,
-      "weight": { "turael": 8 },
+      "weight": { "aldric": 8 },
       "amount": { "min": 15, "max": 50 },
       "locations": ["dawnhaven_farms"]
     },
@@ -121,7 +121,7 @@
       "monster": "cow",
       "beastslayerLevel": 1,
       "combatLevel": 2,
-      "weight": { "turael": 8 },
+      "weight": { "aldric": 8 },
       "amount": { "min": 15, "max": 50 },
       "locations": ["dawnhaven_farms"]
     },
@@ -131,7 +131,7 @@
       "monster": "goblin",
       "beastslayerLevel": 1,
       "combatLevel": 5,
-      "weight": { "turael": 8, "mazchna": 7 },
+      "weight": { "aldric": 8, "vexrath": 7 },
       "amount": { "min": 15, "max": 80 },
       "locations": ["goblin_village", "dawnhaven_outskirts"]
     },
@@ -141,7 +141,7 @@
       "monster": "giant_spider",
       "beastslayerLevel": 1,
       "combatLevel": 24,
-      "weight": { "turael": 7, "mazchna": 8 },
+      "weight": { "aldric": 7, "vexrath": 8 },
       "amount": { "min": 15, "max": 80 },
       "locations": ["ironwood_forest", "spider_cave"]
     },
@@ -151,7 +151,7 @@
       "monster": "wolf",
       "beastslayerLevel": 1,
       "combatLevel": 18,
-      "weight": { "turael": 7, "mazchna": 8 },
+      "weight": { "aldric": 7, "vexrath": 8 },
       "amount": { "min": 15, "max": 80 },
       "locations": ["ironwood_forest", "northern_wilds"]
     },
@@ -161,7 +161,7 @@
       "monster": "zombie",
       "beastslayerLevel": 1,
       "combatLevel": 25,
-      "weight": { "turael": 6, "mazchna": 8 },
+      "weight": { "aldric": 6, "vexrath": 8 },
       "amount": { "min": 15, "max": 80 },
       "locations": ["graveyard", "crypts"]
     },
@@ -171,7 +171,7 @@
       "monster": "skeleton",
       "beastslayerLevel": 1,
       "combatLevel": 22,
-      "weight": { "turael": 6, "mazchna": 8 },
+      "weight": { "aldric": 6, "vexrath": 8 },
       "amount": { "min": 15, "max": 80 },
       "locations": ["crypts", "abandoned_mines"]
     },
@@ -181,7 +181,7 @@
       "monster": "ghost",
       "beastslayerLevel": 1,
       "combatLevel": 32,
-      "weight": { "turael": 5, "mazchna": 7 },
+      "weight": { "aldric": 5, "vexrath": 7 },
       "amount": { "min": 15, "max": 80 },
       "locations": ["haunted_manor", "graveyard"]
     },
@@ -191,7 +191,7 @@
       "monster": "bear",
       "beastslayerLevel": 1,
       "combatLevel": 38,
-      "weight": { "turael": 6, "mazchna": 7 },
+      "weight": { "aldric": 6, "vexrath": 7 },
       "amount": { "min": 15, "max": 80 },
       "locations": ["verdant_highlands", "ironwood_forest"]
     },
@@ -201,7 +201,7 @@
       "monster": "scorpion",
       "beastslayerLevel": 1,
       "combatLevel": 28,
-      "weight": { "turael": 5, "mazchna": 7, "chaeldar": 5 },
+      "weight": { "aldric": 5, "vexrath": 7, "sylara": 5 },
       "amount": { "min": 15, "max": 130 },
       "locations": ["dustfall_expanse"]
     },
@@ -211,7 +211,7 @@
       "monster": "cave_crawler",
       "beastslayerLevel": 10,
       "combatLevel": 38,
-      "weight": { "mazchna": 8, "chaeldar": 6 },
+      "weight": { "vexrath": 8, "sylara": 6 },
       "amount": { "min": 30, "max": 130 },
       "locations": ["deep_caves"],
       "protection": "none"
@@ -222,7 +222,7 @@
       "monster": "banshee",
       "beastslayerLevel": 15,
       "combatLevel": 45,
-      "weight": { "mazchna": 8, "chaeldar": 7 },
+      "weight": { "vexrath": 8, "sylara": 7 },
       "amount": { "min": 30, "max": 130 },
       "locations": ["beastslayer_tower"],
       "protection": "earmuffs"
@@ -233,7 +233,7 @@
       "monster": "hobgoblin",
       "beastslayerLevel": 1,
       "combatLevel": 42,
-      "weight": { "mazchna": 7, "chaeldar": 5 },
+      "weight": { "vexrath": 7, "sylara": 5 },
       "amount": { "min": 30, "max": 130 },
       "locations": ["ironwood_forest", "hobgoblin_camp"]
     },
@@ -243,20 +243,20 @@
       "monster": "basilisk",
       "beastslayerLevel": 40,
       "combatLevel": 88,
-      "weight": { "chaeldar": 8, "konar": 6, "nieve": 6 },
+      "weight": { "sylara": 8, "kazari": 6, "seraphine": 6 },
       "amount": { "min": 50, "max": 150 },
       "locations": ["ancient_ruins"],
       "protection": "mirror_shield"
     },
     {
-      "id": "bloodvelds",
-      "name": "Bloodvelds",
-      "monster": "bloodveld",
+      "id": "bloodmaws",
+      "name": "Bloodmaws",
+      "monster": "bloodmaw",
       "beastslayerLevel": 50,
       "combatLevel": 95,
-      "weight": { "chaeldar": 8, "konar": 8, "nieve": 8, "duradel": 8 },
+      "weight": { "sylara": 8, "kazari": 8, "seraphine": 8, "theron": 8 },
       "amount": { "min": 50, "max": 180 },
-      "locations": ["god_wars_dungeon", "catacombs"]
+      "locations": ["eternal_war_dungeon", "catacombs"]
     },
     {
       "id": "dust_devils",
@@ -264,21 +264,21 @@
       "monster": "dust_devil",
       "beastslayerLevel": 65,
       "combatLevel": 98,
-      "weight": { "chaeldar": 6, "konar": 8, "nieve": 9, "duradel": 9 },
+      "weight": { "sylara": 6, "kazari": 8, "seraphine": 9, "theron": 9 },
       "amount": { "min": 60, "max": 180 },
       "locations": ["dustfall_expanse"],
       "protection": "facemask"
     },
     {
-      "id": "kurasks",
-      "name": "Kurasks",
-      "monster": "kurask",
+      "id": "thornbacks",
+      "name": "Thornbacks",
+      "monster": "thornback",
       "beastslayerLevel": 70,
       "combatLevel": 108,
-      "weight": { "chaeldar": 5, "konar": 7, "nieve": 8, "duradel": 7 },
+      "weight": { "sylara": 5, "kazari": 7, "seraphine": 8, "theron": 7 },
       "amount": { "min": 60, "max": 170 },
       "locations": ["verdant_highlands"],
-      "specialWeapon": "leaf_bladed_weapon"
+      "specialWeapon": "thorn_bladed_weapon"
     },
     {
       "id": "gargoyles",
@@ -286,18 +286,18 @@
       "monster": "gargoyle",
       "beastslayerLevel": 75,
       "combatLevel": 118,
-      "weight": { "konar": 8, "nieve": 9, "duradel": 8 },
+      "weight": { "kazari": 8, "seraphine": 9, "theron": 8 },
       "amount": { "min": 70, "max": 180 },
       "locations": ["ancient_tower", "gargoyle_roost"],
       "finisher": "rock_hammer"
     },
     {
-      "id": "nechryaels",
-      "name": "Nechryaels",
-      "monster": "nechryael",
+      "id": "voidfiends",
+      "name": "Voidfiends",
+      "monster": "voidfiend",
       "beastslayerLevel": 80,
       "combatLevel": 128,
-      "weight": { "konar": 7, "nieve": 9, "duradel": 9 },
+      "weight": { "kazari": 7, "seraphine": 9, "theron": 9 },
       "amount": { "min": 70, "max": 185 },
       "locations": ["infernal_depths"]
     },
@@ -307,7 +307,7 @@
       "monster": "abyssal_demon",
       "beastslayerLevel": 85,
       "combatLevel": 138,
-      "weight": { "konar": 9, "nieve": 12, "duradel": 12 },
+      "weight": { "kazari": 9, "seraphine": 12, "theron": 12 },
       "amount": { "min": 80, "max": 200 },
       "locations": ["abyssal_rift"],
       "superiorVariant": "greater_abyssal_demon"
@@ -318,7 +318,7 @@
       "monster": "dark_beast",
       "beastslayerLevel": 90,
       "combatLevel": 148,
-      "weight": { "konar": 7, "nieve": 8, "duradel": 11 },
+      "weight": { "kazari": 7, "seraphine": 8, "theron": 11 },
       "amount": { "min": 80, "max": 200 },
       "locations": ["shadow_realm"]
     },
@@ -328,7 +328,7 @@
       "monster": "wyrm",
       "beastslayerLevel": 62,
       "combatLevel": 102,
-      "weight": { "chaeldar": 5, "konar": 10, "nieve": 7, "duradel": 7 },
+      "weight": { "sylara": 5, "kazari": 10, "seraphine": 7, "theron": 7 },
       "amount": { "min": 50, "max": 150 },
       "locations": ["wyrm_caverns"]
     },
@@ -338,7 +338,7 @@
       "monster": "hellhound",
       "beastslayerLevel": 1,
       "combatLevel": 105,
-      "weight": { "chaeldar": 7, "konar": 9, "nieve": 10, "duradel": 10 },
+      "weight": { "sylara": 7, "kazari": 9, "seraphine": 10, "theron": 10 },
       "amount": { "min": 60, "max": 185 },
       "locations": ["infernal_caves", "abyssal_rift"]
     },
@@ -348,7 +348,7 @@
       "monster": "black_knight",
       "beastslayerLevel": 1,
       "combatLevel": 72,
-      "weight": { "chaeldar": 6, "konar": 6, "nieve": 5 },
+      "weight": { "sylara": 6, "kazari": 6, "seraphine": 5 },
       "amount": { "min": 50, "max": 150 },
       "locations": ["black_fortress"]
     },
@@ -358,7 +358,7 @@
       "monster": "ice_giant",
       "beastslayerLevel": 1,
       "combatLevel": 88,
-      "weight": { "mazchna": 6, "chaeldar": 7, "konar": 6 },
+      "weight": { "vexrath": 6, "sylara": 7, "kazari": 6 },
       "amount": { "min": 40, "max": 140 },
       "locations": ["frostpeak_range"]
     },
@@ -368,7 +368,7 @@
       "monster": "fire_giant",
       "beastslayerLevel": 1,
       "combatLevel": 98,
-      "weight": { "chaeldar": 8, "konar": 9, "nieve": 8, "duradel": 7 },
+      "weight": { "sylara": 8, "kazari": 9, "seraphine": 8, "theron": 7 },
       "amount": { "min": 50, "max": 160 },
       "locations": ["volcanic_depths"]
     },
@@ -378,7 +378,7 @@
       "monster": "frost_troll",
       "beastslayerLevel": 1,
       "combatLevel": 92,
-      "weight": { "chaeldar": 7, "konar": 8, "nieve": 7 },
+      "weight": { "sylara": 7, "kazari": 8, "seraphine": 7 },
       "amount": { "min": 50, "max": 150 },
       "locations": ["frostpeak_range"]
     },
@@ -388,7 +388,7 @@
       "monster": "shadow_stalker",
       "beastslayerLevel": 75,
       "combatLevel": 112,
-      "weight": { "konar": 6, "nieve": 7, "duradel": 8 },
+      "weight": { "kazari": 6, "seraphine": 7, "theron": 8 },
       "amount": { "min": 60, "max": 170 },
       "locations": ["shadowfen_marsh"]
     },
@@ -398,7 +398,7 @@
       "monster": "chaos_dwarf",
       "beastslayerLevel": 1,
       "combatLevel": 108,
-      "weight": { "konar": 6, "nieve": 6, "duradel": 6 },
+      "weight": { "kazari": 6, "seraphine": 6, "theron": 6 },
       "amount": { "min": 60, "max": 160 },
       "locations": ["chaos_mines"]
     },
@@ -408,7 +408,7 @@
       "monster": "elder_wyrm",
       "beastslayerLevel": 95,
       "combatLevel": 162,
-      "weight": { "duradel": 5 },
+      "weight": { "theron": 5 },
       "amount": { "min": 10, "max": 35 },
       "locations": ["elder_wyrm_lair"],
       "bossTask": true
@@ -418,9 +418,9 @@
     "unlocks": [
       { "id": "extend_tasks", "name": "Bigger and Badder", "cost": 150, "effect": "Unlock superior variants" },
       { "id": "herb_sack", "name": "Herb Sack", "cost": 750, "effect": "Store 30 of each herb" },
-      { "id": "rune_pouch", "name": "Rune Pouch", "cost": 1250, "effect": "Store 3 types of runes" },
+      { "id": "glyph_pouch", "name": "Glyph Pouch", "cost": 1250, "effect": "Store 3 types of glyphs" },
       { "id": "beastslayer_ring", "name": "Beastslayer Ring", "cost": 75, "effect": "Teleport to beastslayer locations", "consumable": true },
-      { "id": "broad_fletching", "name": "Broader Fletching", "cost": 300, "effect": "Fletch broad arrows/bolts" },
+      { "id": "broad_bowcraft", "name": "Broader Bowcraft", "cost": 300, "effect": "Craft broad arrows/bolts" },
       { "id": "beastslayer_helm", "name": "Beastslayer Helm", "cost": 400, "effect": "Combines slayer headgear" },
       { "id": "ring_imbue", "name": "Ring Imbue", "cost": 650, "effect": "Imbue combat rings" }
     ],
@@ -428,25 +428,25 @@
       { "id": "extend_abyssal", "name": "Abyssal Extension", "cost": 100, "task": "abyssal_demons", "bonus": 50 },
       { "id": "extend_dark_beast", "name": "Dark Beast Extension", "cost": 100, "task": "dark_beasts", "bonus": 50 },
       { "id": "extend_gargoyle", "name": "Gargoyle Extension", "cost": 100, "task": "gargoyles", "bonus": 40 },
-      { "id": "extend_nechryael", "name": "Nechryael Extension", "cost": 100, "task": "nechryaels", "bonus": 40 }
+      { "id": "extend_voidfiend", "name": "Voidfiend Extension", "cost": 100, "task": "voidfiends", "bonus": 40 }
     ],
     "blocks": [
       { "id": "block_slot", "name": "Block Task Slot", "cost": 100, "maxSlots": 6, "effect": "Permanently block a task" }
     ]
   },
   "superiorVariants": {
-    "description": "Superior versions of slayer monsters with better drops",
+    "description": "Superior versions of beastslayer monsters with better drops",
     "spawnChance": 0.01,
     "unlockCost": 150,
     "variants": [
       { "base": "cave_crawler", "superior": "chasm_crawler", "bonusXp": 400 },
       { "base": "banshee", "superior": "screaming_banshee", "bonusXp": 550 },
       { "base": "basilisk", "superior": "basilisk_sentinel", "bonusXp": 1200 },
-      { "base": "bloodveld", "superior": "insatiable_bloodveld", "bonusXp": 1400 },
+      { "base": "bloodmaw", "superior": "insatiable_bloodmaw", "bonusXp": 1400 },
       { "base": "dust_devil", "superior": "choke_devil", "bonusXp": 1600 },
-      { "base": "kurask", "superior": "king_kurask", "bonusXp": 1800 },
+      { "base": "thornback", "superior": "thornback_monarch", "bonusXp": 1800 },
       { "base": "gargoyle", "superior": "marble_gargoyle", "bonusXp": 2000 },
-      { "base": "nechryael", "superior": "nechryarch", "bonusXp": 2400 },
+      { "base": "voidfiend", "superior": "voidfiend_archon", "bonusXp": 2400 },
       { "base": "abyssal_demon", "superior": "greater_abyssal_demon", "bonusXp": 3200 },
       { "base": "dark_beast", "superior": "night_beast", "bonusXp": 3600 }
     ],

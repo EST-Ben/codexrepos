@@ -87,7 +87,7 @@
         "hardness": 35,
         "respawnTime": 60,
         "depletionChance": 1.0,
-        "zones": ["crafting_guild_mine", "desert_mines", "arzinian_mines"],
+        "zones": ["crafting_guild_mine", "desert_mines", "goldvein_mines"],
         "examine": "A rock containing gold ore."
       },
       {
@@ -100,7 +100,7 @@
         "respawnTime": 60,
         "depletionChance": 1.0,
         "lootTable": "gem_drops",
-        "zones": ["underground_pass", "shilo_village"],
+        "zones": ["underground_pass", "sunspire_village"],
         "examine": "A rock that may contain precious gems."
       },
       {
@@ -214,7 +214,7 @@
         "hardness": 30,
         "respawnTime": 20,
         "depletionChance": 0.125,
-        "zones": ["riverbank", "draynor_village"],
+        "zones": ["riverbank", "willowvale"],
         "examine": "A weeping willow tree."
       },
       {
@@ -226,7 +226,7 @@
         "hardness": 40,
         "respawnTime": 30,
         "depletionChance": 0.125,
-        "zones": ["seersville", "misc_island"],
+        "zones": ["oraclestead", "tempest_isle"],
         "examine": "A maple tree with distinctive leaves."
       },
       {
@@ -238,7 +238,7 @@
         "hardness": 60,
         "respawnTime": 60,
         "depletionChance": 0.125,
-        "zones": ["behind_chapel", "edgeville"],
+        "zones": ["behind_chapel", "borderton"],
         "examine": "An ancient yew tree."
       },
       {
@@ -250,7 +250,7 @@
         "hardness": 80,
         "respawnTime": 120,
         "depletionChance": 0.125,
-        "zones": ["mage_training_arena", "legends_guild"],
+        "zones": ["arcane_academy", "champion_hall"],
         "examine": "A mystical magic tree."
       },
       {
@@ -299,7 +299,7 @@
           { "action": "bait", "tool": "fishing_rod", "bait": "fishing_bait", "catches": ["sardine", "herring"] }
         ],
         "moveChance": 0.3,
-        "zones": ["dawnhaven_coast", "catherby_beach"]
+        "zones": ["dawnhaven_coast", "tidecrest_beach"]
       },
       {
         "id": "lure_spot",
@@ -309,7 +309,7 @@
           { "action": "bait", "tool": "fishing_rod", "bait": "fishing_bait", "catches": ["pike", "cave_eel"] }
         ],
         "moveChance": 0.3,
-        "zones": ["barbarian_village", "shilo_village"]
+        "zones": ["northwatch_village", "sunspire_village"]
       },
       {
         "id": "cage_spot",
@@ -319,7 +319,7 @@
           { "action": "harpoon", "tool": "harpoon", "catches": ["tuna", "razorfin"] }
         ],
         "moveChance": 0.4,
-        "zones": ["catherby", "fishing_guild", "corsair_cove"]
+        "zones": ["tidecrest", "fishing_guild", "corsair_cove"]
       },
       {
         "id": "big_net_spot",
@@ -329,7 +329,7 @@
           { "action": "harpoon", "tool": "harpoon", "catches": ["ironjaw"] }
         ],
         "moveChance": 0.4,
-        "zones": ["fishing_guild", "jatizso_docks"]
+        "zones": ["fishing_guild", "frostharbor_docks"]
       },
       {
         "id": "monkfish_spot",
@@ -338,7 +338,7 @@
           { "action": "small_net", "tool": "small_fishing_net", "catches": ["monkfish"] }
         ],
         "moveChance": 0.5,
-        "zones": ["piscatoris_colony"],
+        "zones": ["fisher_haven"],
         "requirements": { "quest": "swan_song" }
       },
       {
@@ -366,8 +366,8 @@
       { "id": "abyssfin", "name": "Raw Abyssfin", "level": 90, "xp": 380, "healAmount": 230 }
     ]
   },
-  "divinationWisps": {
-    "description": "Wisps and memories for Divination skill",
+  "aethertapMotes": {
+    "description": "Motes and memories for Aethertap skill",
     "wispTypes": [
       {
         "id": "pale_wisp",
@@ -387,7 +387,7 @@
         "enrichedXp": 6,
         "energy": "flickering_energy",
         "duration": 30,
-        "zones": ["falador_farm"]
+        "zones": ["whiteguard_farms"]
       },
       {
         "id": "bright_wisp",
@@ -397,7 +397,7 @@
         "enrichedXp": 12,
         "energy": "bright_energy",
         "duration": 30,
-        "zones": ["varrock_dig_site"]
+        "zones": ["kingshold_dig_site"]
       },
       {
         "id": "glowing_wisp",
@@ -407,7 +407,7 @@
         "enrichedXp": 18,
         "energy": "glowing_energy",
         "duration": 30,
-        "zones": ["seers_village"]
+        "zones": ["oraclestead"]
       },
       {
         "id": "sparkling_wisp",
@@ -417,7 +417,7 @@
         "enrichedXp": 24,
         "energy": "sparkling_energy",
         "duration": 30,
-        "zones": ["rellekka"]
+        "zones": ["frostharbor"]
       },
       {
         "id": "gleaming_wisp",
@@ -427,7 +427,7 @@
         "enrichedXp": 30,
         "energy": "gleaming_energy",
         "duration": 30,
-        "zones": ["karamja"]
+        "zones": ["tropicana_isle"]
       },
       {
         "id": "vibrant_wisp",
@@ -437,7 +437,7 @@
         "enrichedXp": 36,
         "energy": "vibrant_energy",
         "duration": 30,
-        "zones": ["mortton"]
+        "zones": ["duskhollow"]
       },
       {
         "id": "lustrous_wisp",
@@ -447,7 +447,7 @@
         "enrichedXp": 44,
         "energy": "lustrous_energy",
         "duration": 30,
-        "zones": ["canifis"]
+        "zones": ["moonhowl"]
       },
       {
         "id": "brilliant_wisp",
@@ -457,7 +457,7 @@
         "enrichedXp": 52,
         "energy": "brilliant_energy",
         "duration": 30,
-        "zones": ["sophanem"]
+        "zones": ["sunstone"]
       },
       {
         "id": "radiant_wisp",
@@ -477,7 +477,7 @@
         "enrichedXp": 70,
         "energy": "luminous_energy",
         "duration": 30,
-        "zones": ["prifddinas_outskirts"]
+        "zones": ["prismatic_outskirts"]
       },
       {
         "id": "incandescent_wisp",
@@ -487,7 +487,7 @@
         "enrichedXp": 84,
         "energy": "incandescent_energy",
         "duration": 30,
-        "zones": ["poison_waste"]
+        "zones": ["blighted_marsh"]
       },
       {
         "id": "elder_wisp",
@@ -511,8 +511,8 @@
         "produces": ["potato", "onion", "cabbage", "tomato", "corn", "strawberry", "watermelon", "snape_grass"],
         "locations": [
           { "zone": "dawnhaven", "count": 2 },
-          { "zone": "catherby", "count": 2 },
-          { "zone": "morytania", "count": 2 },
+          { "zone": "tidecrest", "count": 2 },
+          { "zone": "shadowfen", "count": 2 },
           { "zone": "prismatic_city", "count": 2 }
         ]
       },
@@ -523,9 +523,9 @@
         "produces": ["verdantleaf", "thornroot", "bittervine", "sunpetal", "moonbloom", "stormleaf", "voidbloom", "starfall_petal", "eternitys_bloom"],
         "locations": [
           { "zone": "dawnhaven", "count": 1 },
-          { "zone": "catherby", "count": 1 },
-          { "zone": "morytania", "count": 1 },
-          { "zone": "troll_stronghold", "count": 1 },
+          { "zone": "tidecrest", "count": 1 },
+          { "zone": "shadowfen", "count": 1 },
+          { "zone": "frostpeak_stronghold", "count": 1 },
           { "zone": "prismatic_city", "count": 1 }
         ]
       },
@@ -537,7 +537,7 @@
         "protectsAllotments": true,
         "locations": [
           { "zone": "dawnhaven", "count": 1 },
-          { "zone": "catherby", "count": 1 }
+          { "zone": "tidecrest", "count": 1 }
         ]
       },
       {
@@ -548,8 +548,8 @@
         "locations": [
           { "zone": "dawnhaven", "count": 1 },
           { "zone": "ironhold", "count": 1 },
-          { "zone": "falador", "count": 1 },
-          { "zone": "gnome_stronghold", "count": 1 }
+          { "zone": "whiteguard", "count": 1 },
+          { "zone": "sylvan_haven", "count": 1 }
         ]
       },
       {
@@ -558,9 +558,9 @@
         "size": "3x3",
         "produces": ["apple_tree", "banana_tree", "orange_tree", "curry_tree", "pineapple_tree", "papaya_tree", "palm_tree"],
         "locations": [
-          { "zone": "gnome_stronghold", "count": 1 },
-          { "zone": "brimhaven", "count": 1 },
-          { "zone": "lletya", "count": 1 }
+          { "zone": "sylvan_haven", "count": 1 },
+          { "zone": "tropicport", "count": 1 },
+          { "zone": "elvenhallow", "count": 1 }
         ]
       },
       {
@@ -570,8 +570,8 @@
         "produces": ["redberry_bush", "cadavaberry_bush", "dwellberry_bush", "jangerberry_bush", "whiteberry_bush", "poison_ivy_bush"],
         "locations": [
           { "zone": "champion_guild", "count": 1 },
-          { "zone": "rimmington", "count": 1 },
-          { "zone": "etceteria", "count": 1 }
+          { "zone": "coastwatch", "count": 1 },
+          { "zone": "tempest_isle", "count": 1 }
         ]
       },
       {
@@ -581,7 +581,7 @@
         "produces": ["crystal_tree", "spirit_tree", "celastrus_tree", "redwood_tree"],
         "locations": [
           { "zone": "prismatic_city", "type": "crystal_tree", "count": 1 },
-          { "zone": "gnome_stronghold", "type": "spirit_tree", "count": 1 },
+          { "zone": "sylvan_haven", "type": "spirit_tree", "count": 1 },
           { "zone": "farming_guild", "type": "celastrus", "count": 1 }
         ]
       }
@@ -596,8 +596,8 @@
       }
     }
   },
-  "thievingTargets": {
-    "description": "Targets for Thieving skill",
+  "subterfugeTargets": {
+    "description": "Targets for Subterfuge skill",
     "npcs": [
       { "id": "man", "name": "Man", "level": 1, "xp": 8, "stunDamage": 10, "loot": "coins_3" },
       { "id": "woman", "name": "Woman", "level": 1, "xp": 8, "stunDamage": 10, "loot": "coins_3" },
@@ -616,22 +616,22 @@
       { "id": "gem_stall", "name": "Gem Stall", "level": 75, "xp": 160, "respawn": 120, "loot": "gems" }
     ]
   },
-  "runecraftingAltars": {
-    "description": "Rune altars for Runecrafting skill",
-    "altars": [
-      { "id": "air_altar", "rune": "air_rune", "level": 1, "xp": 5, "multiplierAt": [11, 22, 33, 44, 55, 66, 77, 88, 99] },
-      { "id": "mind_altar", "rune": "mind_rune", "level": 5, "xp": 5.5, "multiplierAt": [14, 28, 42, 56, 70, 84, 98] },
-      { "id": "water_altar", "rune": "water_rune", "level": 9, "xp": 6, "multiplierAt": [19, 38, 57, 76, 95] },
-      { "id": "earth_altar", "rune": "earth_rune", "level": 14, "xp": 6.5, "multiplierAt": [26, 52, 78] },
-      { "id": "fire_altar", "rune": "fire_rune", "level": 20, "xp": 7, "multiplierAt": [35, 70] },
-      { "id": "body_altar", "rune": "body_rune", "level": 25, "xp": 7.5, "multiplierAt": [46, 92] },
-      { "id": "cosmic_altar", "rune": "cosmic_rune", "level": 27, "xp": 8, "multiplierAt": [59] },
-      { "id": "chaos_altar", "rune": "chaos_rune", "level": 35, "xp": 8.5, "multiplierAt": [74] },
-      { "id": "nature_altar", "rune": "nature_rune", "level": 44, "xp": 9, "multiplierAt": [91] },
-      { "id": "law_altar", "rune": "law_rune", "level": 54, "xp": 9.5, "multiplierAt": [] },
-      { "id": "death_altar", "rune": "death_rune", "level": 65, "xp": 10, "multiplierAt": [] },
-      { "id": "blood_altar", "rune": "blood_rune", "level": 77, "xp": 23.8, "multiplierAt": [], "special": "blood_essence" },
-      { "id": "soul_altar", "rune": "soul_rune", "level": 90, "xp": 29.7, "multiplierAt": [], "special": "soul_obelisk" }
+  "glyphcraftSanctums": {
+    "description": "Glyph sanctums for Glyphcraft skill",
+    "sanctums": [
+      { "id": "breeze_sanctum", "glyph": "breeze_glyph", "level": 1, "xp": 5, "multiplierAt": [11, 22, 33, 44, 55, 66, 77, 88, 99] },
+      { "id": "thought_sanctum", "glyph": "thought_glyph", "level": 5, "xp": 5.5, "multiplierAt": [14, 28, 42, 56, 70, 84, 98] },
+      { "id": "tide_sanctum", "glyph": "tide_glyph", "level": 9, "xp": 6, "multiplierAt": [19, 38, 57, 76, 95] },
+      { "id": "terra_sanctum", "glyph": "terra_glyph", "level": 14, "xp": 6.5, "multiplierAt": [26, 52, 78] },
+      { "id": "ember_sanctum", "glyph": "ember_glyph", "level": 20, "xp": 7, "multiplierAt": [35, 70] },
+      { "id": "form_sanctum", "glyph": "form_glyph", "level": 25, "xp": 7.5, "multiplierAt": [46, 92] },
+      { "id": "astral_sanctum", "glyph": "astral_glyph", "level": 27, "xp": 8, "multiplierAt": [59] },
+      { "id": "havoc_sanctum", "glyph": "havoc_glyph", "level": 35, "xp": 8.5, "multiplierAt": [74] },
+      { "id": "growth_sanctum", "glyph": "growth_glyph", "level": 44, "xp": 9, "multiplierAt": [91] },
+      { "id": "order_sanctum", "glyph": "order_glyph", "level": 54, "xp": 9.5, "multiplierAt": [] },
+      { "id": "void_sanctum", "glyph": "void_glyph", "level": 65, "xp": 10, "multiplierAt": [] },
+      { "id": "crimson_sanctum", "glyph": "crimson_glyph", "level": 77, "xp": 23.8, "multiplierAt": [], "special": "crimson_essence" },
+      { "id": "spirit_sanctum", "glyph": "spirit_glyph", "level": 90, "xp": 29.7, "multiplierAt": [], "special": "spirit_obelisk" }
     ],
     "pouches": [
       { "id": "small_pouch", "capacity": 3, "level": 1 },

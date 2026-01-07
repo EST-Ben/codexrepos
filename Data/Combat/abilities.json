@@ -10,7 +10,7 @@
     { "id": "magic_threshold", "name": "Magic Threshold", "skill": "magic", "type": "threshold" },
     { "id": "magic_ultimate", "name": "Magic Ultimate", "skill": "magic", "type": "ultimate" },
     { "id": "defense", "name": "Defensive", "skill": "defense", "type": "defensive" },
-    { "id": "prayer", "name": "Prayer", "skill": "prayer", "type": "prayer" }
+    { "id": "sanctity", "name": "Sanctity", "skill": "sanctity", "type": "blessing" }
   ],
   "abilities": {
     "melee": [
@@ -290,10 +290,10 @@
         ]
       },
       {
-        "id": "deaths_swiftness",
-        "name": "Death's Swiftness",
+        "id": "deadeye_zone",
+        "name": "Deadeye Zone",
         "category": "ranged_ultimate",
-        "description": "Create a zone of death that boosts ranged damage within it",
+        "description": "Create a zone of precision that boosts ranged damage within it",
         "level": 80,
         "type": "ultimate",
         "damage": { "min": 0, "max": 0, "type": "none" },
@@ -301,7 +301,7 @@
         "adrenalineGain": 0,
         "adrenalineCost": 100,
         "range": 0,
-        "animation": "deaths_swiftness",
+        "animation": "deadeye_zone",
         "effects": [
           { "type": "zone", "radius": 5, "duration": 30000 },
           { "type": "buff", "id": "ranged_damage", "value": 50, "zone_only": true, "duration": 30000 }
@@ -310,8 +310,8 @@
     ],
     "magic": [
       {
-        "id": "wind_strike",
-        "name": "Wind Strike",
+        "id": "gale_strike",
+        "name": "Gale Strike",
         "category": "magic_basic",
         "description": "Launch a bolt of compressed air at your target",
         "level": 1,
@@ -323,9 +323,9 @@
         "adrenalineCost": 0,
         "manaCost": 5,
         "range": 10,
-        "animation": "cast_wind",
+        "animation": "cast_gale",
         "effects": [],
-        "essenceCost": { "wind_essence": 1 }
+        "essenceCost": { "breeze_essence": 1 }
       },
       {
         "id": "flame_burst",
@@ -408,10 +408,10 @@
         "essenceCost": { "chaos_essence": 2 }
       },
       {
-        "id": "sunshine",
-        "name": "Sunshine",
+        "id": "solar_radiance",
+        "name": "Solar Radiance",
         "category": "magic_ultimate",
-        "description": "Call down sunlight that dramatically boosts magic damage",
+        "description": "Call down radiant light that dramatically boosts magic damage",
         "level": 80,
         "type": "ultimate",
         "damage": { "min": 0, "max": 0, "type": "none" },
@@ -420,12 +420,12 @@
         "adrenalineCost": 100,
         "manaCost": 50,
         "range": 0,
-        "animation": "sunshine",
+        "animation": "solar_radiance",
         "effects": [
           { "type": "zone", "radius": 5, "duration": 30000 },
           { "type": "buff", "id": "magic_damage", "value": 50, "zone_only": true, "duration": 30000 }
         ],
-        "essenceCost": { "flame_essence": 5, "nature_essence": 2 }
+        "essenceCost": { "ember_essence": 5, "growth_essence": 2 }
       }
     ],
     "defense": [
@@ -504,15 +504,15 @@
         ]
       }
     ],
-    "prayer": [
+    "sanctity": [
       {
         "id": "thick_skin",
         "name": "Thick Skin",
-        "category": "prayer",
+        "category": "sanctity",
         "description": "Increases defense by 5%",
         "level": 1,
-        "type": "prayer",
-        "prayerDrain": 1,
+        "type": "blessing",
+        "devotionDrain": 1,
         "effects": [
           { "type": "buff", "id": "defense", "value": 5, "percent": true }
         ]
@@ -520,62 +520,62 @@
       {
         "id": "clarity_of_thought",
         "name": "Clarity of Thought",
-        "category": "prayer",
+        "category": "sanctity",
         "description": "Increases attack accuracy by 5%",
         "level": 7,
-        "type": "prayer",
-        "prayerDrain": 1,
+        "type": "blessing",
+        "devotionDrain": 1,
         "effects": [
           { "type": "buff", "id": "accuracy", "value": 5, "percent": true }
         ]
       },
       {
-        "id": "protect_from_melee",
-        "name": "Protect from Melee",
-        "category": "prayer",
+        "id": "ward_melee",
+        "name": "Ward from Melee",
+        "category": "sanctity",
         "description": "Reduces melee damage taken by 50%",
         "level": 43,
-        "type": "prayer",
-        "prayerDrain": 5,
+        "type": "blessing",
+        "devotionDrain": 5,
         "exclusive": "protection",
         "effects": [
           { "type": "damage_reduction", "damageType": "melee", "value": 50 }
         ]
       },
       {
-        "id": "protect_from_ranged",
-        "name": "Protect from Ranged",
-        "category": "prayer",
+        "id": "ward_ranged",
+        "name": "Ward from Ranged",
+        "category": "sanctity",
         "description": "Reduces ranged damage taken by 50%",
         "level": 40,
-        "type": "prayer",
-        "prayerDrain": 5,
+        "type": "blessing",
+        "devotionDrain": 5,
         "exclusive": "protection",
         "effects": [
           { "type": "damage_reduction", "damageType": "ranged", "value": 50 }
         ]
       },
       {
-        "id": "protect_from_magic",
-        "name": "Protect from Magic",
-        "category": "prayer",
+        "id": "ward_magic",
+        "name": "Ward from Magic",
+        "category": "sanctity",
         "description": "Reduces magic damage taken by 50%",
         "level": 37,
-        "type": "prayer",
-        "prayerDrain": 5,
+        "type": "blessing",
+        "devotionDrain": 5,
         "exclusive": "protection",
         "effects": [
           { "type": "damage_reduction", "damageType": "magic", "value": 50 }
         ]
       },
       {
-        "id": "piety",
-        "name": "Piety",
-        "category": "prayer",
+        "id": "valor",
+        "name": "Valor",
+        "category": "sanctity",
         "description": "Boosts melee attack, strength, and defense by 20%",
         "level": 70,
-        "type": "prayer",
-        "prayerDrain": 12,
+        "type": "blessing",
+        "devotionDrain": 12,
         "exclusive": "combat_boost",
         "effects": [
           { "type": "buff", "id": "melee_attack", "value": 20, "percent": true },
@@ -584,14 +584,14 @@
         ]
       },
       {
-        "id": "soul_split",
-        "name": "Soul Split",
-        "category": "prayer",
+        "id": "lifeweave",
+        "name": "Lifeweave",
+        "category": "sanctity",
         "description": "Heals you for a portion of damage dealt",
         "level": 92,
-        "type": "prayer",
-        "prayerDrain": 15,
-        "exclusive": "curse",
+        "type": "blessing",
+        "devotionDrain": 15,
+        "exclusive": "invocation",
         "effects": [
           { "type": "lifesteal", "value": 10, "percent": true }
         ]
