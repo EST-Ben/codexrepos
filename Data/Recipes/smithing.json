@@ -1,0 +1,387 @@
+{
+  "smelting": [
+    {
+      "id": "smelt_bronze_bar",
+      "name": "Smelt Bronze Bar",
+      "skill": "smithing",
+      "level": 1,
+      "xp": 6,
+      "duration": 3,
+      "inputs": [
+        { "itemId": "copper_ore", "quantity": 1 },
+        { "itemId": "tin_ore", "quantity": 1 }
+      ],
+      "outputs": [{ "itemId": "bronze_bar", "quantity": 1 }],
+      "facility": "furnace"
+    },
+    {
+      "id": "smelt_iron_bar",
+      "name": "Smelt Iron Bar",
+      "skill": "smithing",
+      "level": 15,
+      "xp": 12,
+      "duration": 4,
+      "inputs": [{ "itemId": "iron_ore", "quantity": 1 }],
+      "outputs": [{ "itemId": "iron_bar", "quantity": 1, "chance": 0.5 }],
+      "notes": "50% success rate until level 45"
+    },
+    {
+      "id": "smelt_steel_bar",
+      "name": "Smelt Steel Bar",
+      "skill": "smithing",
+      "level": 30,
+      "xp": 18,
+      "duration": 5,
+      "inputs": [
+        { "itemId": "iron_ore", "quantity": 1 },
+        { "itemId": "coal", "quantity": 2 }
+      ],
+      "outputs": [{ "itemId": "steel_bar", "quantity": 1 }],
+      "facility": "furnace"
+    },
+    {
+      "id": "smelt_mithril_bar",
+      "name": "Smelt Mithril Bar",
+      "skill": "smithing",
+      "level": 50,
+      "xp": 30,
+      "duration": 6,
+      "inputs": [
+        { "itemId": "mithril_ore", "quantity": 1 },
+        { "itemId": "coal", "quantity": 4 }
+      ],
+      "outputs": [{ "itemId": "mithril_bar", "quantity": 1 }],
+      "facility": "furnace"
+    },
+    {
+      "id": "smelt_adamant_bar",
+      "name": "Smelt Adamantite Bar",
+      "skill": "smithing",
+      "level": 70,
+      "xp": 40,
+      "duration": 7,
+      "inputs": [
+        { "itemId": "adamantite_ore", "quantity": 1 },
+        { "itemId": "coal", "quantity": 6 }
+      ],
+      "outputs": [{ "itemId": "adamant_bar", "quantity": 1 }],
+      "facility": "furnace"
+    },
+    {
+      "id": "smelt_runite_bar",
+      "name": "Smelt Runite Bar",
+      "skill": "smithing",
+      "level": 85,
+      "xp": 50,
+      "duration": 8,
+      "inputs": [
+        { "itemId": "runite_ore", "quantity": 1 },
+        { "itemId": "coal", "quantity": 8 }
+      ],
+      "outputs": [{ "itemId": "runite_bar", "quantity": 1 }],
+      "facility": "furnace"
+    }
+  ],
+  "smithing": {
+    "bronze": [
+      {
+        "id": "smith_bronze_dagger",
+        "name": "Bronze Dagger",
+        "level": 1,
+        "xp": 12,
+        "bars": 1,
+        "output": "bronze_dagger"
+      },
+      {
+        "id": "smith_bronze_sword",
+        "name": "Bronze Sword",
+        "level": 4,
+        "xp": 12,
+        "bars": 1,
+        "output": "bronze_sword"
+      },
+      {
+        "id": "smith_bronze_scimitar",
+        "name": "Bronze Scimitar",
+        "level": 5,
+        "xp": 25,
+        "bars": 2,
+        "output": "bronze_scimitar"
+      },
+      {
+        "id": "smith_bronze_helm",
+        "name": "Bronze Helm",
+        "level": 7,
+        "xp": 12,
+        "bars": 1,
+        "output": "bronze_helm"
+      },
+      {
+        "id": "smith_bronze_platebody",
+        "name": "Bronze Platebody",
+        "level": 18,
+        "xp": 62,
+        "bars": 5,
+        "output": "bronze_platebody"
+      },
+      {
+        "id": "smith_bronze_platelegs",
+        "name": "Bronze Platelegs",
+        "level": 16,
+        "xp": 37,
+        "bars": 3,
+        "output": "bronze_platelegs"
+      },
+      {
+        "id": "smith_bronze_pickaxe",
+        "name": "Bronze Pickaxe",
+        "level": 5,
+        "xp": 25,
+        "bars": 2,
+        "output": "bronze_pickaxe"
+      }
+    ],
+    "iron": [
+      {
+        "id": "smith_iron_dagger",
+        "name": "Iron Dagger",
+        "level": 15,
+        "xp": 25,
+        "bars": 1,
+        "output": "iron_dagger"
+      },
+      {
+        "id": "smith_iron_sword",
+        "name": "Iron Sword",
+        "level": 19,
+        "xp": 25,
+        "bars": 1,
+        "output": "iron_sword"
+      },
+      {
+        "id": "smith_iron_scimitar",
+        "name": "Iron Scimitar",
+        "level": 20,
+        "xp": 50,
+        "bars": 2,
+        "output": "iron_scimitar"
+      },
+      {
+        "id": "smith_iron_helm",
+        "name": "Iron Helm",
+        "level": 22,
+        "xp": 25,
+        "bars": 1,
+        "output": "iron_helm"
+      },
+      {
+        "id": "smith_iron_platebody",
+        "name": "Iron Platebody",
+        "level": 33,
+        "xp": 125,
+        "bars": 5,
+        "output": "iron_platebody"
+      },
+      {
+        "id": "smith_iron_platelegs",
+        "name": "Iron Platelegs",
+        "level": 31,
+        "xp": 75,
+        "bars": 3,
+        "output": "iron_platelegs"
+      },
+      {
+        "id": "smith_iron_pickaxe",
+        "name": "Iron Pickaxe",
+        "level": 20,
+        "xp": 50,
+        "bars": 2,
+        "output": "iron_pickaxe"
+      }
+    ],
+    "steel": [
+      {
+        "id": "smith_steel_dagger",
+        "name": "Steel Dagger",
+        "level": 30,
+        "xp": 37,
+        "bars": 1,
+        "output": "steel_dagger"
+      },
+      {
+        "id": "smith_steel_sword",
+        "name": "Steel Sword",
+        "level": 34,
+        "xp": 37,
+        "bars": 1,
+        "output": "steel_sword"
+      },
+      {
+        "id": "smith_steel_scimitar",
+        "name": "Steel Scimitar",
+        "level": 35,
+        "xp": 75,
+        "bars": 2,
+        "output": "steel_scimitar"
+      },
+      {
+        "id": "smith_steel_helm",
+        "name": "Steel Helm",
+        "level": 37,
+        "xp": 37,
+        "bars": 1,
+        "output": "steel_helm"
+      },
+      {
+        "id": "smith_steel_platebody",
+        "name": "Steel Platebody",
+        "level": 48,
+        "xp": 187,
+        "bars": 5,
+        "output": "steel_platebody"
+      },
+      {
+        "id": "smith_steel_platelegs",
+        "name": "Steel Platelegs",
+        "level": 46,
+        "xp": 112,
+        "bars": 3,
+        "output": "steel_platelegs"
+      },
+      {
+        "id": "smith_steel_pickaxe",
+        "name": "Steel Pickaxe",
+        "level": 35,
+        "xp": 75,
+        "bars": 2,
+        "output": "steel_pickaxe"
+      }
+    ],
+    "mithril": [
+      {
+        "id": "smith_mithril_dagger",
+        "name": "Mithril Dagger",
+        "level": 50,
+        "xp": 50,
+        "bars": 1,
+        "output": "mithril_dagger"
+      },
+      {
+        "id": "smith_mithril_sword",
+        "name": "Mithril Sword",
+        "level": 54,
+        "xp": 50,
+        "bars": 1,
+        "output": "mithril_sword"
+      },
+      {
+        "id": "smith_mithril_scimitar",
+        "name": "Mithril Scimitar",
+        "level": 55,
+        "xp": 100,
+        "bars": 2,
+        "output": "mithril_scimitar"
+      },
+      {
+        "id": "smith_mithril_platebody",
+        "name": "Mithril Platebody",
+        "level": 68,
+        "xp": 250,
+        "bars": 5,
+        "output": "mithril_platebody"
+      },
+      {
+        "id": "smith_mithril_pickaxe",
+        "name": "Mithril Pickaxe",
+        "level": 55,
+        "xp": 100,
+        "bars": 2,
+        "output": "mithril_pickaxe"
+      }
+    ],
+    "adamant": [
+      {
+        "id": "smith_adamant_dagger",
+        "name": "Adamant Dagger",
+        "level": 70,
+        "xp": 62,
+        "bars": 1,
+        "output": "adamant_dagger"
+      },
+      {
+        "id": "smith_adamant_sword",
+        "name": "Adamant Sword",
+        "level": 74,
+        "xp": 62,
+        "bars": 1,
+        "output": "adamant_sword"
+      },
+      {
+        "id": "smith_adamant_scimitar",
+        "name": "Adamant Scimitar",
+        "level": 75,
+        "xp": 125,
+        "bars": 2,
+        "output": "adamant_scimitar"
+      },
+      {
+        "id": "smith_adamant_platebody",
+        "name": "Adamant Platebody",
+        "level": 88,
+        "xp": 312,
+        "bars": 5,
+        "output": "adamant_platebody"
+      },
+      {
+        "id": "smith_adamant_pickaxe",
+        "name": "Adamant Pickaxe",
+        "level": 75,
+        "xp": 125,
+        "bars": 2,
+        "output": "adamant_pickaxe"
+      }
+    ],
+    "runite": [
+      {
+        "id": "smith_runite_dagger",
+        "name": "Runite Dagger",
+        "level": 85,
+        "xp": 75,
+        "bars": 1,
+        "output": "runite_dagger"
+      },
+      {
+        "id": "smith_runite_sword",
+        "name": "Runite Sword",
+        "level": 89,
+        "xp": 75,
+        "bars": 1,
+        "output": "runite_sword"
+      },
+      {
+        "id": "smith_runite_scimitar",
+        "name": "Runite Scimitar",
+        "level": 90,
+        "xp": 150,
+        "bars": 2,
+        "output": "runite_scimitar"
+      },
+      {
+        "id": "smith_runite_platebody",
+        "name": "Runite Platebody",
+        "level": 99,
+        "xp": 375,
+        "bars": 5,
+        "output": "runite_platebody"
+      },
+      {
+        "id": "smith_runite_pickaxe",
+        "name": "Runite Pickaxe",
+        "level": 90,
+        "xp": 150,
+        "bars": 2,
+        "output": "runite_pickaxe"
+      }
+    ]
+  }
+}

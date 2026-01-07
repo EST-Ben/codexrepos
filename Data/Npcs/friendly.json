@@ -1,0 +1,205 @@
+{
+  "npcs": [
+    {
+      "id": "guide",
+      "name": "Guide",
+      "type": "tutorial",
+      "location": { "zone": "tutorial_island", "x": 100, "y": 100 },
+      "dialogue": "guide_intro",
+      "examine": "A helpful guide for new adventurers"
+    },
+    {
+      "id": "hans",
+      "name": "Hans",
+      "type": "wandering",
+      "location": { "zone": "lumbridge", "x": 3222, "y": 3218 },
+      "wanderRadius": 20,
+      "dialogue": "hans_chat",
+      "examine": "He wanders around Lumbridge Castle",
+      "actions": ["chat", "age"]
+    },
+    {
+      "id": "cook",
+      "name": "Cook",
+      "type": "quest",
+      "location": { "zone": "lumbridge", "x": 3208, "y": 3212 },
+      "dialogue": "cook_chat",
+      "questStart": "cooks_assistant",
+      "examine": "The head cook of Lumbridge Castle"
+    },
+    {
+      "id": "duke_horacio",
+      "name": "Duke Horacio",
+      "type": "quest",
+      "location": { "zone": "lumbridge", "x": 3210, "y": 3220 },
+      "dialogue": "duke_chat",
+      "examine": "The ruler of Lumbridge",
+      "giveItems": [
+        { "itemId": "anti_dragon_shield", "quest": "dragon_slayer", "step": 8 }
+      ]
+    },
+    {
+      "id": "father_aereck",
+      "name": "Father Aereck",
+      "type": "service",
+      "location": { "zone": "lumbridge", "x": 3243, "y": 3210 },
+      "dialogue": "aereck_chat",
+      "examine": "A priest of Saradomin",
+      "services": ["bless_symbol"]
+    },
+    {
+      "id": "banker",
+      "name": "Banker",
+      "type": "service",
+      "locations": [
+        { "zone": "lumbridge", "x": 3208, "y": 3220 },
+        { "zone": "varrock", "x": 3253, "y": 3420 },
+        { "zone": "falador", "x": 2946, "y": 3368 }
+      ],
+      "dialogue": "banker_chat",
+      "examine": "A bank employee",
+      "services": ["bank", "pin_settings", "collection_box"]
+    },
+    {
+      "id": "grand_exchange_clerk",
+      "name": "Grand Exchange Clerk",
+      "type": "service",
+      "location": { "zone": "varrock", "x": 3164, "y": 3487 },
+      "dialogue": "ge_clerk_chat",
+      "examine": "Manages Grand Exchange trades",
+      "services": ["grand_exchange", "price_check"]
+    },
+    {
+      "id": "make_over_mage",
+      "name": "Make-over Mage",
+      "type": "service",
+      "location": { "zone": "falador", "x": 2900, "y": 3363 },
+      "dialogue": "makeover_chat",
+      "examine": "Can change your appearance",
+      "services": ["makeover"],
+      "cost": 3000
+    },
+    {
+      "id": "slayer_master_turael",
+      "name": "Turael",
+      "type": "slayer_master",
+      "location": { "zone": "burthorpe", "x": 2930, "y": 3535 },
+      "dialogue": "turael_chat",
+      "examine": "The easiest slayer master",
+      "slayerInfo": {
+        "combatLevelRequired": 1,
+        "taskWeighting": "beginner",
+        "slayerPointsPerTask": 0
+      }
+    },
+    {
+      "id": "slayer_master_vannaka",
+      "name": "Vannaka",
+      "type": "slayer_master",
+      "location": { "zone": "edgeville_dungeon", "x": 3146, "y": 9913 },
+      "dialogue": "vannaka_chat",
+      "examine": "A skilled slayer master",
+      "slayerInfo": {
+        "combatLevelRequired": 40,
+        "taskWeighting": "intermediate",
+        "slayerPointsPerTask": 4
+      }
+    },
+    {
+      "id": "slayer_master_nieve",
+      "name": "Nieve",
+      "type": "slayer_master",
+      "location": { "zone": "tree_gnome_stronghold", "x": 2434, "y": 3422 },
+      "dialogue": "nieve_chat",
+      "examine": "One of the best slayer masters",
+      "slayerInfo": {
+        "combatLevelRequired": 85,
+        "taskWeighting": "advanced",
+        "slayerPointsPerTask": 12
+      }
+    },
+    {
+      "id": "wise_old_man",
+      "name": "Wise Old Man",
+      "type": "service",
+      "location": { "zone": "draynor", "x": 3092, "y": 3268 },
+      "dialogue": "wise_old_man_chat",
+      "examine": "An eccentric old wizard",
+      "services": ["quest_cape_check", "bank_cleanup"]
+    },
+    {
+      "id": "nurse_sarah",
+      "name": "Nurse Sarah",
+      "type": "healer",
+      "location": { "zone": "lumbridge", "x": 3233, "y": 3218 },
+      "dialogue": "nurse_chat",
+      "examine": "Heals wounded adventurers",
+      "services": ["heal"],
+      "healAmount": "full"
+    },
+    {
+      "id": "fishing_tutor",
+      "name": "Fishing Tutor",
+      "type": "tutor",
+      "location": { "zone": "lumbridge", "x": 3246, "y": 3154 },
+      "dialogue": "fishing_tutor_chat",
+      "examine": "Can teach you about fishing",
+      "skill": "fishing",
+      "giveItems": [
+        { "itemId": "small_fishing_net", "quantity": 1, "free": true },
+        { "itemId": "fishing_rod", "quantity": 1, "free": true }
+      ]
+    },
+    {
+      "id": "mining_tutor",
+      "name": "Mining Tutor",
+      "type": "tutor",
+      "location": { "zone": "lumbridge", "x": 3227, "y": 3146 },
+      "dialogue": "mining_tutor_chat",
+      "examine": "Can teach you about mining",
+      "skill": "mining",
+      "giveItems": [
+        { "itemId": "bronze_pickaxe", "quantity": 1, "free": true }
+      ]
+    },
+    {
+      "id": "woodcutting_tutor",
+      "name": "Woodcutting Tutor",
+      "type": "tutor",
+      "location": { "zone": "lumbridge", "x": 3232, "y": 3242 },
+      "dialogue": "woodcutting_tutor_chat",
+      "examine": "Can teach you about woodcutting",
+      "skill": "woodcutting",
+      "giveItems": [
+        { "itemId": "bronze_axe", "quantity": 1, "free": true }
+      ]
+    }
+  ],
+  "wanderingNpcs": [
+    {
+      "id": "musician",
+      "name": "Musician",
+      "type": "rest",
+      "locations": [
+        { "zone": "lumbridge", "x": 3219, "y": 3244 },
+        { "zone": "varrock", "x": 3211, "y": 3428 },
+        { "zone": "falador", "x": 2987, "y": 3372 }
+      ],
+      "dialogue": "musician_chat",
+      "examine": "Rest near them to restore run energy faster",
+      "restBonus": 2.0
+    },
+    {
+      "id": "town_crier",
+      "name": "Town Crier",
+      "type": "info",
+      "locations": [
+        { "zone": "varrock", "x": 3213, "y": 3433 },
+        { "zone": "falador", "x": 2994, "y": 3343 }
+      ],
+      "dialogue": "town_crier_chat",
+      "examine": "Announces important events",
+      "announcements": true
+    }
+  ]
+}
