@@ -1,0 +1,418 @@
+{
+  "tools": {
+    "pickaxes": [
+      {
+        "id": "bronze_pickaxe",
+        "name": "Bronze Pickaxe",
+        "description": "A basic mining tool",
+        "type": "tool",
+        "subtype": "pickaxe",
+        "tier": 1,
+        "value": 50,
+        "requirements": { "mining": 1 },
+        "stats": { "miningSpeed": 1.0 }
+      },
+      {
+        "id": "iron_pickaxe",
+        "name": "Iron Pickaxe",
+        "description": "An improved mining tool",
+        "type": "tool",
+        "subtype": "pickaxe",
+        "tier": 2,
+        "value": 150,
+        "requirements": { "mining": 10 },
+        "stats": { "miningSpeed": 1.2 }
+      },
+      {
+        "id": "steel_pickaxe",
+        "name": "Steel Pickaxe",
+        "description": "A reliable steel pickaxe",
+        "type": "tool",
+        "subtype": "pickaxe",
+        "tier": 3,
+        "value": 400,
+        "requirements": { "mining": 20 },
+        "stats": { "miningSpeed": 1.4 }
+      },
+      {
+        "id": "mithril_pickaxe",
+        "name": "Mithril Pickaxe",
+        "description": "A lightweight efficient pickaxe",
+        "type": "tool",
+        "subtype": "pickaxe",
+        "tier": 4,
+        "value": 1500,
+        "requirements": { "mining": 40 },
+        "stats": { "miningSpeed": 1.7 }
+      },
+      {
+        "id": "adamant_pickaxe",
+        "name": "Adamant Pickaxe",
+        "description": "A powerful adamantite pickaxe",
+        "type": "tool",
+        "subtype": "pickaxe",
+        "tier": 5,
+        "value": 5000,
+        "requirements": { "mining": 60 },
+        "stats": { "miningSpeed": 2.0 }
+      },
+      {
+        "id": "runite_pickaxe",
+        "name": "Runite Pickaxe",
+        "description": "The best non-magical pickaxe",
+        "type": "tool",
+        "subtype": "pickaxe",
+        "tier": 6,
+        "value": 20000,
+        "requirements": { "mining": 80 },
+        "stats": { "miningSpeed": 2.4 }
+      },
+      {
+        "id": "dragon_pickaxe",
+        "name": "Dragon Pickaxe",
+        "description": "A legendary pickaxe with a special ability",
+        "type": "tool",
+        "subtype": "pickaxe",
+        "tier": 7,
+        "value": 500000,
+        "requirements": { "mining": 85 },
+        "stats": { "miningSpeed": 2.8 },
+        "ability": { "name": "Rock Smash", "boostMining": 3, "duration": 30, "cooldown": 180 }
+      }
+    ],
+    "axes": [
+      {
+        "id": "bronze_axe",
+        "name": "Bronze Axe",
+        "description": "A basic woodcutting tool",
+        "type": "tool",
+        "subtype": "axe",
+        "tier": 1,
+        "value": 50,
+        "requirements": { "woodcutting": 1 },
+        "stats": { "woodcuttingSpeed": 1.0 }
+      },
+      {
+        "id": "iron_axe",
+        "name": "Iron Axe",
+        "description": "An improved woodcutting tool",
+        "type": "tool",
+        "subtype": "axe",
+        "tier": 2,
+        "value": 150,
+        "requirements": { "woodcutting": 10 },
+        "stats": { "woodcuttingSpeed": 1.2 }
+      },
+      {
+        "id": "steel_axe",
+        "name": "Steel Axe",
+        "description": "A reliable steel axe",
+        "type": "tool",
+        "subtype": "axe",
+        "tier": 3,
+        "value": 400,
+        "requirements": { "woodcutting": 20 },
+        "stats": { "woodcuttingSpeed": 1.4 }
+      },
+      {
+        "id": "mithril_axe",
+        "name": "Mithril Axe",
+        "description": "A lightweight efficient axe",
+        "type": "tool",
+        "subtype": "axe",
+        "tier": 4,
+        "value": 1500,
+        "requirements": { "woodcutting": 40 },
+        "stats": { "woodcuttingSpeed": 1.7 }
+      },
+      {
+        "id": "adamant_axe",
+        "name": "Adamant Axe",
+        "description": "A powerful adamantite axe",
+        "type": "tool",
+        "subtype": "axe",
+        "tier": 5,
+        "value": 5000,
+        "requirements": { "woodcutting": 60 },
+        "stats": { "woodcuttingSpeed": 2.0 }
+      },
+      {
+        "id": "runite_axe",
+        "name": "Runite Axe",
+        "description": "The best non-magical axe",
+        "type": "tool",
+        "subtype": "axe",
+        "tier": 6,
+        "value": 20000,
+        "requirements": { "woodcutting": 80 },
+        "stats": { "woodcuttingSpeed": 2.4 }
+      },
+      {
+        "id": "dragon_axe",
+        "name": "Dragon Axe",
+        "description": "A legendary axe with a special ability",
+        "type": "tool",
+        "subtype": "axe",
+        "tier": 7,
+        "value": 500000,
+        "requirements": { "woodcutting": 85 },
+        "stats": { "woodcuttingSpeed": 2.8 },
+        "ability": { "name": "Timber!", "boostWoodcutting": 3, "duration": 30, "cooldown": 180 }
+      }
+    ],
+    "fishingRods": [
+      {
+        "id": "fishing_rod",
+        "name": "Fishing Rod",
+        "description": "A basic fishing rod",
+        "type": "tool",
+        "subtype": "fishing_rod",
+        "tier": 1,
+        "value": 25,
+        "requirements": { "fishing": 1 },
+        "stats": { "fishingSpeed": 1.0 },
+        "canCatch": ["shrimp", "sardine", "herring", "trout", "salmon"]
+      },
+      {
+        "id": "fly_fishing_rod",
+        "name": "Fly Fishing Rod",
+        "description": "For catching river fish",
+        "type": "tool",
+        "subtype": "fishing_rod",
+        "tier": 2,
+        "value": 100,
+        "requirements": { "fishing": 20 },
+        "stats": { "fishingSpeed": 1.3 },
+        "canCatch": ["trout", "salmon", "pike"]
+      },
+      {
+        "id": "harpoon",
+        "name": "Harpoon",
+        "description": "For catching large ocean fish",
+        "type": "tool",
+        "subtype": "fishing_rod",
+        "tier": 3,
+        "value": 300,
+        "requirements": { "fishing": 35 },
+        "stats": { "fishingSpeed": 1.0 },
+        "canCatch": ["tuna", "swordfish", "shark"]
+      },
+      {
+        "id": "dragon_harpoon",
+        "name": "Dragon Harpoon",
+        "description": "A legendary harpoon with enhanced speed",
+        "type": "tool",
+        "subtype": "fishing_rod",
+        "tier": 7,
+        "value": 400000,
+        "requirements": { "fishing": 85 },
+        "stats": { "fishingSpeed": 1.5 },
+        "canCatch": ["tuna", "swordfish", "shark", "rocktail"],
+        "ability": { "name": "Fish Frenzy", "boostFishing": 3, "duration": 30, "cooldown": 180 }
+      },
+      {
+        "id": "lobster_pot",
+        "name": "Lobster Pot",
+        "description": "A cage for catching lobsters",
+        "type": "tool",
+        "subtype": "fishing_rod",
+        "tier": 3,
+        "value": 150,
+        "requirements": { "fishing": 40 },
+        "stats": { "fishingSpeed": 1.0 },
+        "canCatch": ["lobster", "crab"]
+      }
+    ],
+    "other": [
+      {
+        "id": "tinderbox",
+        "name": "Tinderbox",
+        "description": "Used to light fires",
+        "type": "tool",
+        "subtype": "utility",
+        "tier": 1,
+        "value": 10,
+        "requirements": {},
+        "useWith": ["logs"]
+      },
+      {
+        "id": "hammer",
+        "name": "Hammer",
+        "description": "Used for smithing",
+        "type": "tool",
+        "subtype": "utility",
+        "tier": 1,
+        "value": 15,
+        "requirements": {},
+        "useWith": ["bars", "anvil"]
+      },
+      {
+        "id": "chisel",
+        "name": "Chisel",
+        "description": "Used for gem cutting and crafting",
+        "type": "tool",
+        "subtype": "utility",
+        "tier": 1,
+        "value": 20,
+        "requirements": {},
+        "useWith": ["gems", "bones"]
+      },
+      {
+        "id": "knife",
+        "name": "Knife",
+        "description": "Used for fletching and cooking",
+        "type": "tool",
+        "subtype": "utility",
+        "tier": 1,
+        "value": 15,
+        "requirements": {},
+        "useWith": ["logs", "fish"]
+      },
+      {
+        "id": "needle",
+        "name": "Needle",
+        "description": "Used for leather crafting",
+        "type": "tool",
+        "subtype": "utility",
+        "tier": 1,
+        "value": 5,
+        "requirements": {},
+        "useWith": ["leather", "thread"]
+      },
+      {
+        "id": "thread",
+        "name": "Thread",
+        "description": "Used with needle for crafting",
+        "type": "material",
+        "subtype": "utility",
+        "stackable": true,
+        "maxStack": 100,
+        "tier": 1,
+        "value": 2
+      },
+      {
+        "id": "saw",
+        "name": "Saw",
+        "description": "Used for construction",
+        "type": "tool",
+        "subtype": "utility",
+        "tier": 1,
+        "value": 50,
+        "requirements": {},
+        "useWith": ["planks"]
+      },
+      {
+        "id": "pestle_and_mortar",
+        "name": "Pestle and Mortar",
+        "description": "Used for grinding ingredients in alchemy",
+        "type": "tool",
+        "subtype": "utility",
+        "tier": 1,
+        "value": 25,
+        "requirements": {},
+        "useWith": ["herbs", "secondary_ingredients"]
+      }
+    ]
+  },
+  "herbalism": [
+    {
+      "id": "guam_leaf",
+      "name": "Guam Leaf",
+      "description": "A basic herb used in alchemy",
+      "type": "material",
+      "subtype": "herb",
+      "stackable": true,
+      "maxStack": 100,
+      "value": 10,
+      "source": { "skill": "foraging", "level": 1, "xp": 5 }
+    },
+    {
+      "id": "marrentill",
+      "name": "Marrentill",
+      "description": "An herb with antipoison properties",
+      "type": "material",
+      "subtype": "herb",
+      "stackable": true,
+      "maxStack": 100,
+      "value": 20,
+      "source": { "skill": "foraging", "level": 9, "xp": 10 }
+    },
+    {
+      "id": "tarromin",
+      "name": "Tarromin",
+      "description": "An herb used in strength potions",
+      "type": "material",
+      "subtype": "herb",
+      "stackable": true,
+      "maxStack": 100,
+      "value": 35,
+      "source": { "skill": "foraging", "level": 14, "xp": 15 }
+    },
+    {
+      "id": "harralander",
+      "name": "Harralander",
+      "description": "A versatile herb for various potions",
+      "type": "material",
+      "subtype": "herb",
+      "stackable": true,
+      "maxStack": 100,
+      "value": 50,
+      "source": { "skill": "foraging", "level": 22, "xp": 22 }
+    },
+    {
+      "id": "ranarr",
+      "name": "Ranarr",
+      "description": "A valuable herb for prayer potions",
+      "type": "material",
+      "subtype": "herb",
+      "stackable": true,
+      "maxStack": 100,
+      "value": 500,
+      "source": { "skill": "foraging", "level": 32, "xp": 35 }
+    },
+    {
+      "id": "irit_leaf",
+      "name": "Irit Leaf",
+      "description": "Used in super attack potions",
+      "type": "material",
+      "subtype": "herb",
+      "stackable": true,
+      "maxStack": 100,
+      "value": 200,
+      "source": { "skill": "foraging", "level": 40, "xp": 45 }
+    },
+    {
+      "id": "kwuarm",
+      "name": "Kwuarm",
+      "description": "Used in super strength potions",
+      "type": "material",
+      "subtype": "herb",
+      "stackable": true,
+      "maxStack": 100,
+      "value": 350,
+      "source": { "skill": "foraging", "level": 54, "xp": 55 }
+    },
+    {
+      "id": "snapdragon",
+      "name": "Snapdragon",
+      "description": "A rare herb for powerful potions",
+      "type": "material",
+      "subtype": "herb",
+      "stackable": true,
+      "maxStack": 100,
+      "value": 800,
+      "source": { "skill": "foraging", "level": 62, "xp": 70 }
+    },
+    {
+      "id": "torstol",
+      "name": "Torstol",
+      "description": "The most valuable herb, used in overloads",
+      "type": "material",
+      "subtype": "herb",
+      "stackable": true,
+      "maxStack": 100,
+      "value": 5000,
+      "source": { "skill": "foraging", "level": 85, "xp": 120 }
+    }
+  ]
+}

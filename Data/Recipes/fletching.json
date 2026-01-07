@@ -1,0 +1,372 @@
+{
+  "bows": [
+    {
+      "id": "fletch_shortbow_u",
+      "name": "Shortbow (u)",
+      "skill": "fletching",
+      "level": 5,
+      "xp": 5,
+      "duration": 2,
+      "inputs": [{ "itemId": "normal_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "shortbow_u", "quantity": 1 }],
+      "tool": "knife"
+    },
+    {
+      "id": "fletch_longbow_u",
+      "name": "Longbow (u)",
+      "skill": "fletching",
+      "level": 10,
+      "xp": 10,
+      "duration": 2,
+      "inputs": [{ "itemId": "normal_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "longbow_u", "quantity": 1 }],
+      "tool": "knife"
+    },
+    {
+      "id": "fletch_oak_shortbow_u",
+      "name": "Oak Shortbow (u)",
+      "skill": "fletching",
+      "level": 20,
+      "xp": 16,
+      "duration": 2,
+      "inputs": [{ "itemId": "oak_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "oak_shortbow_u", "quantity": 1 }],
+      "tool": "knife"
+    },
+    {
+      "id": "fletch_oak_longbow_u",
+      "name": "Oak Longbow (u)",
+      "skill": "fletching",
+      "level": 25,
+      "xp": 25,
+      "duration": 2,
+      "inputs": [{ "itemId": "oak_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "oak_longbow_u", "quantity": 1 }],
+      "tool": "knife"
+    },
+    {
+      "id": "fletch_willow_shortbow_u",
+      "name": "Willow Shortbow (u)",
+      "skill": "fletching",
+      "level": 35,
+      "xp": 33,
+      "duration": 2,
+      "inputs": [{ "itemId": "willow_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "willow_shortbow_u", "quantity": 1 }],
+      "tool": "knife"
+    },
+    {
+      "id": "fletch_willow_longbow_u",
+      "name": "Willow Longbow (u)",
+      "skill": "fletching",
+      "level": 40,
+      "xp": 41,
+      "duration": 2,
+      "inputs": [{ "itemId": "willow_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "willow_longbow_u", "quantity": 1 }],
+      "tool": "knife"
+    },
+    {
+      "id": "fletch_maple_shortbow_u",
+      "name": "Maple Shortbow (u)",
+      "skill": "fletching",
+      "level": 50,
+      "xp": 50,
+      "duration": 2,
+      "inputs": [{ "itemId": "maple_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "maple_shortbow_u", "quantity": 1 }],
+      "tool": "knife"
+    },
+    {
+      "id": "fletch_maple_longbow_u",
+      "name": "Maple Longbow (u)",
+      "skill": "fletching",
+      "level": 55,
+      "xp": 58,
+      "duration": 2,
+      "inputs": [{ "itemId": "maple_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "maple_longbow_u", "quantity": 1 }],
+      "tool": "knife"
+    },
+    {
+      "id": "fletch_yew_shortbow_u",
+      "name": "Yew Shortbow (u)",
+      "skill": "fletching",
+      "level": 65,
+      "xp": 67,
+      "duration": 2,
+      "inputs": [{ "itemId": "yew_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "yew_shortbow_u", "quantity": 1 }],
+      "tool": "knife"
+    },
+    {
+      "id": "fletch_yew_longbow_u",
+      "name": "Yew Longbow (u)",
+      "skill": "fletching",
+      "level": 70,
+      "xp": 75,
+      "duration": 2,
+      "inputs": [{ "itemId": "yew_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "yew_longbow_u", "quantity": 1 }],
+      "tool": "knife"
+    },
+    {
+      "id": "fletch_magic_shortbow_u",
+      "name": "Magic Shortbow (u)",
+      "skill": "fletching",
+      "level": 80,
+      "xp": 83,
+      "duration": 2,
+      "inputs": [{ "itemId": "magic_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "magic_shortbow_u", "quantity": 1 }],
+      "tool": "knife"
+    },
+    {
+      "id": "fletch_magic_longbow_u",
+      "name": "Magic Longbow (u)",
+      "skill": "fletching",
+      "level": 85,
+      "xp": 91,
+      "duration": 2,
+      "inputs": [{ "itemId": "magic_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "magic_longbow_u", "quantity": 1 }],
+      "tool": "knife"
+    }
+  ],
+  "stringing": [
+    {
+      "id": "string_shortbow",
+      "name": "String Shortbow",
+      "skill": "fletching",
+      "level": 5,
+      "xp": 5,
+      "duration": 1,
+      "inputs": [
+        { "itemId": "shortbow_u", "quantity": 1 },
+        { "itemId": "bowstring", "quantity": 1 }
+      ],
+      "outputs": [{ "itemId": "shortbow", "quantity": 1 }]
+    },
+    {
+      "id": "string_longbow",
+      "name": "String Longbow",
+      "skill": "fletching",
+      "level": 10,
+      "xp": 10,
+      "duration": 1,
+      "inputs": [
+        { "itemId": "longbow_u", "quantity": 1 },
+        { "itemId": "bowstring", "quantity": 1 }
+      ],
+      "outputs": [{ "itemId": "longbow", "quantity": 1 }]
+    },
+    {
+      "id": "string_oak_shortbow",
+      "name": "String Oak Shortbow",
+      "skill": "fletching",
+      "level": 20,
+      "xp": 16,
+      "duration": 1,
+      "inputs": [
+        { "itemId": "oak_shortbow_u", "quantity": 1 },
+        { "itemId": "bowstring", "quantity": 1 }
+      ],
+      "outputs": [{ "itemId": "oak_shortbow", "quantity": 1 }]
+    },
+    {
+      "id": "string_yew_longbow",
+      "name": "String Yew Longbow",
+      "skill": "fletching",
+      "level": 70,
+      "xp": 75,
+      "duration": 1,
+      "inputs": [
+        { "itemId": "yew_longbow_u", "quantity": 1 },
+        { "itemId": "bowstring", "quantity": 1 }
+      ],
+      "outputs": [{ "itemId": "yew_longbow", "quantity": 1 }]
+    },
+    {
+      "id": "string_magic_longbow",
+      "name": "String Magic Longbow",
+      "skill": "fletching",
+      "level": 85,
+      "xp": 91,
+      "duration": 1,
+      "inputs": [
+        { "itemId": "magic_longbow_u", "quantity": 1 },
+        { "itemId": "bowstring", "quantity": 1 }
+      ],
+      "outputs": [{ "itemId": "magic_longbow", "quantity": 1 }]
+    }
+  ],
+  "arrows": [
+    {
+      "id": "fletch_arrow_shafts",
+      "name": "Arrow Shafts",
+      "skill": "fletching",
+      "level": 1,
+      "xp": 5,
+      "duration": 2,
+      "inputs": [{ "itemId": "normal_log", "quantity": 1 }],
+      "outputs": [{ "itemId": "arrow_shaft", "quantity": 15 }],
+      "tool": "knife"
+    },
+    {
+      "id": "fletch_headless_arrows",
+      "name": "Headless Arrows",
+      "skill": "fletching",
+      "level": 1,
+      "xp": 1,
+      "duration": 1,
+      "inputs": [
+        { "itemId": "arrow_shaft", "quantity": 15 },
+        { "itemId": "feather", "quantity": 15 }
+      ],
+      "outputs": [{ "itemId": "headless_arrow", "quantity": 15 }]
+    },
+    {
+      "id": "fletch_bronze_arrows",
+      "name": "Bronze Arrows",
+      "skill": "fletching",
+      "level": 1,
+      "xp": 1,
+      "duration": 1,
+      "inputs": [
+        { "itemId": "headless_arrow", "quantity": 15 },
+        { "itemId": "bronze_arrowhead", "quantity": 15 }
+      ],
+      "outputs": [{ "itemId": "bronze_arrow", "quantity": 15 }]
+    },
+    {
+      "id": "fletch_iron_arrows",
+      "name": "Iron Arrows",
+      "skill": "fletching",
+      "level": 15,
+      "xp": 2,
+      "duration": 1,
+      "inputs": [
+        { "itemId": "headless_arrow", "quantity": 15 },
+        { "itemId": "iron_arrowhead", "quantity": 15 }
+      ],
+      "outputs": [{ "itemId": "iron_arrow", "quantity": 15 }]
+    },
+    {
+      "id": "fletch_steel_arrows",
+      "name": "Steel Arrows",
+      "skill": "fletching",
+      "level": 30,
+      "xp": 5,
+      "duration": 1,
+      "inputs": [
+        { "itemId": "headless_arrow", "quantity": 15 },
+        { "itemId": "steel_arrowhead", "quantity": 15 }
+      ],
+      "outputs": [{ "itemId": "steel_arrow", "quantity": 15 }]
+    },
+    {
+      "id": "fletch_mithril_arrows",
+      "name": "Mithril Arrows",
+      "skill": "fletching",
+      "level": 45,
+      "xp": 7,
+      "duration": 1,
+      "inputs": [
+        { "itemId": "headless_arrow", "quantity": 15 },
+        { "itemId": "mithril_arrowhead", "quantity": 15 }
+      ],
+      "outputs": [{ "itemId": "mithril_arrow", "quantity": 15 }]
+    },
+    {
+      "id": "fletch_adamant_arrows",
+      "name": "Adamant Arrows",
+      "skill": "fletching",
+      "level": 60,
+      "xp": 10,
+      "duration": 1,
+      "inputs": [
+        { "itemId": "headless_arrow", "quantity": 15 },
+        { "itemId": "adamant_arrowhead", "quantity": 15 }
+      ],
+      "outputs": [{ "itemId": "adamant_arrow", "quantity": 15 }]
+    },
+    {
+      "id": "fletch_runite_arrows",
+      "name": "Runite Arrows",
+      "skill": "fletching",
+      "level": 75,
+      "xp": 12,
+      "duration": 1,
+      "inputs": [
+        { "itemId": "headless_arrow", "quantity": 15 },
+        { "itemId": "runite_arrowhead", "quantity": 15 }
+      ],
+      "outputs": [{ "itemId": "runite_arrow", "quantity": 15 }]
+    },
+    {
+      "id": "fletch_dragon_arrows",
+      "name": "Dragon Arrows",
+      "skill": "fletching",
+      "level": 90,
+      "xp": 15,
+      "duration": 1,
+      "inputs": [
+        { "itemId": "headless_arrow", "quantity": 15 },
+        { "itemId": "dragon_arrowhead", "quantity": 15 }
+      ],
+      "outputs": [{ "itemId": "dragon_arrow", "quantity": 15 }]
+    }
+  ],
+  "bolts": [
+    {
+      "id": "fletch_bronze_bolts",
+      "name": "Bronze Bolts",
+      "skill": "fletching",
+      "level": 9,
+      "xp": 0.5,
+      "duration": 1,
+      "inputs": [{ "itemId": "bronze_bolts_unf", "quantity": 10 }],
+      "outputs": [{ "itemId": "bronze_bolts", "quantity": 10 }]
+    },
+    {
+      "id": "fletch_mithril_bolts",
+      "name": "Mithril Bolts",
+      "skill": "fletching",
+      "level": 54,
+      "xp": 5,
+      "duration": 1,
+      "inputs": [{ "itemId": "mithril_bolts_unf", "quantity": 10 }],
+      "outputs": [{ "itemId": "mithril_bolts", "quantity": 10 }]
+    },
+    {
+      "id": "fletch_adamant_bolts",
+      "name": "Adamant Bolts",
+      "skill": "fletching",
+      "level": 61,
+      "xp": 7,
+      "duration": 1,
+      "inputs": [{ "itemId": "adamant_bolts_unf", "quantity": 10 }],
+      "outputs": [{ "itemId": "adamant_bolts", "quantity": 10 }]
+    },
+    {
+      "id": "fletch_runite_bolts",
+      "name": "Runite Bolts",
+      "skill": "fletching",
+      "level": 69,
+      "xp": 10,
+      "duration": 1,
+      "inputs": [{ "itemId": "runite_bolts_unf", "quantity": 10 }],
+      "outputs": [{ "itemId": "runite_bolts", "quantity": 10 }]
+    },
+    {
+      "id": "fletch_dragon_bolts",
+      "name": "Dragon Bolts",
+      "skill": "fletching",
+      "level": 84,
+      "xp": 12,
+      "duration": 1,
+      "inputs": [{ "itemId": "dragon_bolts_unf", "quantity": 10 }],
+      "outputs": [{ "itemId": "dragon_bolts", "quantity": 10 }]
+    }
+  ]
+}

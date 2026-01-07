@@ -6,17 +6,19 @@
  */
 
 import { PlayerManager } from '../managers/player-manager.js';
-import { ZoneManager } from '../managers/zone-manager.js';
+import { WorldService } from '../world/world-service.js';
 
 export class GameLoop {
   private running = false;
   private tickInterval: NodeJS.Timeout | null = null;
   private tickCount = 0;
   private lastTickTime = 0;
+  private saveInterval = 0;
+  private readonly SAVE_INTERVAL = 300; // Save every 300 ticks (~15 seconds at 20Hz)
 
   constructor(
     private playerManager: PlayerManager,
-    private zoneManager: ZoneManager
+    private worldService: WorldService
   ) {}
 
   start(tickRate: number): void {
@@ -52,14 +54,21 @@ export class GameLoop {
     this.tickCount++;
 
     try {
-      // Update all zones
-      this.zoneManager.update(deltaTime);
+      // Update world state (NPCs, resources, events)
+      this.worldService.update();
 
       // Process player states
       this.playerManager.update(deltaTime);
 
       // Broadcast state updates to nearby players
       this.broadcastUpdates();
+
+      // Periodic saves
+      this.saveInterval++;
+      if (this.saveInterval >= this.SAVE_INTERVAL) {
+        this.saveInterval = 0;
+        this.periodicSave();
+      }
     } catch (error) {
       console.error(`[GameLoop] Error in tick ${this.tickCount}:`, error);
     }
@@ -74,11 +83,37 @@ export class GameLoop {
 
       const nearbyPlayers = this.playerManager.getPlayersInZone(player.zoneId);
 
-      for (const nearby of nearbyPlayers) {
-        if (nearby.id === player.id) continue;
-        // TODO: Send position update packet to nearby player
+      // Build list of nearby player positions
+      const otherPlayers = nearbyPlayers
+        .filter((p) => p.id !== player.id && p.character)
+        .map((p) => ({
+          id: p.character!.id,
+          name: p.character!.name,
+          position: p.character!.position,
+          rotation: p.character!.rotation,
+          health: p.character!.health,
+          maxHealth: p.character!.maxHealth,
+        }));
+
+      // Only send if there are other players
+      if (otherPlayers.length > 0) {
+        const message = JSON.stringify({
+          type: 'players_update',
+          data: { players: otherPlayers },
+        });
+
+        if (player.socket.readyState === 1) {
+          player.socket.send(message);
+        }
       }
     }
+  }
+
+  private periodicSave(): void {
+    // Save all online players periodically
+    this.playerManager.saveAllPlayers().catch((error) => {
+      console.error('[GameLoop] Periodic save failed:', error);
+    });
   }
 
   get isRunning(): boolean {

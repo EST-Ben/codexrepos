@@ -1,0 +1,273 @@
+{
+  "shops": [
+    {
+      "id": "lumbridge_general_store",
+      "name": "Lumbridge General Store",
+      "owner": "shop_keeper",
+      "location": { "zone": "lumbridge", "x": 3211, "y": 3247 },
+      "currency": "gold_coins",
+      "buyRate": 0.6,
+      "sellRate": 1.0,
+      "stock": [
+        { "itemId": "pot", "quantity": 5, "price": 1 },
+        { "itemId": "jug", "quantity": 2, "price": 1 },
+        { "itemId": "shears", "quantity": 2, "price": 1 },
+        { "itemId": "bucket", "quantity": 3, "price": 2 },
+        { "itemId": "bowl", "quantity": 2, "price": 5 },
+        { "itemId": "cake_tin", "quantity": 2, "price": 10 },
+        { "itemId": "tinderbox", "quantity": 3, "price": 1 },
+        { "itemId": "chisel", "quantity": 2, "price": 14 },
+        { "itemId": "hammer", "quantity": 5, "price": 13 },
+        { "itemId": "newcomer_map", "quantity": 10, "price": 1 }
+      ],
+      "buysAll": true
+    },
+    {
+      "id": "bobs_axes",
+      "name": "Bob's Brilliant Axes",
+      "owner": "bob",
+      "location": { "zone": "lumbridge", "x": 3231, "y": 3203 },
+      "currency": "gold_coins",
+      "buyRate": 0.5,
+      "sellRate": 1.0,
+      "stock": [
+        { "itemId": "bronze_axe", "quantity": 10, "price": 16 },
+        { "itemId": "iron_axe", "quantity": 5, "price": 56 },
+        { "itemId": "steel_axe", "quantity": 3, "price": 200 },
+        { "itemId": "bronze_pickaxe", "quantity": 5, "price": 18 },
+        { "itemId": "iron_pickaxe", "quantity": 3, "price": 70 }
+      ],
+      "repairs": true,
+      "repairTypes": ["barrows"]
+    },
+    {
+      "id": "varrock_sword_shop",
+      "name": "Varrock Sword Shop",
+      "owner": "zaff",
+      "location": { "zone": "varrock", "x": 3203, "y": 3434 },
+      "currency": "gold_coins",
+      "buyRate": 0.5,
+      "sellRate": 1.0,
+      "stock": [
+        { "itemId": "bronze_sword", "quantity": 10, "price": 26 },
+        { "itemId": "iron_sword", "quantity": 5, "price": 91 },
+        { "itemId": "steel_sword", "quantity": 3, "price": 325 },
+        { "itemId": "mithril_sword", "quantity": 1, "price": 845 },
+        { "itemId": "adamant_sword", "quantity": 1, "price": 2080 },
+        { "itemId": "bronze_longsword", "quantity": 5, "price": 40 },
+        { "itemId": "iron_longsword", "quantity": 3, "price": 140 },
+        { "itemId": "steel_longsword", "quantity": 2, "price": 500 },
+        { "itemId": "mithril_longsword", "quantity": 1, "price": 1300 }
+      ]
+    },
+    {
+      "id": "zaff_staffs",
+      "name": "Zaff's Superior Staffs",
+      "owner": "zaff",
+      "location": { "zone": "varrock", "x": 3203, "y": 3434 },
+      "currency": "gold_coins",
+      "buyRate": 0.5,
+      "sellRate": 1.0,
+      "stock": [
+        { "itemId": "staff", "quantity": 5, "price": 15 },
+        { "itemId": "magic_staff", "quantity": 5, "price": 200 },
+        { "itemId": "staff_of_air", "quantity": 2, "price": 1500 },
+        { "itemId": "staff_of_water", "quantity": 2, "price": 1500 },
+        { "itemId": "staff_of_earth", "quantity": 2, "price": 1500 },
+        { "itemId": "staff_of_fire", "quantity": 2, "price": 1500 },
+        { "itemId": "battlestaff", "quantity": 5, "price": 7000, "dailyLimit": 5 }
+      ]
+    },
+    {
+      "id": "auburys_rune_shop",
+      "name": "Aubury's Rune Shop",
+      "owner": "aubury",
+      "location": { "zone": "varrock", "x": 3253, "y": 3401 },
+      "currency": "gold_coins",
+      "buyRate": 0.5,
+      "sellRate": 1.0,
+      "stock": [
+        { "itemId": "air_rune", "quantity": 1000, "price": 5 },
+        { "itemId": "water_rune", "quantity": 1000, "price": 5 },
+        { "itemId": "earth_rune", "quantity": 1000, "price": 5 },
+        { "itemId": "fire_rune", "quantity": 1000, "price": 5 },
+        { "itemId": "mind_rune", "quantity": 500, "price": 7 },
+        { "itemId": "body_rune", "quantity": 500, "price": 8 },
+        { "itemId": "chaos_rune", "quantity": 250, "price": 90 },
+        { "itemId": "death_rune", "quantity": 250, "price": 180 },
+        { "itemId": "nature_rune", "quantity": 250, "price": 150 },
+        { "itemId": "law_rune", "quantity": 250, "price": 240 }
+      ],
+      "teleports": ["essence_mine"]
+    },
+    {
+      "id": "varrock_armor_shop",
+      "name": "Horvik's Armour Shop",
+      "owner": "horvik",
+      "location": { "zone": "varrock", "x": 3229, "y": 3436 },
+      "currency": "gold_coins",
+      "buyRate": 0.5,
+      "sellRate": 1.0,
+      "stock": [
+        { "itemId": "bronze_platebody", "quantity": 5, "price": 160 },
+        { "itemId": "iron_platebody", "quantity": 3, "price": 560 },
+        { "itemId": "steel_platebody", "quantity": 2, "price": 2000 },
+        { "itemId": "mithril_platebody", "quantity": 1, "price": 5200 },
+        { "itemId": "bronze_chainbody", "quantity": 5, "price": 60 },
+        { "itemId": "iron_chainbody", "quantity": 3, "price": 210 },
+        { "itemId": "steel_chainbody", "quantity": 2, "price": 750 }
+      ]
+    },
+    {
+      "id": "fishing_shop",
+      "name": "Gerrant's Fishy Business",
+      "owner": "gerrant",
+      "location": { "zone": "port_sarim", "x": 3014, "y": 3224 },
+      "currency": "gold_coins",
+      "buyRate": 0.5,
+      "sellRate": 1.0,
+      "stock": [
+        { "itemId": "small_fishing_net", "quantity": 5, "price": 5 },
+        { "itemId": "fishing_rod", "quantity": 10, "price": 5 },
+        { "itemId": "fly_fishing_rod", "quantity": 5, "price": 50 },
+        { "itemId": "feather", "quantity": 1000, "price": 2 },
+        { "itemId": "fishing_bait", "quantity": 1000, "price": 3 },
+        { "itemId": "harpoon", "quantity": 3, "price": 45 },
+        { "itemId": "lobster_pot", "quantity": 3, "price": 20 }
+      ],
+      "buyCategories": ["fish"]
+    },
+    {
+      "id": "alchemy_supplies",
+      "name": "Jatix's Herblore Shop",
+      "owner": "jatix",
+      "location": { "zone": "taverley", "x": 2899, "y": 3428 },
+      "currency": "gold_coins",
+      "buyRate": 0.4,
+      "sellRate": 1.0,
+      "stock": [
+        { "itemId": "vial", "quantity": 50, "price": 2 },
+        { "itemId": "vial_of_water", "quantity": 50, "price": 3 },
+        { "itemId": "eye_of_newt", "quantity": 100, "price": 3 },
+        { "itemId": "pestle_and_mortar", "quantity": 5, "price": 25 }
+      ]
+    },
+    {
+      "id": "slayer_equipment",
+      "name": "Slayer Equipment",
+      "owner": "slayer_master_turael",
+      "location": { "zone": "burthorpe", "x": 2930, "y": 3535 },
+      "currency": "gold_coins",
+      "slayerPointCurrency": true,
+      "stock": [
+        { "itemId": "enchanted_gem", "quantity": 10, "price": 1 },
+        { "itemId": "mirror_shield", "quantity": 5, "price": 5000 },
+        { "itemId": "nose_peg", "quantity": 5, "price": 500 },
+        { "itemId": "earmuffs", "quantity": 5, "price": 400 },
+        { "itemId": "face_mask", "quantity": 5, "price": 500 },
+        { "itemId": "witchwood_icon", "quantity": 3, "price": 8500 },
+        { "itemId": "bug_lantern", "quantity": 5, "price": 1500 }
+      ],
+      "slayerPointStock": [
+        { "itemId": "slayer_helm", "quantity": 1, "points": 400 },
+        { "itemId": "broad_arrows", "quantity": 250, "points": 35 },
+        { "itemId": "rune_pouch", "quantity": 1, "points": 750 },
+        { "itemId": "herb_sack", "quantity": 1, "points": 750 }
+      ]
+    },
+    {
+      "id": "culinaromancers_chest",
+      "name": "Culinaromancer's Chest",
+      "owner": "chest",
+      "location": { "zone": "lumbridge_basement", "x": 3212, "y": 9617 },
+      "currency": "gold_coins",
+      "requirements": { "quest": "recipe_for_disaster", "subquests": "variable" },
+      "stock": [
+        { "itemId": "bronze_gloves", "quantity": 10, "price": 130, "subquestsRequired": 0 },
+        { "itemId": "iron_gloves", "quantity": 10, "price": 325, "subquestsRequired": 1 },
+        { "itemId": "steel_gloves", "quantity": 10, "price": 650, "subquestsRequired": 2 },
+        { "itemId": "mithril_gloves", "quantity": 10, "price": 1300, "subquestsRequired": 4 },
+        { "itemId": "adamant_gloves", "quantity": 10, "price": 2600, "subquestsRequired": 5 },
+        { "itemId": "rune_gloves", "quantity": 10, "price": 6500, "subquestsRequired": 6 },
+        { "itemId": "dragon_gloves", "quantity": 10, "price": 100000, "subquestsRequired": 7 },
+        { "itemId": "barrows_gloves", "quantity": 10, "price": 130000, "subquestsRequired": 8 }
+      ]
+    },
+    {
+      "id": "warriors_guild_armory",
+      "name": "Lidio's Armour",
+      "owner": "lidio",
+      "location": { "zone": "warriors_guild", "x": 2858, "y": 3551 },
+      "currency": "warrior_guild_tokens",
+      "requirements": { "meleeTotal": 130 },
+      "stock": [
+        { "itemId": "bronze_defender", "quantity": 1, "tokens": 10 },
+        { "itemId": "iron_defender", "quantity": 1, "tokens": 20 },
+        { "itemId": "steel_defender", "quantity": 1, "tokens": 30 },
+        { "itemId": "mithril_defender", "quantity": 1, "tokens": 40 },
+        { "itemId": "adamant_defender", "quantity": 1, "tokens": 50 },
+        { "itemId": "rune_defender", "quantity": 1, "tokens": 60 },
+        { "itemId": "dragon_defender", "quantity": 1, "tokens": 100 }
+      ]
+    }
+  ],
+  "shopkeepers": [
+    {
+      "id": "shop_keeper",
+      "name": "Shop Keeper",
+      "type": "shopkeeper",
+      "dialogue": "shopkeeper_chat",
+      "examine": "A friendly shopkeeper"
+    },
+    {
+      "id": "bob",
+      "name": "Bob",
+      "type": "shopkeeper",
+      "dialogue": "bob_chat",
+      "examine": "A skilled axe seller and repairer"
+    },
+    {
+      "id": "zaff",
+      "name": "Zaff",
+      "type": "shopkeeper",
+      "dialogue": "zaff_chat",
+      "examine": "Sells swords and magical staffs"
+    },
+    {
+      "id": "aubury",
+      "name": "Aubury",
+      "type": "shopkeeper",
+      "dialogue": "aubury_chat",
+      "examine": "A mysterious rune seller",
+      "teleports": ["essence_mine"]
+    },
+    {
+      "id": "horvik",
+      "name": "Horvik",
+      "type": "shopkeeper",
+      "dialogue": "horvik_chat",
+      "examine": "A burly blacksmith"
+    },
+    {
+      "id": "gerrant",
+      "name": "Gerrant",
+      "type": "shopkeeper",
+      "dialogue": "gerrant_chat",
+      "examine": "Knows everything about fishing"
+    },
+    {
+      "id": "jatix",
+      "name": "Jatix",
+      "type": "shopkeeper",
+      "dialogue": "jatix_chat",
+      "examine": "Sells herblore supplies"
+    },
+    {
+      "id": "lidio",
+      "name": "Lidio",
+      "type": "shopkeeper",
+      "dialogue": "lidio_chat",
+      "examine": "Sells defender shields"
+    }
+  ]
+}
