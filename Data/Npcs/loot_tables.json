@@ -72,7 +72,7 @@
       ]
     },
     "bones": {
-      "description": "Bone drops for Prayer skill",
+      "description": "Bone drops for Sanctity skill",
       "items": [
         { "itemId": "bones", "quantity": 1, "weight": 100 }
       ]
@@ -165,10 +165,10 @@
         { "itemId": "eternium_shield", "quantity": 1, "weight": 8 }
       ]
     },
-    "rune_essence": {
-      "description": "Runecrafting materials",
+    "glyph_essence": {
+      "description": "Glyphcraft materials",
       "items": [
-        { "itemId": "rune_essence", "quantityMin": 5, "quantityMax": 15, "weight": 80 },
+        { "itemId": "glyph_essence", "quantityMin": 5, "quantityMax": 15, "weight": 80 },
         { "itemId": "pure_essence", "quantityMin": 3, "quantityMax": 10, "weight": 20 }
       ]
     }
@@ -503,7 +503,7 @@
       "beastslayerOnly": true,
       "finisherRequired": "rock_hammer"
     },
-    "nechryael": {
+    "voidfiend": {
       "alwaysDrops": ["ashes"],
       "mainDrops": [
         { "itemId": "gold_coins", "quantityMin": 600, "quantityMax": 2000, "chance": 1.0 }
@@ -513,7 +513,7 @@
         { "poolRef": "high_tier_herbs", "chance": 0.2 }
       ],
       "rareDrops": [
-        { "itemId": "rune_boots", "quantity": 1, "chance": 0.008 }
+        { "itemId": "voidfiend_boots", "quantity": 1, "chance": 0.008 }
       ],
       "beastslayerLevel": 80,
       "beastslayerOnly": true

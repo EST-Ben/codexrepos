@@ -465,8 +465,8 @@
       "examine": "Stone come to life."
     },
     {
-      "id": "nechryael",
-      "name": "Nechryael",
+      "id": "voidfiend",
+      "name": "Voidfiend",
       "description": "A powerful demon with devastating magic",
       "category": "demon",
       "level": 80,
@@ -478,7 +478,7 @@
       "zones": ["infernal_depths"],
       "stats": { "attack": 55, "defense": 60, "magic": 85, "speed": 1.0 },
       "abilities": ["death_spawn", "dark_magic"],
-      "lootTableRef": "nechryael",
+      "lootTableRef": "voidfiend",
       "beastslayerLevel": 80,
       "examine": "Pure malevolence."
     },
@@ -648,8 +648,8 @@
       "examine": "The desert's fury personified."
     },
     {
-      "id": "kurask",
-      "name": "Kurask",
+      "id": "thornback",
+      "name": "Thornback",
       "description": "A strange forest creature with thick hide",
       "category": "beast",
       "level": 70,
@@ -660,9 +660,9 @@
       "respawnTime": 100,
       "zones": ["verdant_highlands"],
       "stats": { "attack": 65, "defense": 80, "speed": 0.9 },
-      "lootTableRef": "kurask",
+      "lootTableRef": "thornback",
       "beastslayerLevel": 70,
-      "specialItem": "leaf_bladed_weapon",
+      "specialItem": "thorn_bladed_weapon",
       "examine": "Its hide deflects most weapons."
     },
     {

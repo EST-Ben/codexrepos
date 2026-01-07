@@ -3,7 +3,7 @@
     {
       "id": "fletch_shortbow_u",
       "name": "Ashwood Shortbow (u)",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 5,
       "xp": 5,
       "duration": 2,
@@ -14,7 +14,7 @@
     {
       "id": "fletch_longbow_u",
       "name": "Ashwood Longbow (u)",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 10,
       "xp": 10,
       "duration": 2,
@@ -25,7 +25,7 @@
     {
       "id": "fletch_goldleaf_shortbow_u",
       "name": "Goldleaf Shortbow (u)",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 20,
       "xp": 16,
       "duration": 2,
@@ -36,7 +36,7 @@
     {
       "id": "fletch_goldleaf_longbow_u",
       "name": "Goldleaf Longbow (u)",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 25,
       "xp": 25,
       "duration": 2,
@@ -47,7 +47,7 @@
     {
       "id": "fletch_whisperwood_shortbow_u",
       "name": "Whisperwood Shortbow (u)",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 35,
       "xp": 33,
       "duration": 2,
@@ -58,7 +58,7 @@
     {
       "id": "fletch_whisperwood_longbow_u",
       "name": "Whisperwood Longbow (u)",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 40,
       "xp": 41,
       "duration": 2,
@@ -69,7 +69,7 @@
     {
       "id": "fletch_ironwood_shortbow_u",
       "name": "Ironwood Shortbow (u)",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 65,
       "xp": 67,
       "duration": 2,
@@ -80,7 +80,7 @@
     {
       "id": "fletch_ironwood_longbow_u",
       "name": "Ironwood Longbow (u)",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 70,
       "xp": 75,
       "duration": 2,
@@ -91,7 +91,7 @@
     {
       "id": "fletch_spiritbark_shortbow_u",
       "name": "Spiritbark Shortbow (u)",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 80,
       "xp": 83,
       "duration": 2,
@@ -102,7 +102,7 @@
     {
       "id": "fletch_spiritbark_longbow_u",
       "name": "Spiritbark Longbow (u)",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 85,
       "xp": 91,
       "duration": 2,
@@ -115,7 +115,7 @@
     {
       "id": "string_ashwood_shortbow",
       "name": "String Ashwood Shortbow",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 5,
       "xp": 5,
       "duration": 1,
@@ -128,7 +128,7 @@
     {
       "id": "string_ashwood_longbow",
       "name": "String Ashwood Longbow",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 10,
       "xp": 10,
       "duration": 1,
@@ -141,7 +141,7 @@
     {
       "id": "string_goldleaf_shortbow",
       "name": "String Goldleaf Shortbow",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 20,
       "xp": 16,
       "duration": 1,
@@ -154,7 +154,7 @@
     {
       "id": "string_ironwood_longbow",
       "name": "String Ironwood Longbow",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 70,
       "xp": 75,
       "duration": 1,
@@ -167,7 +167,7 @@
     {
       "id": "string_spiritbark_longbow",
       "name": "String Spiritbark Longbow",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 85,
       "xp": 91,
       "duration": 1,
@@ -182,7 +182,7 @@
     {
       "id": "fletch_arrow_shafts",
       "name": "Arrow Shafts",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 1,
       "xp": 5,
       "duration": 2,
@@ -193,7 +193,7 @@
     {
       "id": "fletch_headless_arrows",
       "name": "Headless Arrows",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 1,
       "xp": 1,
       "duration": 1,
@@ -206,7 +206,7 @@
     {
       "id": "fletch_copperweave_arrows",
       "name": "Copperweave Arrows",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 1,
       "xp": 1,
       "duration": 1,
@@ -219,7 +219,7 @@
     {
       "id": "fletch_ironbark_arrows",
       "name": "Ironbark Arrows",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 15,
       "xp": 2,
       "duration": 1,
@@ -232,7 +232,7 @@
     {
       "id": "fletch_stormforged_arrows",
       "name": "Stormforged Arrows",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 30,
       "xp": 5,
       "duration": 1,
@@ -245,7 +245,7 @@
     {
       "id": "fletch_moonveil_arrows",
       "name": "Moonveil Arrows",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 45,
       "xp": 7,
       "duration": 1,
@@ -258,7 +258,7 @@
     {
       "id": "fletch_voidstone_arrows",
       "name": "Voidstone Arrows",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 60,
       "xp": 10,
       "duration": 1,
@@ -271,7 +271,7 @@
     {
       "id": "fletch_eternium_arrows",
       "name": "Eternium Arrows",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 75,
       "xp": 12,
       "duration": 1,
@@ -284,7 +284,7 @@
     {
       "id": "fletch_wyrmscale_arrows",
       "name": "Wyrmscale Arrows",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 90,
       "xp": 15,
       "duration": 1,
@@ -299,7 +299,7 @@
     {
       "id": "fletch_copperweave_bolts",
       "name": "Copperweave Bolts",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 9,
       "xp": 0.5,
       "duration": 1,
@@ -309,7 +309,7 @@
     {
       "id": "fletch_moonveil_bolts",
       "name": "Moonveil Bolts",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 54,
       "xp": 5,
       "duration": 1,
@@ -319,7 +319,7 @@
     {
       "id": "fletch_voidstone_bolts",
       "name": "Voidstone Bolts",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 61,
       "xp": 7,
       "duration": 1,
@@ -329,7 +329,7 @@
     {
       "id": "fletch_eternium_bolts",
       "name": "Eternium Bolts",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 69,
       "xp": 10,
       "duration": 1,
@@ -339,7 +339,7 @@
     {
       "id": "fletch_wyrmscale_bolts",
       "name": "Wyrmscale Bolts",
-      "skill": "fletching",
+      "skill": "bowcraft",
       "level": 84,
       "xp": 12,
       "duration": 1,

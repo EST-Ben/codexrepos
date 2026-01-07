@@ -260,7 +260,7 @@
       {
         "id": "carving_knife",
         "name": "Carving Knife",
-        "description": "Used for fletching and whittling",
+        "description": "Used for bowcraft and whittling",
         "type": "tool",
         "subtype": "utility",
         "tier": 1,
