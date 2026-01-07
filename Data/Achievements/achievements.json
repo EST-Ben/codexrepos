@@ -86,52 +86,52 @@
       }
     },
     {
-      "id": "dragon_hunter",
-      "name": "Dragon Hunter",
-      "description": "Slay 50 dragons",
+      "id": "wyrm_hunter",
+      "name": "Wyrm Hunter",
+      "description": "Slay 50 wyrms",
       "category": "combat",
       "tier": "hard",
       "points": 25,
       "requirements": {
         "type": "kill_count",
-        "target": "dragon",
+        "target": "wyrm",
         "targetType": "category",
         "count": 50
       },
       "rewards": {
-        "title": "the Dragon Hunter",
+        "title": "the Wyrm Hunter",
         "xp": { "melee": 5000 }
       }
     },
     {
-      "id": "slayer_novice",
-      "name": "Slayer Novice",
-      "description": "Complete 10 slayer tasks",
+      "id": "beastslayer_novice",
+      "name": "Beastslayer Novice",
+      "description": "Complete 10 beastslaying tasks",
       "category": "combat",
       "tier": "easy",
       "points": 10,
       "requirements": {
-        "type": "slayer_tasks",
+        "type": "beastslayer_tasks",
         "count": 10
       },
       "rewards": {
-        "slayerPoints": 50
+        "beastslayerPoints": 50
       }
     },
     {
-      "id": "slayer_master_achievement",
-      "name": "Slayer Master",
-      "description": "Complete 100 slayer tasks",
+      "id": "beastslayer_master_achievement",
+      "name": "Beastslayer Master",
+      "description": "Complete 100 beastslaying tasks",
       "category": "combat",
       "tier": "elite",
       "points": 50,
       "requirements": {
-        "type": "slayer_tasks",
+        "type": "beastslayer_tasks",
         "count": 100
       },
       "rewards": {
-        "title": "Slayer Master",
-        "slayerPoints": 500
+        "title": "Beastslayer Master",
+        "beastslayerPoints": 500
       }
     },
     {
@@ -143,7 +143,7 @@
       "points": 5,
       "requirements": {
         "type": "quest_complete",
-        "questId": "tutorial_island"
+        "questId": "the_awakening"
       },
       "rewards": {
         "items": [{ "itemId": "gold_coins", "quantity": 100 }]
@@ -292,15 +292,15 @@
       }
     },
     {
-      "id": "explorer_lumbridge",
-      "name": "Lumbridge Explorer",
-      "description": "Discover all locations in Lumbridge",
+      "id": "explorer_dawnhaven",
+      "name": "Dawnhaven Explorer",
+      "description": "Discover all locations in Dawnhaven",
       "category": "exploration",
       "tier": "easy",
       "points": 5,
       "requirements": {
         "type": "discover_area",
-        "zone": "lumbridge",
+        "zone": "dawnhaven",
         "percentage": 100
       },
       "rewards": {
@@ -350,18 +350,18 @@
       },
       "rewards": {
         "title": "the Billionaire",
-        "items": [{ "itemId": "golden_party_hat", "quantity": 1 }]
+        "items": [{ "itemId": "golden_crown", "quantity": 1 }]
       }
     },
     {
       "id": "first_trade",
       "name": "First Trade",
-      "description": "Complete your first Grand Exchange trade",
+      "description": "Complete your first Eternal Exchange trade",
       "category": "economy",
       "tier": "easy",
       "points": 5,
       "requirements": {
-        "type": "ge_trades",
+        "type": "exchange_trades",
         "count": 1
       },
       "rewards": {
@@ -371,12 +371,12 @@
     {
       "id": "merchant",
       "name": "Merchant",
-      "description": "Complete 100 Grand Exchange trades",
+      "description": "Complete 100 Eternal Exchange trades",
       "category": "economy",
       "tier": "medium",
       "points": 15,
       "requirements": {
-        "type": "ge_trades",
+        "type": "exchange_trades",
         "count": 100
       },
       "rewards": {
@@ -425,34 +425,34 @@
       }
     },
     {
-      "id": "bronze_collector",
-      "name": "Bronze Collector",
-      "description": "Collect a full set of bronze equipment",
+      "id": "copperweave_collector",
+      "name": "Copperweave Collector",
+      "description": "Collect a full set of copperweave equipment",
       "category": "collection",
       "tier": "easy",
       "points": 5,
       "requirements": {
         "type": "collect_set",
-        "setId": "bronze_equipment"
+        "setId": "copperweave_equipment"
       },
       "rewards": {
         "xp": { "defense": 100 }
       }
     },
     {
-      "id": "dragon_collector",
-      "name": "Dragon Collector",
-      "description": "Collect a full set of dragon equipment",
+      "id": "wyrmscale_collector",
+      "name": "Wyrmscale Collector",
+      "description": "Collect a full set of wyrmscale equipment",
       "category": "collection",
       "tier": "elite",
       "points": 75,
       "requirements": {
         "type": "collect_set",
-        "setId": "dragon_equipment"
+        "setId": "wyrmscale_equipment"
       },
       "rewards": {
-        "title": "Dragon Collector",
-        "items": [{ "itemId": "dragon_keepsake_key", "quantity": 1 }]
+        "title": "Wyrmscale Collector",
+        "items": [{ "itemId": "wyrmscale_keepsake_key", "quantity": 1 }]
       }
     },
     {
@@ -495,13 +495,13 @@
     "elite": { "color": "#FF9800", "multiplier": 5 }
   },
   "sets": {
-    "bronze_equipment": {
-      "name": "Bronze Equipment Set",
-      "items": ["bronze_helm", "bronze_platebody", "bronze_platelegs", "bronze_boots", "bronze_gauntlets", "bronze_sword", "bronze_shield"]
+    "copperweave_equipment": {
+      "name": "Copperweave Equipment Set",
+      "items": ["copperweave_helm", "copperweave_platebody", "copperweave_platelegs", "copperweave_boots", "copperweave_gauntlets", "copperweave_sword", "copperweave_shield"]
     },
-    "dragon_equipment": {
-      "name": "Dragon Equipment Set",
-      "items": ["dragon_helm", "dragon_platebody", "dragon_platelegs", "dragon_boots", "dragon_gauntlets", "dragon_scimitar", "dragon_defender"]
+    "wyrmscale_equipment": {
+      "name": "Wyrmscale Equipment Set",
+      "items": ["wyrmscale_helm", "wyrmscale_platebody", "wyrmscale_platelegs", "wyrmscale_boots", "wyrmscale_gauntlets", "wyrmscale_scimitar", "wyrmscale_defender"]
     }
   }
 }

@@ -1,296 +1,296 @@
 {
   "potions": [
     {
-      "id": "brew_attack_potion",
-      "name": "Attack Potion",
+      "id": "brew_vigor_draught",
+      "name": "Vigor Draught",
       "skill": "alchemy",
       "level": 1,
       "xp": 25,
       "duration": 4,
       "inputs": [
-        { "itemId": "guam_leaf", "quantity": 1 },
-        { "itemId": "eye_of_newt", "quantity": 1 },
+        { "itemId": "verdantleaf", "quantity": 1 },
+        { "itemId": "salamander_eye", "quantity": 1 },
         { "itemId": "vial_of_water", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "attack_potion", "quantity": 1 }]
+      "outputs": [{ "itemId": "vigor_draught", "quantity": 1 }]
     },
     {
-      "id": "brew_antipoison",
-      "name": "Antipoison",
+      "id": "brew_antivenom",
+      "name": "Antivenom",
       "skill": "alchemy",
       "level": 5,
       "xp": 37,
       "duration": 4,
       "inputs": [
-        { "itemId": "marrentill", "quantity": 1 },
-        { "itemId": "unicorn_horn_dust", "quantity": 1 },
+        { "itemId": "thornroot", "quantity": 1 },
+        { "itemId": "stag_horn_dust", "quantity": 1 },
         { "itemId": "vial_of_water", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "antipoison", "quantity": 1 }]
+      "outputs": [{ "itemId": "antivenom", "quantity": 1 }]
     },
     {
-      "id": "brew_defense_potion",
-      "name": "Defense Potion",
+      "id": "brew_fortitude_draught",
+      "name": "Fortitude Draught",
       "skill": "alchemy",
       "level": 9,
       "xp": 45,
       "duration": 4,
       "inputs": [
-        { "itemId": "marrentill", "quantity": 1 },
-        { "itemId": "white_berries", "quantity": 1 },
+        { "itemId": "thornroot", "quantity": 1 },
+        { "itemId": "moonberries", "quantity": 1 },
         { "itemId": "vial_of_water", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "defense_potion", "quantity": 1 }]
+      "outputs": [{ "itemId": "fortitude_draught", "quantity": 1 }]
     },
     {
-      "id": "brew_strength_potion",
-      "name": "Strength Potion",
+      "id": "brew_might_draught",
+      "name": "Might Draught",
       "skill": "alchemy",
       "level": 12,
       "xp": 50,
       "duration": 4,
       "inputs": [
-        { "itemId": "tarromin", "quantity": 1 },
-        { "itemId": "limpwurt_root", "quantity": 1 },
+        { "itemId": "bittervine", "quantity": 1 },
+        { "itemId": "stoutvine_root", "quantity": 1 },
         { "itemId": "vial_of_water", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "strength_potion", "quantity": 1 }]
+      "outputs": [{ "itemId": "might_draught", "quantity": 1 }]
     },
     {
-      "id": "brew_ranging_potion",
-      "name": "Ranging Potion",
+      "id": "brew_hawkeye_tincture",
+      "name": "Hawkeye Tincture",
       "skill": "alchemy",
       "level": 30,
       "xp": 75,
       "duration": 5,
       "inputs": [
-        { "itemId": "harralander", "quantity": 1 },
-        { "itemId": "wine_of_zamorak", "quantity": 1 },
+        { "itemId": "sunpetal", "quantity": 1 },
+        { "itemId": "crimson_wine", "quantity": 1 },
         { "itemId": "vial_of_water", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "ranging_potion", "quantity": 1 }]
+      "outputs": [{ "itemId": "hawkeye_tincture", "quantity": 1 }]
     },
     {
-      "id": "brew_magic_potion",
-      "name": "Magic Potion",
+      "id": "brew_arcane_infusion",
+      "name": "Arcane Infusion",
       "skill": "alchemy",
       "level": 36,
       "xp": 87,
       "duration": 5,
       "inputs": [
-        { "itemId": "harralander", "quantity": 1 },
-        { "itemId": "potato_cactus", "quantity": 1 },
+        { "itemId": "sunpetal", "quantity": 1 },
+        { "itemId": "needlefruit", "quantity": 1 },
         { "itemId": "vial_of_water", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "magic_potion", "quantity": 1 }]
+      "outputs": [{ "itemId": "arcane_infusion", "quantity": 1 }]
     },
     {
-      "id": "brew_prayer_potion",
-      "name": "Prayer Potion",
+      "id": "brew_spirit_elixir",
+      "name": "Spirit Elixir",
       "skill": "alchemy",
       "level": 38,
       "xp": 87,
       "duration": 5,
       "inputs": [
-        { "itemId": "ranarr", "quantity": 1 },
-        { "itemId": "snape_grass", "quantity": 1 },
+        { "itemId": "moonbloom", "quantity": 1 },
+        { "itemId": "spiritgrass", "quantity": 1 },
         { "itemId": "vial_of_water", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "prayer_potion", "quantity": 1 }]
+      "outputs": [{ "itemId": "spirit_elixir", "quantity": 1 }]
     },
     {
-      "id": "brew_super_attack",
-      "name": "Super Attack Potion",
+      "id": "brew_potent_vigor_draught",
+      "name": "Potent Vigor Draught",
       "skill": "alchemy",
       "level": 45,
       "xp": 100,
       "duration": 6,
       "inputs": [
-        { "itemId": "irit_leaf", "quantity": 1 },
-        { "itemId": "eye_of_newt", "quantity": 1 },
+        { "itemId": "stormleaf", "quantity": 1 },
+        { "itemId": "salamander_eye", "quantity": 1 },
         { "itemId": "vial_of_water", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "super_attack_potion", "quantity": 1 }]
+      "outputs": [{ "itemId": "potent_vigor_draught", "quantity": 1 }]
     },
     {
-      "id": "brew_super_strength",
-      "name": "Super Strength Potion",
+      "id": "brew_potent_might_draught",
+      "name": "Potent Might Draught",
       "skill": "alchemy",
       "level": 55,
       "xp": 125,
       "duration": 6,
       "inputs": [
-        { "itemId": "kwuarm", "quantity": 1 },
-        { "itemId": "limpwurt_root", "quantity": 1 },
+        { "itemId": "voidbloom", "quantity": 1 },
+        { "itemId": "stoutvine_root", "quantity": 1 },
         { "itemId": "vial_of_water", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "super_strength_potion", "quantity": 1 }]
+      "outputs": [{ "itemId": "potent_might_draught", "quantity": 1 }]
     },
     {
-      "id": "brew_super_restore",
-      "name": "Super Restore",
+      "id": "brew_revitalization_tonic",
+      "name": "Revitalization Tonic",
       "skill": "alchemy",
       "level": 63,
       "xp": 142,
       "duration": 6,
       "inputs": [
-        { "itemId": "snapdragon", "quantity": 1 },
-        { "itemId": "red_spider_eggs", "quantity": 1 },
+        { "itemId": "starfall_petal", "quantity": 1 },
+        { "itemId": "venomweaver_eggs", "quantity": 1 },
         { "itemId": "vial_of_water", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "super_restore", "quantity": 1 }]
+      "outputs": [{ "itemId": "revitalization_tonic", "quantity": 1 }]
     },
     {
-      "id": "brew_antifire",
-      "name": "Antifire Potion",
+      "id": "brew_wyrmward_potion",
+      "name": "Wyrmward Potion",
       "skill": "alchemy",
       "level": 69,
       "xp": 157,
       "duration": 6,
       "inputs": [
-        { "itemId": "snapdragon", "quantity": 1 },
-        { "itemId": "dragon_scale_dust", "quantity": 1 },
+        { "itemId": "starfall_petal", "quantity": 1 },
+        { "itemId": "wyrm_scale_dust", "quantity": 1 },
         { "itemId": "vial_of_water", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "antifire_potion", "quantity": 1 }]
+      "outputs": [{ "itemId": "wyrmward_potion", "quantity": 1 }]
     },
     {
-      "id": "brew_saradomin_brew",
-      "name": "Saradomin Brew",
+      "id": "brew_blessing_brew",
+      "name": "Blessing Brew",
       "skill": "alchemy",
       "level": 81,
       "xp": 180,
       "duration": 7,
       "inputs": [
-        { "itemId": "torstol", "quantity": 1 },
-        { "itemId": "crushed_nest", "quantity": 1 },
+        { "itemId": "eternitys_bloom", "quantity": 1 },
+        { "itemId": "powdered_nest", "quantity": 1 },
         { "itemId": "vial_of_water", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "saradomin_brew", "quantity": 1 }]
+      "outputs": [{ "itemId": "blessing_brew", "quantity": 1 }]
     },
     {
-      "id": "brew_overload",
-      "name": "Overload",
+      "id": "brew_eternity_elixir",
+      "name": "Eternity Elixir",
       "skill": "alchemy",
       "level": 96,
       "xp": 1000,
       "duration": 10,
       "inputs": [
-        { "itemId": "extreme_attack", "quantity": 1 },
-        { "itemId": "extreme_strength", "quantity": 1 },
-        { "itemId": "extreme_defence", "quantity": 1 },
-        { "itemId": "extreme_ranging", "quantity": 1 },
-        { "itemId": "extreme_magic", "quantity": 1 },
-        { "itemId": "torstol", "quantity": 1 }
+        { "itemId": "supreme_vigor", "quantity": 1 },
+        { "itemId": "supreme_might", "quantity": 1 },
+        { "itemId": "supreme_fortitude", "quantity": 1 },
+        { "itemId": "supreme_hawkeye", "quantity": 1 },
+        { "itemId": "supreme_arcane", "quantity": 1 },
+        { "itemId": "eternitys_bloom", "quantity": 1 }
       ],
-      "outputs": [{ "itemId": "overload_potion", "quantity": 1 }],
-      "notes": "Untradeable, must create from extremes"
+      "outputs": [{ "itemId": "eternity_elixir", "quantity": 1 }],
+      "notes": "Untradeable, must create from supreme potions"
     }
   ],
   "cleanHerbs": [
     {
-      "id": "clean_guam",
-      "name": "Clean Guam Leaf",
+      "id": "clean_verdantleaf",
+      "name": "Clean Verdantleaf",
       "skill": "alchemy",
       "level": 1,
       "xp": 2,
       "duration": 1,
-      "inputs": [{ "itemId": "grimy_guam", "quantity": 1 }],
-      "outputs": [{ "itemId": "guam_leaf", "quantity": 1 }]
+      "inputs": [{ "itemId": "grimy_verdantleaf", "quantity": 1 }],
+      "outputs": [{ "itemId": "verdantleaf", "quantity": 1 }]
     },
     {
-      "id": "clean_marrentill",
-      "name": "Clean Marrentill",
+      "id": "clean_thornroot",
+      "name": "Clean Thornroot",
       "skill": "alchemy",
       "level": 5,
       "xp": 3,
       "duration": 1,
-      "inputs": [{ "itemId": "grimy_marrentill", "quantity": 1 }],
-      "outputs": [{ "itemId": "marrentill", "quantity": 1 }]
+      "inputs": [{ "itemId": "grimy_thornroot", "quantity": 1 }],
+      "outputs": [{ "itemId": "thornroot", "quantity": 1 }]
     },
     {
-      "id": "clean_tarromin",
-      "name": "Clean Tarromin",
+      "id": "clean_bittervine",
+      "name": "Clean Bittervine",
       "skill": "alchemy",
       "level": 11,
       "xp": 5,
       "duration": 1,
-      "inputs": [{ "itemId": "grimy_tarromin", "quantity": 1 }],
-      "outputs": [{ "itemId": "tarromin", "quantity": 1 }]
+      "inputs": [{ "itemId": "grimy_bittervine", "quantity": 1 }],
+      "outputs": [{ "itemId": "bittervine", "quantity": 1 }]
     },
     {
-      "id": "clean_harralander",
-      "name": "Clean Harralander",
+      "id": "clean_sunpetal",
+      "name": "Clean Sunpetal",
       "skill": "alchemy",
       "level": 20,
       "xp": 6,
       "duration": 1,
-      "inputs": [{ "itemId": "grimy_harralander", "quantity": 1 }],
-      "outputs": [{ "itemId": "harralander", "quantity": 1 }]
+      "inputs": [{ "itemId": "grimy_sunpetal", "quantity": 1 }],
+      "outputs": [{ "itemId": "sunpetal", "quantity": 1 }]
     },
     {
-      "id": "clean_ranarr",
-      "name": "Clean Ranarr",
+      "id": "clean_moonbloom",
+      "name": "Clean Moonbloom",
       "skill": "alchemy",
       "level": 25,
       "xp": 7,
       "duration": 1,
-      "inputs": [{ "itemId": "grimy_ranarr", "quantity": 1 }],
-      "outputs": [{ "itemId": "ranarr", "quantity": 1 }]
+      "inputs": [{ "itemId": "grimy_moonbloom", "quantity": 1 }],
+      "outputs": [{ "itemId": "moonbloom", "quantity": 1 }]
     },
     {
-      "id": "clean_irit",
-      "name": "Clean Irit Leaf",
+      "id": "clean_stormleaf",
+      "name": "Clean Stormleaf",
       "skill": "alchemy",
       "level": 40,
       "xp": 8,
       "duration": 1,
-      "inputs": [{ "itemId": "grimy_irit", "quantity": 1 }],
-      "outputs": [{ "itemId": "irit_leaf", "quantity": 1 }]
+      "inputs": [{ "itemId": "grimy_stormleaf", "quantity": 1 }],
+      "outputs": [{ "itemId": "stormleaf", "quantity": 1 }]
     },
     {
-      "id": "clean_kwuarm",
-      "name": "Clean Kwuarm",
+      "id": "clean_voidbloom",
+      "name": "Clean Voidbloom",
       "skill": "alchemy",
       "level": 54,
       "xp": 11,
       "duration": 1,
-      "inputs": [{ "itemId": "grimy_kwuarm", "quantity": 1 }],
-      "outputs": [{ "itemId": "kwuarm", "quantity": 1 }]
+      "inputs": [{ "itemId": "grimy_voidbloom", "quantity": 1 }],
+      "outputs": [{ "itemId": "voidbloom", "quantity": 1 }]
     },
     {
-      "id": "clean_snapdragon",
-      "name": "Clean Snapdragon",
+      "id": "clean_starfall_petal",
+      "name": "Clean Starfall Petal",
       "skill": "alchemy",
       "level": 59,
       "xp": 11,
       "duration": 1,
-      "inputs": [{ "itemId": "grimy_snapdragon", "quantity": 1 }],
-      "outputs": [{ "itemId": "snapdragon", "quantity": 1 }]
+      "inputs": [{ "itemId": "grimy_starfall_petal", "quantity": 1 }],
+      "outputs": [{ "itemId": "starfall_petal", "quantity": 1 }]
     },
     {
-      "id": "clean_torstol",
-      "name": "Clean Torstol",
+      "id": "clean_eternitys_bloom",
+      "name": "Clean Eternity's Bloom",
       "skill": "alchemy",
       "level": 75,
       "xp": 15,
       "duration": 1,
-      "inputs": [{ "itemId": "grimy_torstol", "quantity": 1 }],
-      "outputs": [{ "itemId": "torstol", "quantity": 1 }]
+      "inputs": [{ "itemId": "grimy_eternitys_bloom", "quantity": 1 }],
+      "outputs": [{ "itemId": "eternitys_bloom", "quantity": 1 }]
     }
   ],
   "secondaryIngredients": {
     "sources": [
-      { "id": "eye_of_newt", "name": "Eye of Newt", "source": "shop", "price": 3 },
-      { "id": "unicorn_horn_dust", "name": "Unicorn Horn Dust", "source": "grind_unicorn_horn" },
-      { "id": "white_berries", "name": "White Berries", "source": "foraging", "level": 25 },
-      { "id": "limpwurt_root", "name": "Limpwurt Root", "source": "farming", "level": 26 },
-      { "id": "snape_grass", "name": "Snape Grass", "source": "foraging", "level": 61 },
-      { "id": "wine_of_zamorak", "name": "Wine of Zamorak", "source": "telekinetic_grab" },
-      { "id": "potato_cactus", "name": "Potato Cactus", "source": "farming", "level": 64 },
-      { "id": "red_spider_eggs", "name": "Red Spider Eggs", "source": "spawns" },
-      { "id": "dragon_scale_dust", "name": "Dragon Scale Dust", "source": "grind_blue_dragon_scale" },
-      { "id": "crushed_nest", "name": "Crushed Nest", "source": "crush_bird_nest" }
+      { "id": "salamander_eye", "name": "Salamander Eye", "source": "shop", "price": 3 },
+      { "id": "stag_horn_dust", "name": "Stag Horn Dust", "source": "grind_stag_horn" },
+      { "id": "moonberries", "name": "Moonberries", "source": "foraging", "level": 25 },
+      { "id": "stoutvine_root", "name": "Stoutvine Root", "source": "farming", "level": 26 },
+      { "id": "spiritgrass", "name": "Spiritgrass", "source": "foraging", "level": 61 },
+      { "id": "crimson_wine", "name": "Crimson Wine", "source": "arcane_retrieval" },
+      { "id": "needlefruit", "name": "Needlefruit", "source": "farming", "level": 64 },
+      { "id": "venomweaver_eggs", "name": "Venomweaver Eggs", "source": "spawns" },
+      { "id": "wyrm_scale_dust", "name": "Wyrm Scale Dust", "source": "grind_azure_wyrm_scale" },
+      { "id": "powdered_nest", "name": "Powdered Nest", "source": "crush_bird_nest" }
     ]
   }
 }

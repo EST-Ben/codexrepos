@@ -2,9 +2,9 @@
   "armor": {
     "head": [
       {
-        "id": "bronze_helm",
-        "name": "Bronze Full Helm",
-        "description": "A basic bronze helmet offering minimal protection",
+        "id": "copperweave_helm",
+        "name": "Copperweave Full Helm",
+        "description": "A basic helmet forged from warm copperweave alloy",
         "type": "armor",
         "slot": "head",
         "tier": 1,
@@ -13,9 +13,9 @@
         "stats": { "defenseBonus": 4, "healthBonus": 5 }
       },
       {
-        "id": "iron_helm",
-        "name": "Iron Full Helm",
-        "description": "A sturdy iron helmet",
+        "id": "ironbark_helm",
+        "name": "Ironbark Full Helm",
+        "description": "A sturdy helmet infused with ancient wood essence",
         "type": "armor",
         "slot": "head",
         "tier": 2,
@@ -24,9 +24,9 @@
         "stats": { "defenseBonus": 9, "healthBonus": 10 }
       },
       {
-        "id": "steel_helm",
-        "name": "Steel Full Helm",
-        "description": "A well-forged steel helmet",
+        "id": "stormforged_helm",
+        "name": "Stormforged Full Helm",
+        "description": "A helmet tempered by lightning storms",
         "type": "armor",
         "slot": "head",
         "tier": 3,
@@ -35,9 +35,9 @@
         "stats": { "defenseBonus": 16, "healthBonus": 15 }
       },
       {
-        "id": "mithril_helm",
-        "name": "Mithril Full Helm",
-        "description": "A lightweight mithril helmet with a blue sheen",
+        "id": "moonveil_helm",
+        "name": "Moonveil Full Helm",
+        "description": "A lightweight helmet with an ethereal silver glow",
         "type": "armor",
         "slot": "head",
         "tier": 4,
@@ -46,9 +46,9 @@
         "stats": { "defenseBonus": 28, "healthBonus": 25 }
       },
       {
-        "id": "adamant_helm",
-        "name": "Adamant Full Helm",
-        "description": "A helmet forged from green adamantite",
+        "id": "voidstone_helm",
+        "name": "Voidstone Full Helm",
+        "description": "A helmet forged from dark metal of the endless void",
         "type": "armor",
         "slot": "head",
         "tier": 5,
@@ -57,9 +57,9 @@
         "stats": { "defenseBonus": 42, "healthBonus": 35 }
       },
       {
-        "id": "runite_helm",
-        "name": "Runite Full Helm",
-        "description": "A powerful helmet made from rare runite ore",
+        "id": "eternium_helm",
+        "name": "Eternium Full Helm",
+        "description": "A powerful helmet made from the eternal metal",
         "type": "armor",
         "slot": "head",
         "tier": 6,
@@ -70,7 +70,7 @@
       {
         "id": "leather_coif",
         "name": "Leather Coif",
-        "description": "A light leather hood for rangers",
+        "description": "A light leather hood for marksmen",
         "type": "armor",
         "slot": "head",
         "tier": 1,
@@ -79,9 +79,9 @@
         "stats": { "defenseBonus": 2, "rangedBonus": 3 }
       },
       {
-        "id": "wizard_hat",
-        "name": "Wizard Hat",
-        "description": "A pointed hat that enhances magical ability",
+        "id": "arcanist_hat",
+        "name": "Arcanist Hat",
+        "description": "A pointed hat that channels arcane energies",
         "type": "armor",
         "slot": "head",
         "tier": 1,
@@ -92,9 +92,9 @@
     ],
     "body": [
       {
-        "id": "bronze_platebody",
-        "name": "Bronze Platebody",
-        "description": "Basic bronze chest armor",
+        "id": "copperweave_platebody",
+        "name": "Copperweave Platebody",
+        "description": "Basic chest armor of warm copperweave",
         "type": "armor",
         "slot": "body",
         "tier": 1,
@@ -103,9 +103,9 @@
         "stats": { "defenseBonus": 8, "healthBonus": 10 }
       },
       {
-        "id": "iron_platebody",
-        "name": "Iron Platebody",
-        "description": "Sturdy iron chest armor",
+        "id": "ironbark_platebody",
+        "name": "Ironbark Platebody",
+        "description": "Sturdy chest armor with nature's strength",
         "type": "armor",
         "slot": "body",
         "tier": 2,
@@ -114,9 +114,9 @@
         "stats": { "defenseBonus": 18, "healthBonus": 20 }
       },
       {
-        "id": "steel_platebody",
-        "name": "Steel Platebody",
-        "description": "Well-crafted steel chest armor",
+        "id": "stormforged_platebody",
+        "name": "Stormforged Platebody",
+        "description": "Chest armor crackling with residual storm energy",
         "type": "armor",
         "slot": "body",
         "tier": 3,
@@ -125,9 +125,9 @@
         "stats": { "defenseBonus": 32, "healthBonus": 30 }
       },
       {
-        "id": "mithril_platebody",
-        "name": "Mithril Platebody",
-        "description": "Lightweight mithril chest armor",
+        "id": "moonveil_platebody",
+        "name": "Moonveil Platebody",
+        "description": "Lightweight armor that shimmers like moonlight",
         "type": "armor",
         "slot": "body",
         "tier": 4,
@@ -136,9 +136,9 @@
         "stats": { "defenseBonus": 56, "healthBonus": 50 }
       },
       {
-        "id": "adamant_platebody",
-        "name": "Adamant Platebody",
-        "description": "Heavy adamantite chest armor",
+        "id": "voidstone_platebody",
+        "name": "Voidstone Platebody",
+        "description": "Heavy chest armor pulsing with dark energy",
         "type": "armor",
         "slot": "body",
         "tier": 5,
@@ -147,9 +147,9 @@
         "stats": { "defenseBonus": 84, "healthBonus": 70 }
       },
       {
-        "id": "runite_platebody",
-        "name": "Runite Platebody",
-        "description": "The finest non-magical chest armor",
+        "id": "eternium_platebody",
+        "name": "Eternium Platebody",
+        "description": "The finest non-magical chest armor in existence",
         "type": "armor",
         "slot": "body",
         "tier": 6,
@@ -159,7 +159,7 @@
       },
       {
         "id": "leather_body",
-        "name": "Leather Body",
+        "name": "Leather Tunic",
         "description": "Flexible leather armor for agile fighters",
         "type": "armor",
         "slot": "body",
@@ -170,8 +170,8 @@
       },
       {
         "id": "studded_body",
-        "name": "Studded Leather Body",
-        "description": "Reinforced leather with metal studs",
+        "name": "Riveted Leather Tunic",
+        "description": "Reinforced leather with metal rivets",
         "type": "armor",
         "slot": "body",
         "tier": 2,
@@ -180,9 +180,9 @@
         "stats": { "defenseBonus": 12, "rangedBonus": 14 }
       },
       {
-        "id": "dragonhide_body",
-        "name": "Green Dragonhide Body",
-        "description": "Armor crafted from dragon scales",
+        "id": "wyrmhide_body",
+        "name": "Verdant Wyrmhide Tunic",
+        "description": "Armor crafted from wyrm scales",
         "type": "armor",
         "slot": "body",
         "tier": 4,
@@ -191,9 +191,9 @@
         "stats": { "defenseBonus": 40, "rangedBonus": 35, "magicBonus": -10 }
       },
       {
-        "id": "wizard_robe_top",
-        "name": "Wizard Robe Top",
-        "description": "Enchanted robes that boost magical power",
+        "id": "arcanist_robe_top",
+        "name": "Arcanist Robe",
+        "description": "Enchanted robes that amplify magical power",
         "type": "armor",
         "slot": "body",
         "tier": 1,
@@ -202,9 +202,9 @@
         "stats": { "defenseBonus": 2, "magicBonus": 12, "manaBonus": 25 }
       },
       {
-        "id": "mystic_robe_top",
-        "name": "Mystic Robe Top",
-        "description": "Powerful magical robes",
+        "id": "mystic_vestment",
+        "name": "Mystic Vestment",
+        "description": "Powerful robes woven with arcane threads",
         "type": "armor",
         "slot": "body",
         "tier": 3,
@@ -215,9 +215,9 @@
     ],
     "legs": [
       {
-        "id": "bronze_platelegs",
-        "name": "Bronze Platelegs",
-        "description": "Basic bronze leg armor",
+        "id": "copperweave_platelegs",
+        "name": "Copperweave Platelegs",
+        "description": "Basic leg armor of warm copperweave",
         "type": "armor",
         "slot": "legs",
         "tier": 1,
@@ -226,9 +226,9 @@
         "stats": { "defenseBonus": 6, "healthBonus": 5 }
       },
       {
-        "id": "iron_platelegs",
-        "name": "Iron Platelegs",
-        "description": "Sturdy iron leg armor",
+        "id": "ironbark_platelegs",
+        "name": "Ironbark Platelegs",
+        "description": "Sturdy leg armor infused with wood essence",
         "type": "armor",
         "slot": "legs",
         "tier": 2,
@@ -237,9 +237,9 @@
         "stats": { "defenseBonus": 13, "healthBonus": 10 }
       },
       {
-        "id": "steel_platelegs",
-        "name": "Steel Platelegs",
-        "description": "Well-crafted steel leg armor",
+        "id": "stormforged_platelegs",
+        "name": "Stormforged Platelegs",
+        "description": "Leg armor tempered by lightning",
         "type": "armor",
         "slot": "legs",
         "tier": 3,
@@ -248,9 +248,9 @@
         "stats": { "defenseBonus": 24, "healthBonus": 15 }
       },
       {
-        "id": "mithril_platelegs",
-        "name": "Mithril Platelegs",
-        "description": "Lightweight mithril leg armor",
+        "id": "moonveil_platelegs",
+        "name": "Moonveil Platelegs",
+        "description": "Lightweight leg armor with ethereal glow",
         "type": "armor",
         "slot": "legs",
         "tier": 4,
@@ -259,9 +259,9 @@
         "stats": { "defenseBonus": 42, "healthBonus": 25 }
       },
       {
-        "id": "adamant_platelegs",
-        "name": "Adamant Platelegs",
-        "description": "Heavy adamantite leg armor",
+        "id": "voidstone_platelegs",
+        "name": "Voidstone Platelegs",
+        "description": "Heavy leg armor from the endless void",
         "type": "armor",
         "slot": "legs",
         "tier": 5,
@@ -270,9 +270,9 @@
         "stats": { "defenseBonus": 63, "healthBonus": 35 }
       },
       {
-        "id": "runite_platelegs",
-        "name": "Runite Platelegs",
-        "description": "Exceptional runite leg armor",
+        "id": "eternium_platelegs",
+        "name": "Eternium Platelegs",
+        "description": "Exceptional leg armor of the eternal metal",
         "type": "armor",
         "slot": "legs",
         "tier": 6,
@@ -294,8 +294,8 @@
         "stats": { "defenseBonus": 1 }
       },
       {
-        "id": "bronze_gauntlets",
-        "name": "Bronze Gauntlets",
+        "id": "copperweave_gauntlets",
+        "name": "Copperweave Gauntlets",
         "description": "Basic metal gauntlets",
         "type": "armor",
         "slot": "hands",
@@ -305,8 +305,8 @@
         "stats": { "defenseBonus": 2, "attackBonus": 1 }
       },
       {
-        "id": "mithril_gauntlets",
-        "name": "Mithril Gauntlets",
+        "id": "moonveil_gauntlets",
+        "name": "Moonveil Gauntlets",
         "description": "Lightweight but strong gauntlets",
         "type": "armor",
         "slot": "hands",
@@ -329,8 +329,8 @@
         "stats": { "defenseBonus": 1 }
       },
       {
-        "id": "bronze_boots",
-        "name": "Bronze Boots",
+        "id": "copperweave_boots",
+        "name": "Copperweave Boots",
         "description": "Basic metal boots",
         "type": "armor",
         "slot": "feet",
@@ -340,9 +340,9 @@
         "stats": { "defenseBonus": 3 }
       },
       {
-        "id": "iron_boots",
-        "name": "Iron Boots",
-        "description": "Sturdy iron boots",
+        "id": "ironbark_boots",
+        "name": "Ironbark Boots",
+        "description": "Sturdy boots with natural reinforcement",
         "type": "armor",
         "slot": "feet",
         "tier": 2,
@@ -351,8 +351,8 @@
         "stats": { "defenseBonus": 6 }
       },
       {
-        "id": "mithril_boots",
-        "name": "Mithril Boots",
+        "id": "moonveil_boots",
+        "name": "Moonveil Boots",
         "description": "Light and durable boots",
         "type": "armor",
         "slot": "feet",
@@ -364,9 +364,9 @@
     ],
     "cape": [
       {
-        "id": "basic_cape",
-        "name": "Cape",
-        "description": "A simple cloth cape",
+        "id": "basic_cloak",
+        "name": "Traveler's Cloak",
+        "description": "A simple cloth cloak",
         "type": "armor",
         "slot": "cape",
         "tier": 1,
@@ -375,9 +375,9 @@
         "stats": {}
       },
       {
-        "id": "fire_cape",
-        "name": "Fire Cape",
-        "description": "A legendary cape imbued with the power of fire",
+        "id": "inferno_cloak",
+        "name": "Inferno Cloak",
+        "description": "A legendary cloak imbued with the power of flame",
         "type": "armor",
         "slot": "cape",
         "tier": 6,
@@ -387,9 +387,9 @@
         "stats": { "defenseBonus": 11, "attackBonus": 4, "magicBonus": 1 }
       },
       {
-        "id": "skill_cape_mining",
-        "name": "Mining Skillcape",
-        "description": "A cape awarded to master miners",
+        "id": "masters_cloak_mining",
+        "name": "Stonewarden's Cloak",
+        "description": "A cloak awarded to master miners",
         "type": "armor",
         "slot": "cape",
         "tier": 6,
@@ -401,9 +401,9 @@
     ],
     "neck": [
       {
-        "id": "gold_amulet",
-        "name": "Gold Amulet",
-        "description": "A simple gold amulet",
+        "id": "gold_pendant",
+        "name": "Gold Pendant",
+        "description": "A simple gold pendant",
         "type": "armor",
         "slot": "neck",
         "tier": 1,
@@ -412,8 +412,8 @@
         "stats": {}
       },
       {
-        "id": "amulet_of_strength",
-        "name": "Amulet of Strength",
+        "id": "pendant_of_might",
+        "name": "Pendant of Might",
         "description": "Increases physical damage",
         "type": "armor",
         "slot": "neck",
@@ -423,8 +423,8 @@
         "stats": { "attackBonus": 10 }
       },
       {
-        "id": "amulet_of_magic",
-        "name": "Amulet of Magic",
+        "id": "pendant_of_arcana",
+        "name": "Pendant of Arcana",
         "description": "Enhances magical ability",
         "type": "armor",
         "slot": "neck",
@@ -434,9 +434,9 @@
         "stats": { "magicBonus": 10 }
       },
       {
-        "id": "amulet_of_glory",
-        "name": "Amulet of Glory",
-        "description": "A versatile enchanted amulet",
+        "id": "medallion_of_valor",
+        "name": "Medallion of Valor",
+        "description": "A versatile enchanted medallion",
         "type": "armor",
         "slot": "neck",
         "tier": 4,
@@ -446,9 +446,9 @@
         "perks": ["teleport_charges"]
       },
       {
-        "id": "amulet_of_fury",
-        "name": "Amulet of Fury",
-        "description": "One of the most powerful amulets",
+        "id": "talisman_of_wrath",
+        "name": "Talisman of Wrath",
+        "description": "One of the most powerful talismans",
         "type": "armor",
         "slot": "neck",
         "tier": 6,
@@ -459,8 +459,8 @@
     ],
     "ring": [
       {
-        "id": "gold_ring",
-        "name": "Gold Ring",
+        "id": "gold_band",
+        "name": "Gold Band",
         "description": "A simple gold ring",
         "type": "armor",
         "slot": "ring",
@@ -470,8 +470,8 @@
         "stats": {}
       },
       {
-        "id": "ring_of_life",
-        "name": "Ring of Life",
+        "id": "ring_of_escape",
+        "name": "Ring of Escape",
         "description": "Teleports you to safety when near death",
         "type": "armor",
         "slot": "ring",
@@ -482,8 +482,8 @@
         "perks": ["emergency_teleport"]
       },
       {
-        "id": "ring_of_wealth",
-        "name": "Ring of Wealth",
+        "id": "ring_of_fortune",
+        "name": "Ring of Fortune",
         "description": "Improves rare drop chances",
         "type": "armor",
         "slot": "ring",
@@ -494,8 +494,8 @@
         "perks": ["improved_drops"]
       },
       {
-        "id": "berserker_ring",
-        "name": "Berserker Ring",
+        "id": "bloodrage_ring",
+        "name": "Bloodrage Ring",
         "description": "Increases melee damage",
         "type": "armor",
         "slot": "ring",
@@ -505,8 +505,8 @@
         "stats": { "attackBonus": 8 }
       },
       {
-        "id": "archers_ring",
-        "name": "Archer's Ring",
+        "id": "hawkeye_ring",
+        "name": "Hawkeye Ring",
         "description": "Increases ranged accuracy",
         "type": "armor",
         "slot": "ring",
@@ -516,8 +516,8 @@
         "stats": { "rangedBonus": 8 }
       },
       {
-        "id": "seers_ring",
-        "name": "Seer's Ring",
+        "id": "oracle_ring",
+        "name": "Oracle's Ring",
         "description": "Increases magic damage",
         "type": "armor",
         "slot": "ring",
@@ -529,8 +529,8 @@
     ],
     "shield": [
       {
-        "id": "wooden_shield",
-        "name": "Wooden Shield",
+        "id": "wooden_buckler",
+        "name": "Wooden Buckler",
         "description": "A basic wooden shield",
         "type": "armor",
         "slot": "offHand",
@@ -540,9 +540,9 @@
         "stats": { "defenseBonus": 3 }
       },
       {
-        "id": "bronze_kiteshield",
-        "name": "Bronze Kiteshield",
-        "description": "A bronze shield shaped like a kite",
+        "id": "copperweave_warshield",
+        "name": "Copperweave Warshield",
+        "description": "A sturdy copperweave shield",
         "type": "armor",
         "slot": "offHand",
         "tier": 1,
@@ -551,9 +551,9 @@
         "stats": { "defenseBonus": 6, "healthBonus": 5 }
       },
       {
-        "id": "iron_kiteshield",
-        "name": "Iron Kiteshield",
-        "description": "A sturdy iron shield",
+        "id": "ironbark_warshield",
+        "name": "Ironbark Warshield",
+        "description": "A nature-reinforced shield",
         "type": "armor",
         "slot": "offHand",
         "tier": 2,
@@ -562,9 +562,9 @@
         "stats": { "defenseBonus": 12, "healthBonus": 10 }
       },
       {
-        "id": "steel_kiteshield",
-        "name": "Steel Kiteshield",
-        "description": "A well-made steel shield",
+        "id": "stormforged_warshield",
+        "name": "Stormforged Warshield",
+        "description": "A shield crackling with storm energy",
         "type": "armor",
         "slot": "offHand",
         "tier": 3,
@@ -573,9 +573,9 @@
         "stats": { "defenseBonus": 22, "healthBonus": 15 }
       },
       {
-        "id": "mithril_kiteshield",
-        "name": "Mithril Kiteshield",
-        "description": "A light but strong mithril shield",
+        "id": "moonveil_warshield",
+        "name": "Moonveil Warshield",
+        "description": "A light but strong ethereal shield",
         "type": "armor",
         "slot": "offHand",
         "tier": 4,
@@ -584,9 +584,9 @@
         "stats": { "defenseBonus": 38, "healthBonus": 25 }
       },
       {
-        "id": "dragon_kiteshield",
-        "name": "Dragon Kiteshield",
-        "description": "A legendary shield made from dragon metal",
+        "id": "wyrmscale_warshield",
+        "name": "Wyrmscale Warshield",
+        "description": "A legendary shield forged from wyrm scales",
         "type": "armor",
         "slot": "offHand",
         "tier": 6,

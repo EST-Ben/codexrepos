@@ -2,8 +2,8 @@
   "food": [
     {
       "id": "bread",
-      "name": "Bread",
-      "description": "A simple loaf of bread",
+      "name": "Fresh Bread",
+      "description": "A simple but filling loaf",
       "type": "consumable",
       "subtype": "food",
       "stackable": true,
@@ -12,9 +12,9 @@
       "effects": { "healAmount": 50 }
     },
     {
-      "id": "cooked_shrimp",
-      "name": "Cooked Shrimp",
-      "description": "Delicious small shrimp",
+      "id": "cooked_mudcrawler",
+      "name": "Grilled Mudcrawler",
+      "description": "A tasty small crustacean",
       "type": "consumable",
       "subtype": "food",
       "stackable": true,
@@ -24,21 +24,9 @@
       "effects": { "healAmount": 30 }
     },
     {
-      "id": "cooked_sardine",
-      "name": "Cooked Sardine",
-      "description": "A tasty sardine",
-      "type": "consumable",
-      "subtype": "food",
-      "stackable": true,
-      "maxStack": 100,
-      "value": 15,
-      "requirements": { "cooking": 5 },
-      "effects": { "healAmount": 40 }
-    },
-    {
-      "id": "cooked_trout",
-      "name": "Cooked Trout",
-      "description": "A nicely cooked trout",
+      "id": "cooked_silverscale",
+      "name": "Pan-Seared Silverscale",
+      "description": "A shimmering freshwater fish, perfectly cooked",
       "type": "consumable",
       "subtype": "food",
       "stackable": true,
@@ -48,9 +36,9 @@
       "effects": { "healAmount": 70 }
     },
     {
-      "id": "cooked_salmon",
-      "name": "Cooked Salmon",
-      "description": "Perfectly cooked salmon",
+      "id": "cooked_crimsonfish",
+      "name": "Roasted Crimsonfish",
+      "description": "A vibrant red fish with rich flavor",
       "type": "consumable",
       "subtype": "food",
       "stackable": true,
@@ -60,9 +48,9 @@
       "effects": { "healAmount": 90 }
     },
     {
-      "id": "cooked_lobster",
-      "name": "Cooked Lobster",
-      "description": "A delicious cooked lobster",
+      "id": "cooked_stoneclaw",
+      "name": "Steamed Stoneclaw",
+      "description": "Tender meat from a hard-shelled crustacean",
       "type": "consumable",
       "subtype": "food",
       "stackable": true,
@@ -72,9 +60,9 @@
       "effects": { "healAmount": 120 }
     },
     {
-      "id": "cooked_swordfish",
-      "name": "Cooked Swordfish",
-      "description": "A hearty swordfish steak",
+      "id": "cooked_razorfin",
+      "name": "Grilled Razorfin",
+      "description": "A dangerous fish turned delicacy",
       "type": "consumable",
       "subtype": "food",
       "stackable": true,
@@ -84,9 +72,9 @@
       "effects": { "healAmount": 140 }
     },
     {
-      "id": "cooked_shark",
-      "name": "Cooked Shark",
-      "description": "High-quality shark meat",
+      "id": "cooked_ironjaw",
+      "name": "Braised Ironjaw",
+      "description": "Hearty meal from a fearsome predator",
       "type": "consumable",
       "subtype": "food",
       "stackable": true,
@@ -96,9 +84,9 @@
       "effects": { "healAmount": 200 }
     },
     {
-      "id": "cooked_rocktail",
-      "name": "Cooked Rocktail",
-      "description": "The finest fish in the realm",
+      "id": "cooked_abyssfin",
+      "name": "Abyssfin Delicacy",
+      "description": "The finest fish in all the realm",
       "type": "consumable",
       "subtype": "food",
       "stackable": true,
@@ -108,9 +96,9 @@
       "effects": { "healAmount": 230, "overheal": true, "maxOverheal": 100 }
     },
     {
-      "id": "meat_pie",
-      "name": "Meat Pie",
-      "description": "A savory meat pie",
+      "id": "meat_pastry",
+      "name": "Meat Pastry",
+      "description": "A savory pastry filled with seasoned meat",
       "type": "consumable",
       "subtype": "food",
       "stackable": true,
@@ -120,9 +108,9 @@
       "effects": { "healAmount": 120, "portions": 2 }
     },
     {
-      "id": "summer_pie",
-      "name": "Summer Pie",
-      "description": "A refreshing fruit pie that boosts agility",
+      "id": "sunfruit_tart",
+      "name": "Sunfruit Tart",
+      "description": "A refreshing fruit tart that invigorates the body",
       "type": "consumable",
       "subtype": "food",
       "stackable": true,
@@ -136,9 +124,9 @@
       }
     },
     {
-      "id": "wild_pie",
-      "name": "Wild Pie",
-      "description": "A pie that temporarily boosts slayer and ranged",
+      "id": "hunters_feast",
+      "name": "Hunter's Feast",
+      "description": "A hearty meal that sharpens hunting instincts",
       "type": "consumable",
       "subtype": "food",
       "stackable": true,
@@ -149,7 +137,7 @@
         "healAmount": 110,
         "portions": 2,
         "buffs": [
-          { "skill": "slayer", "boost": 5, "duration": 300 },
+          { "skill": "beastslaying", "boost": 5, "duration": 300 },
           { "skill": "ranged", "boost": 4, "duration": 300 }
         ]
       }
@@ -157,9 +145,9 @@
   ],
   "potions": [
     {
-      "id": "attack_potion",
-      "name": "Attack Potion",
-      "description": "Temporarily boosts attack level",
+      "id": "vigor_draught",
+      "name": "Vigor Draught",
+      "description": "Temporarily boosts attack power",
       "type": "consumable",
       "subtype": "potion",
       "stackable": true,
@@ -172,9 +160,9 @@
       }
     },
     {
-      "id": "strength_potion",
-      "name": "Strength Potion",
-      "description": "Temporarily boosts strength damage",
+      "id": "might_draught",
+      "name": "Might Draught",
+      "description": "Temporarily boosts raw strength",
       "type": "consumable",
       "subtype": "potion",
       "stackable": true,
@@ -187,9 +175,9 @@
       }
     },
     {
-      "id": "defense_potion",
-      "name": "Defense Potion",
-      "description": "Temporarily boosts defense level",
+      "id": "fortitude_draught",
+      "name": "Fortitude Draught",
+      "description": "Temporarily boosts defensive capabilities",
       "type": "consumable",
       "subtype": "potion",
       "stackable": true,
@@ -202,9 +190,9 @@
       }
     },
     {
-      "id": "super_attack_potion",
-      "name": "Super Attack Potion",
-      "description": "Significantly boosts attack level",
+      "id": "potent_vigor_draught",
+      "name": "Potent Vigor Draught",
+      "description": "Significantly boosts attack power",
       "type": "consumable",
       "subtype": "potion",
       "stackable": true,
@@ -217,9 +205,9 @@
       }
     },
     {
-      "id": "super_strength_potion",
-      "name": "Super Strength Potion",
-      "description": "Significantly boosts strength damage",
+      "id": "potent_might_draught",
+      "name": "Potent Might Draught",
+      "description": "Significantly boosts raw strength",
       "type": "consumable",
       "subtype": "potion",
       "stackable": true,
@@ -232,9 +220,9 @@
       }
     },
     {
-      "id": "prayer_potion",
-      "name": "Prayer Potion",
-      "description": "Restores prayer points",
+      "id": "spirit_elixir",
+      "name": "Spirit Elixir",
+      "description": "Restores devotion points",
       "type": "consumable",
       "subtype": "potion",
       "stackable": true,
@@ -243,13 +231,13 @@
       "requirements": { "alchemy": 38 },
       "effects": {
         "doses": 4,
-        "restorePrayer": { "percent": 25, "flat": 7 }
+        "restoreDevotion": { "percent": 25, "flat": 7 }
       }
     },
     {
-      "id": "super_restore",
-      "name": "Super Restore",
-      "description": "Restores prayer and all reduced stats",
+      "id": "revitalization_tonic",
+      "name": "Revitalization Tonic",
+      "description": "Restores devotion and all reduced stats",
       "type": "consumable",
       "subtype": "potion",
       "stackable": true,
@@ -258,14 +246,14 @@
       "requirements": { "alchemy": 63 },
       "effects": {
         "doses": 4,
-        "restorePrayer": { "percent": 25, "flat": 8 },
+        "restoreDevotion": { "percent": 25, "flat": 8 },
         "restoreStats": true
       }
     },
     {
-      "id": "ranging_potion",
-      "name": "Ranging Potion",
-      "description": "Boosts ranged level",
+      "id": "hawkeye_tincture",
+      "name": "Hawkeye Tincture",
+      "description": "Enhances ranged accuracy",
       "type": "consumable",
       "subtype": "potion",
       "stackable": true,
@@ -278,9 +266,9 @@
       }
     },
     {
-      "id": "magic_potion",
-      "name": "Magic Potion",
-      "description": "Boosts magic level",
+      "id": "arcane_infusion",
+      "name": "Arcane Infusion",
+      "description": "Amplifies magical power",
       "type": "consumable",
       "subtype": "potion",
       "stackable": true,
@@ -293,8 +281,8 @@
       }
     },
     {
-      "id": "antipoison",
-      "name": "Antipoison",
+      "id": "antivenom",
+      "name": "Antivenom",
       "description": "Cures poison and provides brief immunity",
       "type": "consumable",
       "subtype": "potion",
@@ -309,9 +297,9 @@
       }
     },
     {
-      "id": "antifire_potion",
-      "name": "Antifire Potion",
-      "description": "Reduces damage from dragon fire",
+      "id": "wyrmward_potion",
+      "name": "Wyrmward Potion",
+      "description": "Provides protection against wyrm fire breath",
       "type": "consumable",
       "subtype": "potion",
       "stackable": true,
@@ -320,13 +308,13 @@
       "requirements": { "alchemy": 69 },
       "effects": {
         "doses": 4,
-        "dragonFireResist": { "percent": 75, "duration": 360 }
+        "wyrmFireResist": { "percent": 75, "duration": 360 }
       }
     },
     {
-      "id": "saradomin_brew",
-      "name": "Saradomin Brew",
-      "description": "Heals significantly but reduces attack stats",
+      "id": "blessing_brew",
+      "name": "Blessing Brew",
+      "description": "Heals significantly but reduces combat stats",
       "type": "consumable",
       "subtype": "potion",
       "stackable": true,
@@ -344,9 +332,9 @@
       }
     },
     {
-      "id": "overload_potion",
-      "name": "Overload",
-      "description": "Massively boosts all combat stats",
+      "id": "eternity_elixir",
+      "name": "Eternity Elixir",
+      "description": "The ultimate combat potion - massively boosts all stats",
       "type": "consumable",
       "subtype": "potion",
       "stackable": true,
@@ -369,9 +357,9 @@
   ],
   "rawFood": [
     {
-      "id": "raw_shrimp",
-      "name": "Raw Shrimp",
-      "description": "Needs to be cooked",
+      "id": "raw_mudcrawler",
+      "name": "Raw Mudcrawler",
+      "description": "A small crustacean that needs cooking",
       "type": "material",
       "subtype": "fish",
       "stackable": true,
@@ -379,19 +367,9 @@
       "value": 5
     },
     {
-      "id": "raw_sardine",
-      "name": "Raw Sardine",
-      "description": "Needs to be cooked",
-      "type": "material",
-      "subtype": "fish",
-      "stackable": true,
-      "maxStack": 100,
-      "value": 8
-    },
-    {
-      "id": "raw_trout",
-      "name": "Raw Trout",
-      "description": "Needs to be cooked",
+      "id": "raw_silverscale",
+      "name": "Raw Silverscale",
+      "description": "A shimmering fish that needs cooking",
       "type": "material",
       "subtype": "fish",
       "stackable": true,
@@ -399,9 +377,9 @@
       "value": 20
     },
     {
-      "id": "raw_salmon",
-      "name": "Raw Salmon",
-      "description": "Needs to be cooked",
+      "id": "raw_crimsonfish",
+      "name": "Raw Crimsonfish",
+      "description": "A vibrant red fish that needs cooking",
       "type": "material",
       "subtype": "fish",
       "stackable": true,
@@ -409,9 +387,9 @@
       "value": 35
     },
     {
-      "id": "raw_lobster",
-      "name": "Raw Lobster",
-      "description": "Needs to be cooked",
+      "id": "raw_stoneclaw",
+      "name": "Raw Stoneclaw",
+      "description": "A hard-shelled crustacean that needs steaming",
       "type": "material",
       "subtype": "fish",
       "stackable": true,
@@ -419,9 +397,9 @@
       "value": 100
     },
     {
-      "id": "raw_swordfish",
-      "name": "Raw Swordfish",
-      "description": "Needs to be cooked",
+      "id": "raw_razorfin",
+      "name": "Raw Razorfin",
+      "description": "A dangerous fish that needs careful cooking",
       "type": "material",
       "subtype": "fish",
       "stackable": true,
@@ -429,9 +407,9 @@
       "value": 180
     },
     {
-      "id": "raw_shark",
-      "name": "Raw Shark",
-      "description": "Needs to be cooked",
+      "id": "raw_ironjaw",
+      "name": "Raw Ironjaw",
+      "description": "A fearsome predator that needs braising",
       "type": "material",
       "subtype": "fish",
       "stackable": true,
@@ -439,9 +417,9 @@
       "value": 400
     },
     {
-      "id": "raw_rocktail",
-      "name": "Raw Rocktail",
-      "description": "A rare fish that needs careful preparation",
+      "id": "raw_abyssfin",
+      "name": "Raw Abyssfin",
+      "description": "A rare deep-sea fish requiring expert preparation",
       "type": "material",
       "subtype": "fish",
       "stackable": true,
