@@ -449,7 +449,7 @@
         "level": 41,
         "xp": 240,
         "trap": "pitfall",
-        "locations": ["karamja_hunter_area"],
+        "locations": ["celestine_archipelago_hunter_area"],
         "drops": ["graahk_fur", "tatty_graahk_fur", "big_bones"],
         "fur_outfit": "graahk_hunting_gear"
       },

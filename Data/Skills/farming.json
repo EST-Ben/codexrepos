@@ -111,7 +111,7 @@
 
   "patch_locations": {
     "allotment": [
-      {"name": "South Falador", "coordinates": {"x": 3054, "y": 3307, "z": 0}},
+      {"name": "South Stoneguard", "coordinates": {"x": 3054, "y": 3307, "z": 0}},
       {"name": "North Ardougne", "coordinates": {"x": 2667, "y": 3374, "z": 0}},
       {"name": "Catherby", "coordinates": {"x": 2813, "y": 3463, "z": 0}},
       {"name": "Port Phasmatys", "coordinates": {"x": 3602, "y": 3529, "z": 0}},
@@ -120,7 +120,7 @@
       {"name": "Prifddinas", "coordinates": {"x": 3293, "y": 6101, "z": 0}, "requirements": {"quest": "song_of_the_elves"}}
     ],
     "herb": [
-      {"name": "South Falador", "coordinates": {"x": 3058, "y": 3311, "z": 0}},
+      {"name": "South Stoneguard", "coordinates": {"x": 3058, "y": 3311, "z": 0}},
       {"name": "North Ardougne", "coordinates": {"x": 2670, "y": 3374, "z": 0}},
       {"name": "Catherby", "coordinates": {"x": 2813, "y": 3463, "z": 0}},
       {"name": "Port Phasmatys", "coordinates": {"x": 3605, "y": 3529, "z": 0}},
@@ -130,9 +130,9 @@
       {"name": "Farming Guild", "coordinates": {"x": 1239, "y": 3727, "z": 0}, "requirements": {"farming": 65}}
     ],
     "tree": [
-      {"name": "Lumbridge", "coordinates": {"x": 3193, "y": 3230, "z": 0}},
-      {"name": "Varrock Castle", "coordinates": {"x": 3228, "y": 3458, "z": 0}},
-      {"name": "Falador Park", "coordinates": {"x": 3003, "y": 3372, "z": 0}},
+      {"name": "Millbrook", "coordinates": {"x": 3193, "y": 3230, "z": 0}},
+      {"name": "Thornhaven Castle", "coordinates": {"x": 3228, "y": 3458, "z": 0}},
+      {"name": "Stoneguard Park", "coordinates": {"x": 3003, "y": 3372, "z": 0}},
       {"name": "Taverly", "coordinates": {"x": 2936, "y": 3437, "z": 0}},
       {"name": "Tree Gnome Stronghold", "coordinates": {"x": 2435, "y": 3415, "z": 0}},
       {"name": "Farming Guild", "coordinates": {"x": 1232, "y": 3736, "z": 0}, "requirements": {"farming": 65}}

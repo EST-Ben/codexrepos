@@ -1,506 +1,574 @@
 {
   "version": "1.0.0",
-  "description": "World region definitions for Realm of Eternity",
+  "description": "World region definitions for Realm of Eternity - Aethermoor Continent",
 
   "world_overview": {
-    "world_name": "Gielinor",
-    "total_regions": 24,
-    "continent": "Main Continent",
-    "islands": ["Karamja", "Entrana", "Miscellania", "Lunar Isle", "Ape Atoll", "Fossil Island", "Anachronia"],
-    "other_realms": ["Zanaris", "Abyss", "Wilderness", "God Wars Dungeon"]
+    "world_name": "Aethermoor",
+    "total_regions": 10,
+    "continent": "Aethermoor",
+    "islands": ["Serpent's Maw", "Palmshade Isle", "Coral Reach", "Skyward Monastery"],
+    "other_realms": ["The Eternal Rift", "Void'thar's Prison", "The Shattered Realm"]
   },
 
   "regions": {
-    "mistral": {
-      "id": "mistral",
-      "name": "Mistral Kingdom",
-      "description": "The heart of civilization, home to Lumbridge, Varrock, and the seat of human power",
-      "capital": "Varrock",
-      "faction": "Human Kingdom",
+    "misthollow_vale": {
+      "id": "misthollow_vale",
+      "name": "Misthollow Vale",
+      "description": "The pastoral heartland of Aethermoor - rolling hills, misty forests, and peaceful farmlands where new adventurers begin their journey",
+      "capital": "Thornhaven",
+      "faction": "Solarian Order",
       "climate": "temperate",
-      "biomes": ["grassland", "farmland", "light_forest"],
+      "biomes": ["grassland", "farmland", "light_forest", "misty_meadows"],
       "major_cities": [
         {
-          "name": "Lumbridge",
-          "type": "starting_town",
+          "name": "Millbrook Village",
+          "type": "starting_village",
           "population": "small",
-          "features": ["castle", "church", "general_store", "fishing_spots"],
-          "coordinates": {"x": 3222, "y": 3218, "z": 0}
+          "features": ["mill", "chapel", "general_store", "fishing_spots", "tutorial_area"],
+          "coordinates": {"x": 1000, "y": 1000, "z": 0},
+          "description": "A quiet farming hamlet where adventurers first awaken"
         },
         {
-          "name": "Varrock",
+          "name": "Thornhaven",
           "type": "capital",
           "population": "large",
-          "features": ["grand_exchange", "palace", "museum", "sewers", "anvils"],
-          "coordinates": {"x": 3212, "y": 3424, "z": 0}
+          "features": ["eternal_exchange", "council_hall", "academy", "crafting_quarter", "bank"],
+          "coordinates": {"x": 1500, "y": 1500, "z": 0},
+          "description": "Walled market town and central hub of the region"
         },
         {
-          "name": "Draynor Village",
+          "name": "Silverstream",
+          "type": "fishing_town",
+          "population": "medium",
+          "features": ["docks", "fishmonger", "river_access", "water_temple"],
+          "coordinates": {"x": 1200, "y": 1800, "z": 0},
+          "description": "River town known for its bountiful fishing"
+        },
+        {
+          "name": "Willowmere",
           "type": "village",
           "population": "small",
-          "features": ["bank", "manor", "willows", "fishing"],
-          "coordinates": {"x": 3093, "y": 3244, "z": 0}
+          "features": ["herbalist", "willow_grove", "ferry_crossing"],
+          "coordinates": {"x": 1100, "y": 1400, "z": 0},
+          "description": "Peaceful village known for its ancient willow trees"
         },
         {
-          "name": "Edgeville",
+          "name": "Borderwatch",
           "type": "outpost",
           "population": "small",
-          "features": ["bank", "wilderness_access", "dungeon", "fairy_ring"],
-          "coordinates": {"x": 3087, "y": 3496, "z": 0}
+          "features": ["garrison", "wasteland_access", "supply_depot", "portal_stones"],
+          "coordinates": {"x": 1600, "y": 2000, "z": 0},
+          "description": "Military outpost guarding the northern wastes"
         }
       ],
-      "dungeons": ["lumbridge_swamp_caves", "edgeville_dungeon", "varrock_sewers"],
-      "key_npcs": ["duke_horacio", "king_roald", "grand_exchange_clerks"],
-      "music_theme": "peaceful_kingdom",
-      "level_range": [1, 30]
+      "dungeons": ["oldstone_ruins", "ravenswood_caves", "millbrook_cellars"],
+      "key_npcs": ["warden_aldric", "sage_miranda", "exchange_masters"],
+      "music_theme": "peaceful_beginning",
+      "level_range": [1, 30],
+      "eternal_influence": "Solarius"
     },
 
-    "asgarnia": {
-      "id": "asgarnia",
-      "name": "Asgarnia",
-      "description": "The white knight kingdom, with Falador as its shining capital",
-      "capital": "Falador",
-      "faction": "White Knights",
-      "climate": "temperate",
-      "biomes": ["grassland", "hills", "mountain_foothills"],
+    "ironhold_dominion": {
+      "id": "ironhold_dominion",
+      "name": "Ironhold Dominion",
+      "description": "Industrial kingdom of master smiths, built into volcanic mountains with vast forges and deep mines",
+      "capital": "Forgecrest",
+      "faction": "Valdrosian Legion",
+      "climate": "volcanic_temperate",
+      "biomes": ["mountains", "volcanic_plains", "caverns", "forge_cities"],
       "major_cities": [
         {
-          "name": "Falador",
+          "name": "Forgecrest",
           "type": "capital",
           "population": "large",
-          "features": ["white_knight_castle", "party_room", "mining_guild", "park"],
-          "coordinates": {"x": 2964, "y": 3378, "z": 0}
+          "features": ["grand_forge", "smithing_guild", "ore_exchange", "lava_channels", "anvil_plaza"],
+          "coordinates": {"x": 3000, "y": 2000, "z": 0},
+          "description": "Great city of smiths built into a dormant volcano"
         },
         {
-          "name": "Port Sarim",
-          "type": "port",
+          "name": "Hammerfall",
+          "type": "mining_city",
           "population": "medium",
-          "features": ["ships", "fishing", "jail", "rusty_anchor_inn"],
-          "coordinates": {"x": 3023, "y": 3208, "z": 0}
+          "features": ["deep_mines", "ore_carts", "underground_railway", "miner_guild"],
+          "coordinates": {"x": 3200, "y": 1800, "z": 0},
+          "description": "Vast mining complex stretching deep underground"
         },
         {
-          "name": "Rimmington",
-          "type": "village",
+          "name": "Cinderpeak",
+          "type": "volcanic_outpost",
           "population": "small",
-          "features": ["crafting_guild_nearby", "mines", "house_portal"],
-          "coordinates": {"x": 2957, "y": 3214, "z": 0}
+          "features": ["obsidian_quarry", "fire_temple", "lava_forges"],
+          "coordinates": {"x": 3400, "y": 2200, "z": 0},
+          "description": "Outpost near the active volcanic mountain"
         },
         {
-          "name": "Taverley",
-          "type": "druid_village",
+          "name": "Stoneguard Fortress",
+          "type": "military_stronghold",
           "population": "medium",
-          "features": ["druids", "herblore_shop", "dungeon", "summoning_obelisk"],
-          "coordinates": {"x": 2894, "y": 3436, "z": 0}
+          "features": ["barracks", "war_academy", "siege_workshop", "training_grounds"],
+          "coordinates": {"x": 2800, "y": 1600, "z": 0},
+          "description": "Impenetrable military stronghold of the Valdrosian Legion"
         },
         {
-          "name": "Burthorpe",
-          "type": "military_outpost",
-          "population": "medium",
-          "features": ["warriors_guild", "troll_frontline", "games_room"],
-          "coordinates": {"x": 2889, "y": 3528, "z": 0}
+          "name": "Deepforge Caverns",
+          "type": "underground_city",
+          "population": "large",
+          "features": ["underground_market", "mushroom_farms", "crystal_mines", "subterranean_lake"],
+          "coordinates": {"x": 3100, "y": 2100, "z": -200},
+          "description": "Underground city in the depths of the mountains"
         }
       ],
-      "dungeons": ["taverley_dungeon", "asgarnian_ice_dungeon", "giants_den"],
-      "bosses": ["giant_mole"],
-      "music_theme": "noble_knights",
-      "level_range": [20, 60]
+      "dungeons": ["molten_depths", "crystal_caverns", "forge_trials", "cinderpeak_caldera"],
+      "bosses": ["pyraxion"],
+      "key_npcs": ["forgemaster_grimjaw", "warlord_thane", "master_smelter"],
+      "music_theme": "industrial_power",
+      "level_range": [30, 60],
+      "eternal_influence": "Valdros"
     },
 
-    "kandarin": {
-      "id": "kandarin",
-      "name": "Kandarin",
-      "description": "The western kingdom, home to Camelot and the ranging guild",
-      "capital": "Ardougne",
-      "faction": "Kingdom of Kandarin",
-      "climate": "temperate_coastal",
-      "biomes": ["forest", "coastline", "grassland", "swamp"],
+    "verdant_wilds": {
+      "id": "verdant_wilds",
+      "name": "Verdant Wilds",
+      "description": "Dense ancient forests hiding an elven civilization and druidic circles, where nature magic runs strong",
+      "capital": "Sylvanheart",
+      "faction": "Terrwyn's Children",
+      "climate": "temperate_rainforest",
+      "biomes": ["ancient_forest", "crystal_groves", "living_architecture", "sacred_glades"],
       "major_cities": [
         {
-          "name": "Ardougne",
-          "type": "capital",
+          "name": "Sylvanheart",
+          "type": "crystal_capital",
           "population": "large",
-          "features": ["castle", "market", "zoo", "east_west_division"],
-          "coordinates": {"x": 2661, "y": 3304, "z": 0}
+          "features": ["living_tree_city", "crystal_spires", "nature_sanctum", "beast_menagerie", "elder_council"],
+          "coordinates": {"x": 500, "y": 2500, "z": 100},
+          "description": "Crystal city grown from living trees by ancient magic"
         },
         {
-          "name": "Seers' Village",
-          "type": "village",
-          "population": "medium",
-          "features": ["magic_trees", "flax_field", "courthouse", "agility_course"],
-          "coordinates": {"x": 2725, "y": 3484, "z": 0}
-        },
-        {
-          "name": "Catherby",
-          "type": "fishing_village",
+          "name": "Moonpetal Grove",
+          "type": "sacred_site",
           "population": "small",
-          "features": ["fishing", "farming", "ranging_guild_nearby"],
-          "coordinates": {"x": 2813, "y": 3447, "z": 0}
+          "features": ["druid_circle", "moon_altar", "herb_gardens", "beast_sanctuary"],
+          "coordinates": {"x": 400, "y": 2800, "z": 0},
+          "description": "Sacred gathering place of the druids"
         },
         {
-          "name": "Yanille",
-          "type": "mage_city",
+          "name": "Whisperwind Sanctuary",
+          "type": "hidden_refuge",
           "population": "medium",
-          "features": ["magic_guild", "watchtower", "house_portal"],
-          "coordinates": {"x": 2544, "y": 3089, "z": 0}
+          "features": ["hidden_paths", "nature_healing", "ranger_lodge", "treehouse_village"],
+          "coordinates": {"x": 300, "y": 2600, "z": 50},
+          "description": "Hidden elven refuge accessible only by secret paths"
+        },
+        {
+          "name": "Thornwall Maze",
+          "type": "defensive_zone",
+          "population": "none",
+          "features": ["living_labyrinth", "trap_vines", "guardian_treants"],
+          "coordinates": {"x": 600, "y": 2300, "z": 0},
+          "description": "Magical defensive labyrinth protecting the wilds"
         }
       ],
-      "guilds": ["fishing_guild", "ranging_guild", "magic_guild", "legends_guild"],
-      "dungeons": ["ardougne_sewers", "underground_pass"],
-      "music_theme": "western_adventure",
-      "level_range": [40, 80]
+      "dungeons": ["elderwood_depths", "corrupted_hollow", "spider_nest", "fungal_caves"],
+      "bosses": ["thornmother_yvex"],
+      "key_npcs": ["archdruid_faelan", "elder_sylvanas", "beastmaster_theron"],
+      "music_theme": "ethereal_nature",
+      "level_range": [40, 75],
+      "eternal_influence": "Terrwyn"
     },
 
-    "morytania": {
-      "id": "morytania",
-      "name": "Morytania",
-      "description": "The cursed swampland ruled by vampyres, shrouded in perpetual darkness",
-      "capital": "Meiyerditch",
-      "faction": "Vampyre Lords",
+    "dreadmire_marshes": {
+      "id": "dreadmire_marshes",
+      "name": "Dreadmire Marshes",
+      "description": "Cursed swamplands shrouded in perpetual gloom, ruled by undead lords and dark magic practitioners",
+      "capital": "Grimhallow",
+      "faction": "The Duskmourne Court",
       "climate": "perpetual_gloom",
-      "biomes": ["swamp", "dead_forest", "haunted_moors"],
+      "biomes": ["swamp", "dead_forest", "haunted_moors", "flooded_ruins"],
       "atmosphere": {
         "lighting": "dark",
         "fog": "heavy",
-        "desaturation": 0.3
+        "desaturation": 0.4,
+        "ambient_sounds": ["whispers", "chains", "howling"]
       },
       "major_cities": [
         {
-          "name": "Canifis",
-          "type": "werewolf_village",
-          "population": "medium",
-          "features": ["pub", "slayer_master", "general_store"],
-          "coordinates": {"x": 3496, "y": 3488, "z": 0},
-          "requirements": {"quest": "priest_in_peril"}
-        },
-        {
-          "name": "Port Phasmatys",
-          "type": "ghost_town",
+          "name": "Grimhallow",
+          "type": "fallen_city",
           "population": "undead",
-          "features": ["ectofuntus", "charter_ship", "brewery"],
-          "coordinates": {"x": 3688, "y": 3502, "z": 0}
+          "features": ["ruined_cathedral", "haunted_streets", "crypt_entrances", "blood_fountain"],
+          "coordinates": {"x": 4000, "y": 3000, "z": 0},
+          "description": "Once-great city now overrun by the undead"
         },
         {
-          "name": "Burgh de Rott",
-          "type": "refugee_village",
+          "name": "Blightfen Village",
+          "type": "cursed_settlement",
           "population": "small",
-          "features": ["myreque_hideout", "bank", "fishing"],
-          "coordinates": {"x": 3495, "y": 3181, "z": 0}
+          "features": ["cursed_inhabitants", "plague_doctor", "tainted_well"],
+          "coordinates": {"x": 3800, "y": 2800, "z": 0},
+          "description": "Village of the cursed, neither living nor dead",
+          "requirements": {"quest": "dread_awakening"}
         },
         {
-          "name": "Darkmeyer",
-          "type": "vampyre_city",
-          "population": "large",
-          "features": ["blood_tithes", "arboretum", "theatre_of_blood_nearby"],
-          "coordinates": {"x": 3617, "y": 3357, "z": 0},
+          "name": "Wraithwood",
+          "type": "haunted_forest",
+          "population": "none",
+          "features": ["dying_trees", "will_o_wisps", "ghostly_apparitions"],
+          "coordinates": {"x": 3900, "y": 3200, "z": 0},
+          "description": "Forest of eternally dying trees"
+        },
+        {
+          "name": "Ghostharbor",
+          "type": "ghost_port",
+          "population": "spectral",
+          "features": ["phantom_ships", "soul_lanterns", "spectral_market", "ferry_to_beyond"],
+          "coordinates": {"x": 4200, "y": 2900, "z": 0},
+          "description": "Port town where the dead await passage"
+        },
+        {
+          "name": "Castle Duskmourne",
+          "type": "vampire_fortress",
+          "population": "undead",
+          "features": ["blood_throne", "vampire_court", "torture_chambers", "observatory"],
+          "coordinates": {"x": 4100, "y": 3300, "z": 100},
+          "description": "Fortress of the vampire lord Vexaris",
           "requirements": {"quest": "sins_of_the_father"}
         }
       ],
-      "dungeons": ["slayer_tower", "barrows", "theatre_of_blood"],
-      "bosses": ["barrows_brothers", "nightmare", "verzik_vitur"],
+      "dungeons": ["sunken_crypts", "barrowmound", "blood_sanctum", "soul_prison"],
+      "bosses": ["malachar_the_undying", "lord_vexaris_duskmourne", "barrow_brothers"],
+      "key_npcs": ["father_morbius", "the_gravedigger", "lady_ashworth"],
       "music_theme": "ominous_horror",
-      "level_range": [50, 120]
+      "level_range": [50, 100],
+      "eternal_influence": "Nythara"
     },
 
-    "kharidian_desert": {
-      "id": "kharidian_desert",
-      "name": "Kharidian Desert",
-      "description": "The scorching desert of the south, with ancient pyramids and hidden oases",
-      "capital": "Menaphos",
-      "faction": "Menaphite Pantheon",
+    "sunscorch_wastes": {
+      "id": "sunscorch_wastes",
+      "name": "Sunscorch Wastes",
+      "description": "Vast desert of scorching sands, ancient buried civilizations, and nomadic traders seeking forgotten treasures",
+      "capital": "Al'Kazar",
+      "faction": "Sun Covenant",
       "climate": "arid_desert",
-      "biomes": ["sand_dunes", "rocky_desert", "oasis"],
+      "biomes": ["sand_dunes", "rocky_desert", "oasis", "buried_ruins"],
       "hazards": {
         "desert_heat": true,
         "requires_waterskins": true,
-        "damage_without_water": 10
+        "damage_without_water": 10,
+        "sandstorms": true
       },
       "major_cities": [
         {
-          "name": "Al Kharid",
-          "type": "border_city",
-          "population": "medium",
-          "features": ["palace", "tannery", "gem_rocks", "duel_arena"],
-          "coordinates": {"x": 3293, "y": 3174, "z": 0}
-        },
-        {
-          "name": "Pollnivneach",
-          "type": "bandit_town",
-          "population": "small",
-          "features": ["blackjacking", "smoke_dungeon_nearby"],
-          "coordinates": {"x": 3359, "y": 2981, "z": 0}
-        },
-        {
-          "name": "Sophanem",
-          "type": "plague_city",
-          "population": "medium",
-          "features": ["pyramid_plunder", "temple", "slayer_dungeon"],
-          "coordinates": {"x": 3306, "y": 2780, "z": 0},
-          "requirements": {"quest": "contact"}
-        },
-        {
-          "name": "Menaphos",
-          "type": "golden_city",
+          "name": "Al'Kazar",
+          "type": "desert_capital",
           "population": "large",
-          "features": ["ports", "soul_obelisk", "shifting_tombs", "grand_library"],
-          "coordinates": {"x": 3216, "y": 2716, "z": 0},
-          "requirements": {"quest": "the_jack_of_spades"}
+          "features": ["grand_bazaar", "sun_palace", "water_gardens", "merchant_guild", "arena"],
+          "coordinates": {"x": 2500, "y": 4000, "z": 0},
+          "description": "Magnificent desert capital, city of merchants and scholars"
         },
         {
-          "name": "Nardah",
-          "type": "oasis_town",
+          "name": "Sandspire",
+          "type": "fortress_city",
+          "population": "medium",
+          "features": ["towering_rock_formation", "carved_dwellings", "wind_towers", "observatory"],
+          "coordinates": {"x": 2700, "y": 4200, "z": 100},
+          "description": "City built into a towering rock formation"
+        },
+        {
+          "name": "The Buried Kingdom",
+          "type": "ancient_ruins",
+          "population": "none",
+          "features": ["buried_temples", "treasure_vaults", "trap_corridors", "mummy_guardians"],
+          "coordinates": {"x": 2300, "y": 4400, "z": -100},
+          "description": "Ancient civilization buried beneath the sand"
+        },
+        {
+          "name": "Scorpion's Rest",
+          "type": "bandit_stronghold",
+          "population": "medium",
+          "features": ["black_market", "smuggler_caves", "arena_pit"],
+          "coordinates": {"x": 2900, "y": 3800, "z": 0},
+          "description": "Lawless bandit stronghold in the eastern wastes"
+        },
+        {
+          "name": "Oasis Solara",
+          "type": "sacred_oasis",
           "population": "small",
-          "features": ["shrine", "water_source", "elidinis_temple"],
-          "coordinates": {"x": 3428, "y": 2892, "z": 0}
+          "features": ["healing_waters", "sun_temple", "date_palms", "pilgrimage_site"],
+          "coordinates": {"x": 2600, "y": 4500, "z": 0},
+          "description": "Sacred oasis blessed by Solarius"
         }
       ],
-      "dungeons": ["kalphite_lair", "sophanem_slayer_dungeon", "tombs_of_amascut"],
-      "bosses": ["kalphite_queen", "wardens"],
+      "dungeons": ["pharaoh_tomb", "scorpion_caves", "sunken_temple", "sandworm_lair"],
+      "bosses": ["sandking_kethral", "ancient_pharaoh"],
+      "key_npcs": ["sultan_rashid", "archaeologist_zara", "caravan_master"],
       "music_theme": "arabian_mystery",
-      "level_range": [30, 120]
+      "level_range": [35, 90],
+      "eternal_influence": "Solarius"
     },
 
-    "fremennik_province": {
-      "id": "fremennik_province",
-      "name": "Fremennik Province",
-      "description": "The frozen northern lands of the warrior vikings",
-      "capital": "Rellekka",
-      "faction": "Fremennik Tribes",
+    "frostpeak_reaches": {
+      "id": "frostpeak_reaches",
+      "name": "Frostpeak Reaches",
+      "description": "Frozen tundra and towering glaciers, home to hardy warriors and ancient ice magic",
+      "capital": "Winterhold",
+      "faction": "Frost Clans",
       "climate": "arctic",
-      "biomes": ["tundra", "frozen_coast", "snow_mountains"],
+      "biomes": ["tundra", "frozen_coast", "glaciers", "snow_mountains"],
+      "hazards": {
+        "extreme_cold": true,
+        "requires_warmth": true,
+        "blizzards": true
+      },
       "major_cities": [
         {
-          "name": "Rellekka",
+          "name": "Winterhold",
           "type": "tribal_capital",
-          "population": "medium",
-          "features": ["longhall", "rock_crabs", "helmet_shop"],
-          "coordinates": {"x": 2660, "y": 3657, "z": 0},
-          "requirements": {"quest": "fremennik_trials"}
-        },
-        {
-          "name": "Neitiznot",
-          "type": "island_settlement",
-          "population": "small",
-          "features": ["yak_herding", "bridges", "ice_trolls"],
-          "coordinates": {"x": 2310, "y": 3780, "z": 0}
-        },
-        {
-          "name": "Jatizso",
-          "type": "island_settlement",
-          "population": "small",
-          "features": ["mining", "tax_collector", "ice_trolls"],
-          "coordinates": {"x": 2392, "y": 3813, "z": 0}
-        },
-        {
-          "name": "Lunar Isle",
-          "type": "mage_island",
-          "population": "small",
-          "features": ["lunar_spellbook", "oneiromancer", "suqah"],
-          "coordinates": {"x": 2100, "y": 3914, "z": 0},
-          "requirements": {"quest": "lunar_diplomacy"}
-        }
-      ],
-      "dungeons": ["waterbirth_dungeon", "fremennik_slayer_dungeon"],
-      "bosses": ["dagannoth_kings", "vorkath"],
-      "music_theme": "nordic_saga",
-      "level_range": [40, 100]
-    },
-
-    "tirannwn": {
-      "id": "tirannwn",
-      "name": "Tirannwn",
-      "description": "The elven lands, dense forests hiding an ancient civilization",
-      "capital": "Prifddinas",
-      "faction": "Elven Clans",
-      "climate": "temperate_rainforest",
-      "biomes": ["dense_forest", "crystal_caves", "elven_architecture"],
-      "major_cities": [
-        {
-          "name": "Lletya",
-          "type": "hidden_village",
-          "population": "small",
-          "features": ["elven_shop", "bank", "fruit_tree_patch"],
-          "coordinates": {"x": 2341, "y": 3171, "z": 0},
-          "requirements": {"quest": "roving_elves"}
-        },
-        {
-          "name": "Prifddinas",
-          "type": "crystal_city",
           "population": "large",
-          "features": ["eight_clans", "max_guild", "gauntlet", "zalcano", "grand_library"],
-          "coordinates": {"x": 2208, "y": 3360, "z": 1},
-          "requirements": {"quest": "song_of_the_elves"},
-          "clans": ["Cadarn", "Crwys", "Amlodd", "Hefin", "Iorwerth", "Ithell", "Meilyr", "Trahaearn"]
-        }
-      ],
-      "dungeons": ["underground_pass", "temple_of_light"],
-      "bosses": ["zulrah", "crystalline_hunllef", "fragment_of_seren"],
-      "music_theme": "ethereal_elven",
-      "level_range": [60, 120]
-    },
-
-    "karamja": {
-      "id": "karamja",
-      "name": "Karamja",
-      "description": "The tropical jungle island, home to volcano and dangerous wildlife",
-      "capital": "Brimhaven",
-      "faction": "Independent",
-      "climate": "tropical",
-      "biomes": ["jungle", "volcano", "beaches"],
-      "major_cities": [
+          "features": ["great_hall", "mead_brewery", "warrior_lodge", "hunting_grounds", "ship_harbor"],
+          "coordinates": {"x": 2000, "y": 5000, "z": 0},
+          "description": "Great hall of the frost clans, seat of the High Jarl"
+        },
         {
-          "name": "Brimhaven",
-          "type": "pirate_town",
+          "name": "Glacierheim",
+          "type": "ice_city",
           "population": "medium",
-          "features": ["agility_arena", "dungeon", "house_portal"],
-          "coordinates": {"x": 2760, "y": 3173, "z": 0}
+          "features": ["ice_carved_structures", "frost_temple", "aurora_observatory"],
+          "coordinates": {"x": 1800, "y": 5300, "z": 50},
+          "description": "City carved entirely into an ancient glacier"
         },
         {
-          "name": "Shilo Village",
-          "type": "village",
+          "name": "The Frozen Throne",
+          "type": "sacred_site",
           "population": "small",
-          "features": ["gem_rocks", "fishing", "slayer_master"],
-          "coordinates": {"x": 2852, "y": 2955, "z": 0},
-          "requirements": {"quest": "shilo_village"}
+          "features": ["high_jarl_seat", "ancestor_tombs", "frost_oracle"],
+          "coordinates": {"x": 2200, "y": 5500, "z": 200},
+          "description": "Seat of power atop the highest peak"
         },
         {
-          "name": "Tai Bwo Wannai",
-          "type": "tribal_village",
+          "name": "Mammoth Grounds",
+          "type": "hunting_territory",
+          "population": "nomadic",
+          "features": ["mammoth_herds", "hunter_camps", "bone_crafting"],
+          "coordinates": {"x": 1600, "y": 4800, "z": 0},
+          "description": "Vast hunting grounds of the northern clans"
+        },
+        {
+          "name": "Iceveil Monastery",
+          "type": "monastic_order",
           "population": "small",
-          "features": ["hardwood_grove", "tribal_shop"],
-          "coordinates": {"x": 2795, "y": 3065, "z": 0}
+          "features": ["frost_monks", "ice_meditation", "ancient_scrolls"],
+          "coordinates": {"x": 2400, "y": 5200, "z": 300},
+          "description": "Order of frost monks who master ice magic"
         }
       ],
-      "dungeons": ["brimhaven_dungeon", "tzhaar_city"],
-      "bosses": ["tztok_jad", "tzkal_zuk"],
-      "music_theme": "tribal_jungle",
-      "level_range": [30, 90]
+      "dungeons": ["ice_wyrm_lair", "frozen_crypts", "yeti_caves", "frost_giant_hold"],
+      "bosses": ["frostfang_the_eternal", "ice_witch_vardis"],
+      "key_npcs": ["high_jarl_bjorn", "frost_oracle", "hunt_master"],
+      "music_theme": "nordic_saga",
+      "level_range": [45, 95],
+      "eternal_influence": "Valdros"
     },
 
-    "wilderness": {
-      "id": "wilderness",
-      "name": "The Wilderness",
-      "description": "The dangerous northern wasteland where player-killing is enabled",
+    "ashfall_badlands": {
+      "id": "ashfall_badlands",
+      "name": "Ashfall Badlands",
+      "description": "Volcanic wasteland torn by demonic incursions, where factions battle for control and survival",
       "capital": "none",
-      "faction": "Lawless",
-      "climate": "post_apocalyptic",
-      "biomes": ["wasteland", "lava_fields", "ruins"],
+      "faction": "Contested",
+      "climate": "volcanic_hellscape",
+      "biomes": ["lava_fields", "ash_wastes", "demon_rifts", "ruined_fortresses"],
       "pvp_enabled": true,
       "level_range_indicator": true,
-      "teleport_restrictions": {
-        "below_level_20": "normal_teleports",
-        "below_level_30": "glory_teleport",
-        "above_level_30": "no_teleports"
+      "hazards": {
+        "volcanic_vents": true,
+        "demon_patrols": true,
+        "ash_storms": true
       },
       "notable_locations": [
-        {"name": "Edgeville Wilderness", "level_range": [1, 5]},
-        {"name": "Dark Warriors' Fortress", "level_range": [12, 16]},
-        {"name": "Chaos Temple", "level_range": [11, 13]},
-        {"name": "Revenant Caves", "level_range": [17, 40]},
-        {"name": "Mage Arena", "level_range": [52, 56]},
-        {"name": "Wilderness Volcano", "level_range": [20, 25]},
-        {"name": "Rogues' Castle", "level_range": [50, 56]}
+        {"name": "Ember's Edge", "type": "last_bastion", "level_range": [60, 65], "description": "Final defensive line before the wastes"},
+        {"name": "The Scorched Fort", "type": "ruined_outpost", "level_range": [65, 75], "description": "Ruined military outpost, now contested territory"},
+        {"name": "Hellrift", "type": "demon_portal", "level_range": [80, 90], "description": "Portal to the demonic realm"},
+        {"name": "Obsidian Spire", "type": "dark_tower", "level_range": [85, 95], "description": "Ancient dark tower of forbidden power"},
+        {"name": "Bonefield", "type": "battlefield", "level_range": [70, 80], "description": "Graveyard of a great battle"},
+        {"name": "Chaos Sanctum", "type": "temple", "level_range": [90, 100], "description": "Temple of chaotic power"}
       ],
-      "bosses": ["chaos_elemental", "king_black_dragon", "callisto", "venenatis", "vetion", "scorpia"],
+      "bosses": ["chaos_incarnate", "demon_overlord", "volcanic_titan", "ash_phoenix"],
       "resources": {
-        "runite_ore": true,
-        "black_chinchompas": true,
-        "green_dragons": true,
-        "lava_dragons": true,
-        "dark_crabs": true
+        "obsidian_ore": true,
+        "demon_essence": true,
+        "volcanic_crystals": true,
+        "rare_minerals": true
       },
-      "music_theme": "ominous_danger",
-      "level_range": [1, 56]
+      "music_theme": "apocalyptic_battle",
+      "level_range": [60, 100],
+      "eternal_influence": "Void'thar"
     },
 
-    "fossil_island": {
-      "id": "fossil_island",
-      "name": "Fossil Island",
-      "description": "An archaeological wonder with prehistoric creatures",
-      "requirements": {"quest": "bone_voyage"},
-      "climate": "temperate_volcanic",
-      "biomes": ["tar_swamps", "volcanic", "jungle", "underwater"],
-      "features": [
-        "herbiboar_tracking",
-        "birdhouse_runs",
-        "underwater_agility",
-        "volcanic_mine",
-        "mushroom_forest",
-        "rare_fossils"
-      ],
-      "bosses": ["deranged_archaeologist"],
-      "music_theme": "prehistoric_discovery",
-      "level_range": [50, 90]
-    },
-
-    "anachronia": {
-      "id": "anachronia",
-      "name": "Anachronia",
-      "description": "The land out of time, where dinosaurs still roam",
-      "requirements": {"quest": "desperate_times"},
-      "climate": "prehistoric_tropical",
-      "biomes": ["jungle", "swamp", "volcanic_plains"],
-      "base_camp": {
-        "upgradeable": true,
-        "tiers": 5,
-        "unlocks": ["bank", "altar", "lodestone"]
-      },
-      "agility_course": {
-        "name": "Anachronia Agility Course",
-        "obstacles": 7,
-        "xp_per_lap": 800
-      },
-      "big_game_hunter": {
-        "dinosaurs": ["arcane_apoterrasaur", "scimitops", "malletops", "oculi_apoterrasaur", "pavosaurus_rex", "bagrada_rex", "corbicula_rex", "spicati_apoterrasaur", "brutish_dinosaur"],
-        "level_range": [75, 96]
-      },
-      "music_theme": "primal_land",
-      "level_range": [60, 120]
-    },
-
-    "kourend": {
-      "id": "kourend",
-      "name": "Great Kourend",
-      "description": "A distant continent with five powerful houses",
-      "capital": "Kourend Castle",
-      "faction": "Council of Kourend",
-      "climate": "varied",
-      "houses": [
+    "celestine_archipelago": {
+      "id": "celestine_archipelago",
+      "name": "Celestine Archipelago",
+      "description": "Tropical island chain of pirates, sea monsters, and ancient underwater ruins",
+      "capital": "Freeport",
+      "faction": "Pirate Confederation",
+      "climate": "tropical",
+      "biomes": ["jungle_islands", "coral_reefs", "volcanic_beaches", "underwater_ruins"],
+      "major_cities": [
         {
-          "name": "Arceuus",
-          "focus": "magic",
-          "favor_activities": ["library_books", "arceuus_spellbook_unlock"],
-          "color": "purple"
+          "name": "Freeport",
+          "type": "pirate_haven",
+          "population": "large",
+          "features": ["black_market", "tavern_row", "ship_repair", "treasure_auction", "no_law"],
+          "coordinates": {"x": 5000, "y": 2000, "z": 0},
+          "description": "Lawless pirate haven where anything goes"
         },
         {
-          "name": "Hosidius",
-          "focus": "farming",
-          "favor_activities": ["ploughing", "making_fertiliser", "vineyard"],
-          "color": "green"
+          "name": "Palmshade Isle",
+          "type": "jungle_island",
+          "population": "medium",
+          "features": ["dense_jungle", "native_tribe", "ancient_temple", "exotic_wildlife"],
+          "coordinates": {"x": 5200, "y": 2300, "z": 0},
+          "description": "Dense jungle island with ancient secrets"
         },
         {
-          "name": "Lovakengj",
-          "focus": "smithing",
-          "favor_activities": ["blast_mine", "sulphur_mining"],
-          "color": "brown"
+          "name": "Coral Reach",
+          "type": "underwater_city",
+          "population": "small",
+          "features": ["sunken_ruins", "underwater_breathing_zone", "merfolk_traders", "treasure_vaults"],
+          "coordinates": {"x": 4800, "y": 2500, "z": -100},
+          "description": "Underwater city ruins accessible by magic"
         },
         {
-          "name": "Piscarilius",
-          "focus": "fishing",
-          "favor_activities": ["stealing_fish", "anglerfish_cooking"],
-          "color": "cyan"
+          "name": "Stormwreck Cove",
+          "type": "ship_graveyard",
+          "population": "none",
+          "features": ["wrecked_ships", "ghost_pirates", "hidden_treasure", "treacherous_waters"],
+          "coordinates": {"x": 5400, "y": 1800, "z": 0},
+          "description": "Ship graveyard haunted by ghost pirates"
         },
         {
-          "name": "Shayzien",
-          "focus": "combat",
-          "favor_activities": ["combat_challenges", "lizardman_slaying"],
-          "color": "red"
+          "name": "Serpent's Maw",
+          "type": "hunting_grounds",
+          "population": "none",
+          "features": ["sea_monster_spawns", "leviathan_territory", "deep_sea_diving"],
+          "coordinates": {"x": 5100, "y": 2600, "z": 0},
+          "description": "Dangerous waters where sea monsters hunt"
         }
       ],
-      "dungeons": ["catacombs_of_kourend", "forthos_dungeon"],
-      "bosses": ["skotizo", "sarachnis", "konar_slayer_bosses"],
-      "raids": ["chambers_of_xeric"],
-      "music_theme": "mysterious_continent",
-      "level_range": [30, 120]
+      "dungeons": ["sunken_temple", "pirate_cove", "leviathan_lair", "treasure_maze"],
+      "bosses": ["kraken_supreme", "ghost_captain_blackheart", "coral_guardian"],
+      "key_npcs": ["pirate_king_morgan", "sea_witch_marina", "treasure_hunter_jack"],
+      "music_theme": "swashbuckling_adventure",
+      "level_range": [40, 85],
+      "eternal_influence": "Nythara"
+    },
+
+    "crystalvale_highlands": {
+      "id": "crystalvale_highlands",
+      "name": "Crystalvale Highlands",
+      "description": "Realm of floating islands and arcane academies where the greatest mages study reality itself",
+      "capital": "Aetherpoint",
+      "faction": "Arcane Conclave",
+      "climate": "magical_temperate",
+      "biomes": ["floating_islands", "crystal_formations", "leyline_nexuses", "cloud_forests"],
+      "major_cities": [
+        {
+          "name": "Aetherpoint",
+          "type": "floating_capital",
+          "population": "large",
+          "features": ["grand_spire", "teleportation_hub", "arcane_library", "enchanter_quarter", "council_chamber"],
+          "coordinates": {"x": 3500, "y": 500, "z": 500},
+          "description": "Magnificent floating city of mages"
+        },
+        {
+          "name": "The Arcanum",
+          "type": "magical_academy",
+          "population": "medium",
+          "features": ["lecture_halls", "practice_arenas", "magical_research", "artifact_vault"],
+          "coordinates": {"x": 3300, "y": 300, "z": 400},
+          "description": "Grand magical academy training the world's greatest mages"
+        },
+        {
+          "name": "Leyline Nexus",
+          "type": "power_convergence",
+          "population": "small",
+          "features": ["raw_magical_energy", "reality_fluctuations", "power_amplification"],
+          "coordinates": {"x": 3600, "y": 700, "z": 600},
+          "description": "Convergence of all magical leylines"
+        },
+        {
+          "name": "Voidtouched Ruins",
+          "type": "corrupted_zone",
+          "population": "none",
+          "features": ["reality_tears", "corrupted_magic", "void_creatures"],
+          "coordinates": {"x": 3800, "y": 400, "z": 300},
+          "description": "Island corrupted by Void'thar's influence"
+        },
+        {
+          "name": "Skyward Monastery",
+          "type": "cloud_temple",
+          "population": "small",
+          "features": ["meditation_chambers", "cloud_walking", "enlightenment_trials"],
+          "coordinates": {"x": 3200, "y": 600, "z": 800},
+          "description": "Temple in the clouds for magical enlightenment"
+        }
+      ],
+      "dungeons": ["dimensional_rift", "arcane_vault", "crystal_caves", "void_breach"],
+      "bosses": ["archmage_corrupted", "crystal_titan", "void_weaver"],
+      "key_npcs": ["grand_magister", "arcane_librarian", "reality_keeper"],
+      "music_theme": "celestial_wonder",
+      "level_range": [70, 110],
+      "eternal_influence": "Solarius"
+    },
+
+    "eternal_rift": {
+      "id": "eternal_rift",
+      "name": "The Eternal Rift",
+      "description": "End-game zone where reality itself breaks down - the prison of Void'thar and source of ultimate power",
+      "capital": "none",
+      "faction": "None",
+      "climate": "planar_chaos",
+      "biomes": ["fractured_reality", "cosmic_void", "temporal_anomaly", "pure_energy"],
+      "requirements": {
+        "level": 100,
+        "quest_line": "path_to_eternity"
+      },
+      "notable_locations": [
+        {
+          "name": "The Shattered Realm",
+          "type": "fractured_zone",
+          "description": "Reality has shattered into floating fragments",
+          "hazards": ["reality_tears", "gravity_shifts", "time_distortions"]
+        },
+        {
+          "name": "Void'thar's Prison",
+          "type": "cosmic_prison",
+          "description": "Where the dark Eternal is bound",
+          "hazards": ["corruption_aura", "void_whispers", "sanity_drain"]
+        },
+        {
+          "name": "The Last Bastion",
+          "type": "final_defense",
+          "description": "Final defensive line against the void",
+          "features": ["eternal_guardians", "power_conduits", "hope_shrine"]
+        },
+        {
+          "name": "Temporal Anomaly",
+          "type": "time_distorted",
+          "description": "Region where time flows differently",
+          "hazards": ["time_loops", "age_acceleration", "temporal_echoes"]
+        },
+        {
+          "name": "The Heart of Eternity",
+          "type": "ultimate_power",
+          "description": "Source of all power in existence",
+          "features": ["eternal_essence", "reality_core", "creation_point"]
+        }
+      ],
+      "raids": ["spire_of_eternity"],
+      "bosses": ["the_unmaker", "void_herald", "chrono_warden", "fractured_ones"],
+      "music_theme": "cosmic_dread",
+      "level_range": [100, 120],
+      "eternal_influence": "Void'thar"
     }
   },
 
@@ -522,6 +590,13 @@
       "architecture_style": "per_region",
       "npc_clothing": "per_region",
       "ambient_sounds": "per_region"
+    },
+    "eternal_influence_effects": {
+      "Solarius": {"lighting": "golden_glow", "particles": "light_motes"},
+      "Nythara": {"lighting": "purple_shadows", "particles": "shadow_wisps"},
+      "Valdros": {"lighting": "crimson_tint", "particles": "ember_sparks"},
+      "Terrwyn": {"lighting": "verdant_filter", "particles": "nature_spirits"},
+      "Void'thar": {"lighting": "void_distortion", "particles": "reality_tears"}
     }
   }
 }

@@ -1,550 +1,307 @@
 {
   "version": "1.0.0",
-  "description": "Transportation and teleportation systems for Realm of Eternity",
+  "description": "Transportation and teleportation systems for Realm of Eternity - Aethermoor",
 
   "teleport_networks": {
-    "lodestones": {
-      "description": "Network of attuned waypoints across the world",
-      "unlock_method": "Visit and activate each lodestone",
+    "waystones": {
+      "description": "Network of attuned ancient waystones across Aethermoor",
+      "unlock_method": "Visit and activate each waystone",
       "cooldown_seconds": 0,
       "cost": "free",
       "animation_time_seconds": 3.5,
       "locations": [
         {
-          "id": "lodestone_lumbridge",
-          "name": "Lumbridge Lodestone",
-          "region": "mistral",
-          "coordinates": {"x": 3233, "y": 3222, "z": 0},
+          "id": "waystone_millbrook",
+          "name": "Millbrook Waystone",
+          "region": "misthollow_vale",
+          "coordinates": {"x": 1000, "y": 1000, "z": 0},
           "unlocked_by_default": true
         },
         {
-          "id": "lodestone_varrock",
-          "name": "Varrock Lodestone",
-          "region": "mistral",
-          "coordinates": {"x": 3214, "y": 3376, "z": 0},
+          "id": "waystone_thornhaven",
+          "name": "Thornhaven Waystone",
+          "region": "misthollow_vale",
+          "coordinates": {"x": 1500, "y": 1500, "z": 0},
           "unlocked_by_default": false
         },
         {
-          "id": "lodestone_falador",
-          "name": "Falador Lodestone",
-          "region": "mistral",
-          "coordinates": {"x": 2967, "y": 3403, "z": 0},
+          "id": "waystone_silverstream",
+          "name": "Silverstream Waystone",
+          "region": "misthollow_vale",
+          "coordinates": {"x": 1200, "y": 1800, "z": 0},
           "unlocked_by_default": false
         },
         {
-          "id": "lodestone_edgeville",
-          "name": "Edgeville Lodestone",
-          "region": "wilderness_border",
-          "coordinates": {"x": 3067, "y": 3505, "z": 0},
+          "id": "waystone_borderwatch",
+          "name": "Borderwatch Waystone",
+          "region": "misthollow_vale",
+          "coordinates": {"x": 1600, "y": 2000, "z": 0},
           "unlocked_by_default": false
         },
         {
-          "id": "lodestone_draynor",
-          "name": "Draynor Lodestone",
-          "region": "mistral",
-          "coordinates": {"x": 3105, "y": 3298, "z": 0},
+          "id": "waystone_forgecrest",
+          "name": "Forgecrest Waystone",
+          "region": "ironhold_dominion",
+          "coordinates": {"x": 3000, "y": 2000, "z": 0},
           "unlocked_by_default": false
         },
         {
-          "id": "lodestone_port_sarim",
-          "name": "Port Sarim Lodestone",
-          "region": "mistral",
-          "coordinates": {"x": 3011, "y": 3215, "z": 0},
+          "id": "waystone_hammerfall",
+          "name": "Hammerfall Waystone",
+          "region": "ironhold_dominion",
+          "coordinates": {"x": 3200, "y": 1800, "z": 0},
           "unlocked_by_default": false
         },
         {
-          "id": "lodestone_ardougne",
-          "name": "Ardougne Lodestone",
-          "region": "kandarin",
-          "coordinates": {"x": 2634, "y": 3348, "z": 0},
+          "id": "waystone_stoneguard",
+          "name": "Stoneguard Waystone",
+          "region": "ironhold_dominion",
+          "coordinates": {"x": 2800, "y": 1600, "z": 0},
+          "unlocked_by_default": false
+        },
+        {
+          "id": "waystone_sylvanheart",
+          "name": "Sylvanheart Waystone",
+          "region": "verdant_wilds",
+          "coordinates": {"x": 500, "y": 2500, "z": 100},
           "unlocked_by_default": false,
-          "requirements": {"quests": ["biohazard"]}
+          "requirements": {"quests": ["verdant_treaty"]}
         },
         {
-          "id": "lodestone_seers",
-          "name": "Seers' Village Lodestone",
-          "region": "kandarin",
-          "coordinates": {"x": 2689, "y": 3482, "z": 0},
+          "id": "waystone_moonpetal",
+          "name": "Moonpetal Waystone",
+          "region": "verdant_wilds",
+          "coordinates": {"x": 400, "y": 2800, "z": 0},
           "unlocked_by_default": false
         },
         {
-          "id": "lodestone_yanille",
-          "name": "Yanille Lodestone",
-          "region": "kandarin",
-          "coordinates": {"x": 2529, "y": 3094, "z": 0},
-          "unlocked_by_default": false
-        },
-        {
-          "id": "lodestone_karamja",
-          "name": "Karamja Lodestone",
-          "region": "karamja",
-          "coordinates": {"x": 2761, "y": 3147, "z": 0},
-          "unlocked_by_default": false
-        },
-        {
-          "id": "lodestone_taverly",
-          "name": "Taverly Lodestone",
-          "region": "asgarnia",
-          "coordinates": {"x": 2878, "y": 3442, "z": 0},
-          "unlocked_by_default": false
-        },
-        {
-          "id": "lodestone_burthorpe",
-          "name": "Burthorpe Lodestone",
-          "region": "asgarnia",
-          "coordinates": {"x": 2899, "y": 3544, "z": 0},
-          "unlocked_by_default": false
-        },
-        {
-          "id": "lodestone_canifis",
-          "name": "Canifis Lodestone",
-          "region": "morytania",
-          "coordinates": {"x": 3518, "y": 3515, "z": 0},
+          "id": "waystone_grimhallow",
+          "name": "Grimhallow Waystone",
+          "region": "dreadmire_marshes",
+          "coordinates": {"x": 4000, "y": 3000, "z": 0},
           "unlocked_by_default": false,
-          "requirements": {"quests": ["priest_in_peril"]}
+          "requirements": {"quests": ["border_peril"]}
         },
         {
-          "id": "lodestone_catherby",
-          "name": "Catherby Lodestone",
-          "region": "kandarin",
-          "coordinates": {"x": 2811, "y": 3449, "z": 0},
+          "id": "waystone_blightfen",
+          "name": "Blightfen Waystone",
+          "region": "dreadmire_marshes",
+          "coordinates": {"x": 3800, "y": 2800, "z": 0},
           "unlocked_by_default": false
         },
         {
-          "id": "lodestone_al_kharid",
-          "name": "Al Kharid Lodestone",
-          "region": "kharidian_desert",
-          "coordinates": {"x": 3297, "y": 3184, "z": 0},
+          "id": "waystone_alkazar",
+          "name": "Al'Kazar Waystone",
+          "region": "sunscorch_wastes",
+          "coordinates": {"x": 2500, "y": 4000, "z": 0},
           "unlocked_by_default": false
         },
         {
-          "id": "lodestone_menaphos",
-          "name": "Menaphos Lodestone",
-          "region": "kharidian_desert",
-          "coordinates": {"x": 3216, "y": 2716, "z": 0},
-          "unlocked_by_default": false,
-          "requirements": {"quests": ["the_jack_of_spades"]}
-        },
-        {
-          "id": "lodestone_prifddinas",
-          "name": "Prifddinas Lodestone",
-          "region": "tirannwn",
-          "coordinates": {"x": 2208, "y": 3360, "z": 1},
-          "unlocked_by_default": false,
-          "requirements": {"quests": ["plague_end"]}
-        },
-        {
-          "id": "lodestone_wilderness",
-          "name": "Wilderness Volcano Lodestone",
-          "region": "wilderness",
-          "coordinates": {"x": 3142, "y": 3635, "z": 0},
-          "unlocked_by_default": false,
-          "warnings": ["Teleports into PvP-enabled area"]
-        },
-        {
-          "id": "lodestone_anachronia",
-          "name": "Anachronia Lodestone",
-          "region": "anachronia",
-          "coordinates": {"x": 5431, "y": 2338, "z": 0},
+          "id": "waystone_sandspire",
+          "name": "Sandspire Waystone",
+          "region": "sunscorch_wastes",
+          "coordinates": {"x": 2700, "y": 4200, "z": 100},
           "unlocked_by_default": false
         },
         {
-          "id": "lodestone_wars_retreat",
-          "name": "War's Retreat Lodestone",
-          "region": "hub",
-          "coordinates": {"x": 3294, "y": 10124, "z": 0},
+          "id": "waystone_winterhold",
+          "name": "Winterhold Waystone",
+          "region": "frostpeak_reaches",
+          "coordinates": {"x": 2000, "y": 5000, "z": 0},
+          "unlocked_by_default": false
+        },
+        {
+          "id": "waystone_glacierheim",
+          "name": "Glacierheim Waystone",
+          "region": "frostpeak_reaches",
+          "coordinates": {"x": 1800, "y": 5300, "z": 50},
+          "unlocked_by_default": false
+        },
+        {
+          "id": "waystone_freeport",
+          "name": "Freeport Waystone",
+          "region": "celestine_archipelago",
+          "coordinates": {"x": 5000, "y": 2000, "z": 0},
+          "unlocked_by_default": false
+        },
+        {
+          "id": "waystone_aetherpoint",
+          "name": "Aetherpoint Waystone",
+          "region": "crystalvale_highlands",
+          "coordinates": {"x": 3500, "y": 500, "z": 500},
           "unlocked_by_default": false,
-          "requirements": {"boss_kills": 10}
+          "requirements": {"quests": ["ascension"]}
+        },
+        {
+          "id": "waystone_embers_edge",
+          "name": "Ember's Edge Waystone",
+          "region": "ashfall_badlands",
+          "coordinates": {"x": 4500, "y": 4500, "z": 0},
+          "unlocked_by_default": false
+        },
+        {
+          "id": "waystone_last_bastion",
+          "name": "Last Bastion Waystone",
+          "region": "eternal_rift",
+          "coordinates": {"x": 6000, "y": 6000, "z": 0},
+          "unlocked_by_default": false,
+          "requirements": {"quests": ["path_to_eternity"]}
         }
       ]
     },
 
-    "ancient_magicks_teleports": {
-      "description": "Teleportation spells from the ancient spellbook",
-      "unlock_method": "Complete Desert Treasure quest",
-      "rune_costs": true,
+    "portal_stones": {
+      "description": "Network of magical portal stones for regional travel",
+      "unlock_method": "Complete regional quests",
       "locations": [
-        {"id": "paddewwa", "name": "Paddewwa Teleport", "destination": "Edgeville Dungeon", "level": 54, "runes": {"law": 2, "fire": 1, "air": 1}},
-        {"id": "senntisten", "name": "Senntisten Teleport", "destination": "Digsite", "level": 60, "runes": {"law": 2, "soul": 1}},
-        {"id": "kharyrll", "name": "Kharyrll Teleport", "destination": "Canifis", "level": 66, "runes": {"law": 2, "blood": 1}},
-        {"id": "lassar", "name": "Lassar Teleport", "destination": "Ice Mountain", "level": 72, "runes": {"law": 2, "water": 4}},
-        {"id": "dareeyak", "name": "Dareeyak Teleport", "destination": "Wilderness Ruins", "level": 78, "runes": {"law": 2, "fire": 3, "air": 2}},
-        {"id": "carrallangar", "name": "Carrallangar Teleport", "destination": "Graveyard of Shadows", "level": 84, "runes": {"law": 2, "soul": 2}},
-        {"id": "annakarl", "name": "Annakarl Teleport", "destination": "Demonic Ruins", "level": 90, "runes": {"law": 2, "blood": 2}},
-        {"id": "ghorrock", "name": "Ghorrock Teleport", "destination": "Ice Fortress", "level": 96, "runes": {"law": 2, "water": 8}}
+        {
+          "id": "portal_misthollow",
+          "name": "Misthollow Portal",
+          "region": "misthollow_vale",
+          "connects_to": ["thornhaven", "silverstream", "ravenswood"]
+        },
+        {
+          "id": "portal_ironhold",
+          "name": "Ironhold Portal",
+          "region": "ironhold_dominion",
+          "connects_to": ["forgecrest", "hammerfall", "cinderpeak"]
+        },
+        {
+          "id": "portal_verdant",
+          "name": "Verdant Portal",
+          "region": "verdant_wilds",
+          "connects_to": ["sylvanheart", "moonpetal_grove", "whisperwind"]
+        }
       ]
     },
 
-    "lunar_teleports": {
-      "description": "Teleportation spells from the lunar spellbook",
-      "unlock_method": "Complete Lunar Diplomacy quest",
-      "locations": [
-        {"id": "moonclan", "name": "Moonclan Teleport", "destination": "Lunar Isle", "level": 69, "runes": {"law": 1, "astral": 2, "earth": 2}},
-        {"id": "ourania", "name": "Ourania Teleport", "destination": "Ourania Altar", "level": 71, "runes": {"law": 1, "astral": 2, "earth": 6}},
-        {"id": "waterbirth", "name": "Waterbirth Teleport", "destination": "Waterbirth Island", "level": 72, "runes": {"law": 1, "astral": 2, "water": 1}},
-        {"id": "barbarian", "name": "Barbarian Teleport", "destination": "Barbarian Outpost", "level": 75, "runes": {"law": 2, "astral": 2, "fire": 3}},
-        {"id": "khazard", "name": "Khazard Teleport", "destination": "Port Khazard", "level": 78, "runes": {"law": 2, "astral": 2, "water": 4}},
-        {"id": "fishing_guild", "name": "Fishing Guild Teleport", "destination": "Fishing Guild", "level": 85, "runes": {"law": 3, "astral": 3, "water": 10}},
-        {"id": "catherby_lunar", "name": "Catherby Teleport", "destination": "Catherby", "level": 87, "runes": {"law": 3, "astral": 3, "water": 10}},
-        {"id": "ice_plateau", "name": "Ice Plateau Teleport", "destination": "Wilderness Ice Plateau", "level": 89, "runes": {"law": 3, "astral": 3, "water": 8}}
-      ]
-    },
-
-    "portal_nexus": {
-      "description": "Player-owned house teleport hub",
-      "build_location": "Portal Nexus room",
-      "max_portals_by_tier": {
-        "basic": 3,
-        "improved": 8,
-        "greater": 16,
-        "elite": 24,
-        "master": 37
-      },
-      "available_destinations": [
-        {"id": "varrock", "construction_level": 50, "cost_gp": 100},
-        {"id": "lumbridge", "construction_level": 50, "cost_gp": 100},
-        {"id": "falador", "construction_level": 50, "cost_gp": 100},
-        {"id": "camelot", "construction_level": 50, "cost_gp": 200},
-        {"id": "ardougne", "construction_level": 51, "cost_gp": 200},
-        {"id": "watchtower", "construction_level": 58, "cost_gp": 300},
-        {"id": "trollheim", "construction_level": 64, "cost_gp": 350},
-        {"id": "kourend", "construction_level": 69, "cost_gp": 500},
-        {"id": "grand_exchange", "construction_level": 75, "cost_gp": 1000},
-        {"id": "lunar_isle", "construction_level": 80, "cost_gp": 2000},
-        {"id": "senntisten", "construction_level": 85, "cost_gp": 3000},
-        {"id": "prifddinas", "construction_level": 90, "cost_gp": 5000}
+    "house_portals": {
+      "description": "Teleport rooms in player estates",
+      "construction_skill_required": 50,
+      "destinations": [
+        {"id": "thornhaven", "construction_level": 50, "cost_gp": 100},
+        {"id": "forgecrest", "construction_level": 55, "cost_gp": 150},
+        {"id": "sylvanheart", "construction_level": 60, "cost_gp": 200},
+        {"id": "alkazar", "construction_level": 65, "cost_gp": 250},
+        {"id": "winterhold", "construction_level": 70, "cost_gp": 300}
       ]
     }
   },
 
-  "nature_networks": {
-    "spirit_trees": {
-      "description": "Ancient trees grown by Aethertap that connect through the spirit realm",
-      "skill_requirement": "farming",
-      "level_requirement": 83,
-      "network_unlock": "Complete Tree Gnome Village quest",
-      "locations": [
-        {"id": "gnome_stronghold", "name": "Tree Gnome Stronghold", "coordinates": {"x": 2461, "y": 3444, "z": 0}, "default_unlocked": true},
-        {"id": "gnome_village", "name": "Tree Gnome Village", "coordinates": {"x": 2542, "y": 3170, "z": 0}, "default_unlocked": true},
-        {"id": "battlefield", "name": "Khazard Battlefield", "coordinates": {"x": 2555, "y": 3259, "z": 0}},
-        {"id": "grand_exchange", "name": "Grand Exchange", "coordinates": {"x": 3186, "y": 3508, "z": 0}},
-        {"id": "port_sarim", "name": "Port Sarim", "coordinates": {"x": 3059, "y": 3258, "z": 0}},
-        {"id": "etceteria", "name": "Etceteria", "coordinates": {"x": 2613, "y": 3857, "z": 0}},
-        {"id": "brimhaven", "name": "Brimhaven", "coordinates": {"x": 2800, "y": 3203, "z": 0}},
-        {"id": "poh_garden", "name": "Player House (Garden)", "coordinates": "dynamic", "requirements": {"farming": 83, "construction": 75}}
-      ],
-      "player_grown_trees": {
-        "max_count": 2,
-        "growth_time_hours": 58,
-        "locations_available": [
-          {"id": "farming_guild", "name": "Farming Guild"},
-          {"id": "poh", "name": "Player-Owned House"},
-          {"id": "port_sarim_patch", "name": "Port Sarim Spirit Patch"},
-          {"id": "brimhaven_patch", "name": "Brimhaven Spirit Patch"},
-          {"id": "etceteria_patch", "name": "Etceteria Spirit Patch"}
-        ]
-      }
-    },
-
-    "fairy_rings": {
-      "description": "Magical mushroom rings that teleport using three-letter codes",
-      "unlock_requirements": {
-        "quests": ["fairy_tale_part_2_started"],
-        "staff_required_until": "fairy_tale_part_3"
-      },
-      "code_system": {
-        "letters": ["A", "B", "C", "D", "I", "J", "K", "L", "P", "Q", "R", "S"],
-        "positions": 3,
-        "total_combinations": 1728
-      },
-      "notable_locations": [
-        {"code": "AIQ", "name": "Mudskipper Point", "region": "asgarnia"},
-        {"code": "AJR", "name": "Slayer Tower", "region": "morytania"},
-        {"code": "AKQ", "name": "Piscatoris Hunter Area", "region": "kandarin"},
-        {"code": "AKS", "name": "Feldip Hunter Area", "region": "feldip"},
-        {"code": "ALP", "name": "Lighthouse", "region": "fremennik"},
-        {"code": "ALS", "name": "McGrubor's Wood", "region": "kandarin"},
-        {"code": "BIP", "name": "Islands South of Mos Le'Harmless", "region": "mos_leharmless"},
-        {"code": "BIQ", "name": "Kalphite Lair Entrance", "region": "kharidian_desert"},
-        {"code": "BJS", "name": "Near Zul-Andra", "region": "tirannwn"},
-        {"code": "BKP", "name": "South of Castle Wars", "region": "kandarin"},
-        {"code": "BKR", "name": "Mort Myre Swamp South", "region": "morytania"},
-        {"code": "BLR", "name": "Legends' Guild", "region": "kandarin"},
-        {"code": "CIP", "name": "Miscellania", "region": "fremennik"},
-        {"code": "CIQ", "name": "North-West of Yanille", "region": "kandarin"},
-        {"code": "CJR", "name": "Sinclair Mansion", "region": "kandarin"},
-        {"code": "CKR", "name": "South of Tai Bwo Wannai", "region": "karamja"},
-        {"code": "CKS", "name": "Canifis", "region": "morytania"},
-        {"code": "CLP", "name": "Draynor Island", "region": "mistral"},
-        {"code": "DIP", "name": "Ape Atoll Entrance", "region": "ape_atoll"},
-        {"code": "DIS", "name": "Wizards' Tower", "region": "mistral"},
-        {"code": "DJP", "name": "Tower of Life", "region": "kandarin"},
-        {"code": "DJR", "name": "Chasm of Fire", "region": "kourend"},
-        {"code": "DKP", "name": "Karambwan Fishing", "region": "karamja"},
-        {"code": "DKR", "name": "Edgeville", "region": "mistral"},
-        {"code": "DKS", "name": "Snowy Hunter Area", "region": "fremennik"},
-        {"code": "DLQ", "name": "North of Nardah", "region": "kharidian_desert"},
-        {"code": "DLR", "name": "Islands East of Mort Myre", "region": "morytania"}
-      ],
-      "hub_location": {
-        "name": "Zanaris",
-        "code": null,
-        "access_method": "shed_with_dramen_staff"
-      }
-    },
-
-    "gnome_gliders": {
-      "description": "Glider network operated by the gnomes",
-      "unlock_method": "Complete The Grand Tree quest",
-      "locations": [
-        {"id": "ta_quir_priw", "name": "Grand Tree", "coordinates": {"x": 2465, "y": 3501, "z": 3}},
-        {"id": "sindarpos", "name": "White Wolf Mountain", "coordinates": {"x": 2848, "y": 3498, "z": 0}},
-        {"id": "lemanto_andra", "name": "Digsite", "coordinates": {"x": 3321, "y": 3430, "z": 0}},
-        {"id": "kar_hewo", "name": "Al Kharid", "coordinates": {"x": 3284, "y": 3213, "z": 0}},
-        {"id": "gandius", "name": "Karamja Shipyard", "coordinates": {"x": 2970, "y": 2972, "z": 0}},
-        {"id": "lemantolly_undri", "name": "Feldip Hills", "coordinates": {"x": 2544, "y": 2970, "z": 0}},
-        {"id": "ookookolly_undri", "name": "Ape Atoll", "coordinates": {"x": 2711, "y": 2803, "z": 0}, "requirements": {"quests": ["monkey_madness"]}}
-      ]
-    }
-  },
-
-  "sea_travel": {
-    "charter_ships": {
-      "description": "Pay-to-travel ship network connecting ports",
-      "locations": [
-        {"id": "port_sarim", "name": "Port Sarim"},
-        {"id": "karamja_musa", "name": "Musa Point, Karamja"},
-        {"id": "brimhaven", "name": "Brimhaven"},
-        {"id": "port_khazard", "name": "Port Khazard"},
-        {"id": "catherby", "name": "Catherby"},
-        {"id": "ship_yard", "name": "Karamja Ship Yard"},
-        {"id": "port_tyras", "name": "Port Tyras"},
-        {"id": "port_phasmatys", "name": "Port Phasmatys"},
-        {"id": "mos_le_harmless", "name": "Mos Le'Harmless"},
-        {"id": "oo_glog", "name": "Oo'glog"},
-        {"id": "corsair_cove", "name": "Corsair Cove"},
-        {"id": "menaphos_port", "name": "Menaphos Port District"}
-      ],
-      "pricing_formula": "base_cost * distance_multiplier",
-      "base_costs": {
-        "short": 200,
-        "medium": 400,
-        "long": 800,
-        "very_long": 1600
-      },
-      "discounts": {
-        "ring_of_charos_a": 0.5,
-        "cabin_fever_complete": 0.5,
-        "achievement_diary": 0.25
-      }
-    },
-
-    "regular_ships": {
+  "physical_transport": {
+    "ships": {
+      "description": "Sea travel between coastal locations",
       "routes": [
         {
-          "id": "port_sarim_karamja",
-          "from": "Port Sarim",
-          "to": "Musa Point",
+          "id": "thornhaven_freeport",
+          "name": "Thornhaven to Freeport",
+          "start": "Thornhaven Docks",
+          "end": "Freeport Harbor",
           "cost_gp": 30,
-          "return_cost": 30,
-          "travel_time_seconds": 12
+          "travel_time_seconds": 60
         },
         {
-          "id": "ardougne_brimhaven",
-          "from": "Ardougne",
-          "to": "Brimhaven",
-          "cost_gp": 30,
-          "return_cost": 30
+          "id": "freeport_palmshade",
+          "name": "Freeport to Palmshade Isle",
+          "start": "Freeport Harbor",
+          "end": "Palmshade Docks",
+          "cost_gp": 20,
+          "travel_time_seconds": 45
         },
         {
-          "id": "rellekka_miscellania",
-          "from": "Rellekka",
-          "to": "Miscellania",
-          "cost_gp": 0,
-          "requirements": {"quests": ["fremennik_trials"]}
-        },
-        {
-          "id": "rellekka_neitiznot",
-          "from": "Rellekka",
-          "to": "Neitiznot",
-          "cost_gp": 0,
-          "requirements": {"quests": ["fremennik_isles_started"]}
-        },
-        {
-          "id": "rellekka_jatizso",
-          "from": "Rellekka",
-          "to": "Jatizso",
-          "cost_gp": 0,
-          "requirements": {"quests": ["fremennik_isles_started"]}
-        },
-        {
-          "id": "rellekka_waterbirth",
-          "from": "Rellekka",
-          "to": "Waterbirth Island",
-          "cost_gp": 0,
-          "requirements": {"quests": ["fremennik_trials"]}
-        },
-        {
-          "id": "fossil_island_barge",
-          "from": "Digsite",
-          "to": "Fossil Island",
-          "cost_gp": 0,
-          "requirements": {"quests": ["bone_voyage"]}
+          "id": "silverstream_coral",
+          "name": "Silverstream to Coral Reach",
+          "start": "Silverstream River Port",
+          "end": "Coral Reach Surface Platform",
+          "cost_gp": 40,
+          "travel_time_seconds": 90
         }
       ]
     },
 
-    "player_owned_ports": {
-      "description": "High-level sailing hub with voyages to the Eastern Lands",
-      "unlock_requirements": {"skill_level_90_any": true},
-      "ship_upgrades": ["hull", "deck", "ram", "figurehead"],
-      "crew_types": ["morale", "combat", "seafaring", "speed"],
-      "voyage_types": ["standard", "special", "clue", "random_event"],
-      "regions": [
-        {"id": "arc", "name": "The Arc", "distance": 500, "unlock_level": 90},
-        {"id": "skull", "name": "The Skull", "distance": 750, "unlock_level": 92},
-        {"id": "hook", "name": "The Hook", "distance": 1000, "unlock_level": 95},
-        {"id": "scythe", "name": "The Scythe", "distance": 1500, "unlock_level": 97},
-        {"id": "bowl", "name": "The Bowl", "distance": 2000, "unlock_level": 99},
-        {"id": "pincers", "name": "The Pincers", "distance": 2500, "unlock_level": 99},
-        {"id": "loop", "name": "The Loop", "distance": 3000, "unlock_level": 99},
-        {"id": "shield", "name": "The Shield", "distance": 4000, "unlock_level": 99}
+    "caravans": {
+      "description": "Desert caravan routes",
+      "routes": [
+        {"id": "alkazar_sandspire", "name": "Al'Kazar to Sandspire", "cost_gp": 50},
+        {"id": "alkazar_oasis", "name": "Al'Kazar to Oasis Solara", "cost_gp": 30},
+        {"id": "sandspire_buried", "name": "Sandspire to Buried Kingdom", "cost_gp": 75}
+      ]
+    },
+
+    "lava_channels": {
+      "description": "Ironhold Dominion's underground lava transport system",
+      "routes": [
+        {"id": "forge_hammer", "name": "Forgecrest to Hammerfall"},
+        {"id": "hammer_deep", "name": "Hammerfall to Deepforge Caverns"},
+        {"id": "forge_cinder", "name": "Forgecrest to Cinderpeak"}
       ]
     }
   },
 
-  "land_travel": {
-    "minecarts": {
-      "description": "Underground minecart network through dwarven mines",
-      "unlock_method": "Discovery during quests or exploration",
-      "locations": [
-        {"id": "ice_mountain", "name": "Ice Mountain Entrance"},
-        {"id": "keldagrim", "name": "Keldagrim"},
-        {"id": "grand_exchange", "name": "Grand Exchange"},
-        {"id": "white_wolf", "name": "White Wolf Mountain"},
-        {"id": "blast_furnace", "name": "Blast Furnace"}
-      ]
-    },
-
-    "agility_shortcuts": {
-      "description": "Shortcuts requiring Agility levels",
-      "examples": [
-        {"id": "varrock_wall", "location": "Varrock South Wall", "level": 21, "type": "climbing"},
-        {"id": "falador_wall", "location": "Falador Wall", "level": 5, "type": "climbing"},
-        {"id": "taverly_pipe", "location": "Taverly Dungeon", "level": 70, "type": "squeeze"},
-        {"id": "god_wars_boulder", "location": "God Wars Dungeon", "level": 60, "type": "climbing"},
-        {"id": "abyss_obstacles", "location": "Abyss", "level_range": [20, 65], "type": "various"},
-        {"id": "shilo_stepping_stones", "location": "Shilo Village", "level": 32, "type": "jumping"},
-        {"id": "elven_overpass", "location": "Tirannwn", "level": 85, "type": "balance"}
-      ]
-    },
-
-    "eagles_peak_transport": {
-      "description": "Giant eagle network for fast travel",
-      "unlock_method": "Complete Eagles' Peak quest",
-      "rope_required": true,
-      "locations": [
-        {"id": "eagles_peak", "name": "Eagles' Peak"},
-        {"id": "rellekka", "name": "Rellekka Hunter Area"},
-        {"id": "uzer", "name": "Uzer"},
-        {"id": "feldip", "name": "Feldip Hills"},
-        {"id": "piscatoris", "name": "Piscatoris"}
-      ]
-    },
-
-    "canoes": {
-      "description": "River travel via woodcutting canoes",
-      "skill": "woodcutting",
-      "canoe_types": [
-        {"id": "log", "name": "Log", "level": 12, "stations_reach": 1},
-        {"id": "dugout", "name": "Dugout", "level": 27, "stations_reach": 2},
-        {"id": "stable_dugout", "name": "Stable Dugout", "level": 42, "stations_reach": 3},
-        {"id": "waka", "name": "Waka", "level": 57, "stations_reach": "all"}
-      ],
-      "stations": [
-        {"id": "lumbridge", "name": "Lumbridge", "order": 1},
-        {"id": "champions_guild", "name": "Champions' Guild", "order": 2},
-        {"id": "barbarian_village", "name": "Barbarian Village", "order": 3},
-        {"id": "edgeville", "name": "Edgeville", "order": 4},
-        {"id": "wilderness_pond", "name": "Wilderness Pond", "order": 5, "warning": "One-way trip to Wilderness"}
-      ]
-    }
+  "agility_shortcuts": {
+    "description": "Skill-based shortcuts requiring agility levels",
+    "shortcuts": [
+      {"id": "thornhaven_wall", "location": "Thornhaven South Wall", "level": 21, "type": "climbing"},
+      {"id": "forgecrest_ledge", "location": "Forgecrest Cliff Ledge", "level": 35, "type": "climbing"},
+      {"id": "sylvanheart_vines", "location": "Sylvanheart Vine Bridge", "level": 45, "type": "balance"},
+      {"id": "grimhallow_gaps", "location": "Grimhallow Rooftop Path", "level": 55, "type": "jumping"},
+      {"id": "winterhold_ice", "location": "Winterhold Ice Climb", "level": 65, "type": "climbing"},
+      {"id": "aetherpoint_float", "location": "Aetherpoint Floating Stones", "level": 75, "type": "jumping"}
+    ]
   },
 
   "teleport_items": {
-    "jewelry_teleports": [
-      {"item": "ring_of_dueling", "charges": 8, "destinations": ["duel_arena", "castle_wars", "clan_wars", "ferox_enclave"]},
-      {"item": "games_necklace", "charges": 8, "destinations": ["burthorpe_games", "barbarian_outpost", "clan_wars", "wintertodt"]},
-      {"item": "combat_bracelet", "charges": 6, "destinations": ["warriors_guild", "champions_guild", "monastery", "ranging_guild"]},
-      {"item": "skills_necklace", "charges": 6, "destinations": ["fishing_guild", "mining_guild", "crafting_guild", "cooking_guild", "farming_guild", "woodcutting_guild"]},
-      {"item": "amulet_of_glory", "charges": 6, "destinations": ["edgeville", "karamja", "draynor", "al_kharid"]},
-      {"item": "ring_of_wealth", "charges": 5, "destinations": ["miscellania", "grand_exchange", "falador_park", "dondakans_rock"]},
-      {"item": "necklace_of_passage", "charges": 5, "destinations": ["wizards_tower", "outpost", "eagles_eyrie"]},
-      {"item": "digsite_pendant", "charges": 5, "destinations": ["digsite", "fossil_island", "lithkren"]}
+    "jewelry": [
+      {
+        "item": "amulet_of_travel",
+        "charges": 6,
+        "destinations": ["borderwatch", "freeport", "willowmere", "alkazar"]
+      },
+      {
+        "item": "ring_of_fortune",
+        "charges": 5,
+        "destinations": ["eternal_exchange", "forgecrest_market", "sylvanheart_bazaar"]
+      }
     ],
+    "scrolls": [
+      {"type": "thornhaven_scroll", "single_use": true, "destination": "thornhaven"},
+      {"type": "forgecrest_scroll", "single_use": true, "destination": "forgecrest"}
+    ],
+    "spellbook_teleports": {
+      "standard": ["thornhaven", "millbrook", "forgecrest", "sylvanheart", "alkazar", "winterhold", "estate"],
+      "solar_magicks": ["oasis_solara", "buried_kingdom", "sun_temple"],
+      "void_magicks": ["last_bastion", "void_prison", "shattered_realm"]
+    }
+  },
 
-    "teleport_tablets": {
-      "standard": ["varrock", "lumbridge", "falador", "camelot", "ardougne", "watchtower", "trollheim", "house"],
-      "creation_method": "lectern_in_poh",
-      "materials_per_tablet": {"soft_clay": 1, "runes": "as_spell"}
-    },
-
-    "special_teleport_items": [
-      {"item": "pharaohs_sceptre", "destination": "pyramid_plunder", "charges": 3, "recharge": "thieving_artifacts"},
-      {"item": "crystal_teleport_seed", "destination": "lletya_or_prifddinas", "charges": "unlimited_after_quest"},
-      {"item": "ectophial", "destination": "ectofuntus", "charges": "unlimited", "requirements": {"quests": ["ghosts_ahoy"]}},
-      {"item": "drakan_medallion", "destinations": ["ver_sinhaza", "darkmeyer", "meiyerditch"], "charges": "unlimited", "requirements": {"quests": ["a_taste_of_hope"]}},
-      {"item": "royal_seed_pod", "destination": "grand_tree", "charges": "unlimited", "requirements": {"quests": ["monkey_madness_2"]}},
-      {"item": "slayer_ring", "destinations": ["slayer_tower", "fremennik_slayer_dungeon", "tarns_lair", "stronghold_slayer_cave"], "charges": 8}
+  "diary_unlocks": {
+    "description": "Transportation perks from completing regional diaries",
+    "unlocks": [
+      {"diary": "misthollow_hard", "unlock": "portal_stone_in_ravenswood"},
+      {"diary": "ironhold_elite", "unlock": "unlimited_lava_channel_access"},
+      {"diary": "verdant_elite", "unlock": "sylvanheart_full_teleport"},
+      {"diary": "dreadmire_elite", "unlock": "ghostharbor_ferry_access"},
+      {"diary": "celestine_hard", "unlock": "free_ship_travel"}
     ]
   },
 
-  "achievement_unlocks": {
-    "description": "Transportation unlocks from achievement diaries",
-    "diary_rewards": [
-      {"diary": "lumbridge_hard", "unlock": "fairy_ring_in_shed"},
-      {"diary": "fremennik_elite", "unlock": "seal_of_passage_not_required"},
-      {"diary": "kandarin_hard", "unlock": "sherlock_teleport"},
-      {"diary": "wilderness_hard", "unlock": "wilderness_lever_return"},
-      {"diary": "morytania_elite", "unlock": "direct_burgh_de_rott_teleport"},
-      {"diary": "kourend_medium", "unlock": "xeric_talisman_teleports"}
-    ]
-  },
-
-  "transportation_ue5": {
+  "ue5_implementation": {
     "teleport_effects": {
-      "lodestone": {
-        "charge_up_duration": 3.5,
-        "particle_system": "PS_Lodestone_Teleport",
-        "sound_cue": "SC_Teleport_Lodestone",
-        "camera_shake": false,
-        "post_process_fade": true
+      "waystone_activation": {
+        "particle_system": "NS_WaystoneActivation",
+        "sound_cue": "SFX_WaystoneTeleport",
+        "camera_fade": true,
+        "fade_duration": 0.5
       },
-      "spell_teleport": {
-        "cast_duration": 2.0,
-        "particle_system": "PS_Magic_Teleport",
-        "sound_cue": "SC_Teleport_Spell",
-        "portal_appearance": true
-      },
-      "fairy_ring": {
-        "spin_animation": true,
-        "mushroom_glow": true,
-        "particle_system": "PS_Fairy_Dust",
-        "duration": 1.5
-      },
-      "spirit_tree": {
-        "tree_animation": "roots_embrace",
-        "particle_system": "PS_Nature_Magic",
-        "duration": 2.0,
-        "fade_through_tree": true
+      "portal_stone_effect": {
+        "particle_system": "NS_PortalStoneSwirl",
+        "color_by_region": true
       }
     },
-
-    "world_streaming": {
-      "pre_teleport_loading": true,
-      "destination_preload_radius": 100,
-      "loading_screen_threshold_meters": 5000,
-      "seamless_threshold_meters": 500
+    "ship_travel": {
+      "cinematic_mode": true,
+      "skippable": true,
+      "show_route_on_map": true
     }
   }
 }

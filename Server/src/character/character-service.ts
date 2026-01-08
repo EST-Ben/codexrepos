@@ -301,7 +301,7 @@ export class CharacterService {
     const defense = getLevel('defense');
     const prayer = getLevel('prayer');
 
-    // Combat formula similar to RuneScape
+    // Combat level formula based on primary combat skills
     const base = defense + Math.floor(prayer / 2);
     const meleeContrib = melee * 1.3;
     const rangedContrib = ranged * 1.3;

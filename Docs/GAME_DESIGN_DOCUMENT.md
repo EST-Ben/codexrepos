@@ -24,7 +24,7 @@
 ## Vision & Overview
 
 ### High Concept
-**Realm of Eternity** is an open-world MMORPG that combines the addictive progression systems and player freedom of classic MMOs like RuneScape with modern AAA graphics powered by Unreal Engine 5. Players inhabit a living fantasy world where they can pursue any path: become a master blacksmith, a legendary warrior, a wealthy merchant, or anything in between.
+**Realm of Eternity** is an open-world MMORPG that combines the addictive progression systems and player freedom of classic sandbox MMOs with modern AAA graphics powered by Unreal Engine 5. Players inhabit a living fantasy world where they can pursue any path: become a master blacksmith, a legendary warrior, a wealthy merchant, or anything in between.
 
 ### Target Experience
 - **Satisfying Grind**: Progress should feel meaningful and rewarding
@@ -454,21 +454,21 @@ Every 10 levels unlock:
 
 ## Appendix
 
-### Inspirations
-- RuneScape (skill freedom, economy)
-- Black Desert Online (graphics, combat)
-- Guild Wars 2 (events, exploration)
-- Albion Online (player economy)
-- Valheim (crafting satisfaction)
+### Design Philosophy
+- **Skill Freedom**: No class restrictions, train any skill
+- **Player Economy**: All gear crafted by players
+- **Modern Graphics**: AAA visuals with Unreal Engine 5
+- **Exploration Rewards**: Secrets and discoveries everywhere
+- **Crafting Satisfaction**: Meaningful progression through creation
 
 ### Competitive Analysis
-| Feature | Our Game | RuneScape | WoW | GW2 |
-|---------|----------|-----------|-----|-----|
-| Classless | ✓ | ✓ | ✗ | ✗ |
-| Modern Graphics | ✓ | ✗ | △ | △ |
-| Player Economy | ✓ | ✓ | ✗ | △ |
-| Action Combat | ✓ | ✗ | ✗ | ✓ |
-| F2P Option | TBD | ✓ | ✗ | ✓ |
+| Feature | Realm of Eternity | Traditional MMOs | Action MMOs |
+|---------|-------------------|------------------|-------------|
+| Classless | ✓ | Rarely | ✗ |
+| Modern Graphics | ✓ | Varies | ✓ |
+| Player Economy | ✓ | Limited | Some |
+| Action Combat | ✓ | Usually Tab-Target | ✓ |
+| Skill-Based Progression | ✓ | Level-Based | Mixed |
 
 ---
 
