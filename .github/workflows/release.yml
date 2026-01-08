@@ -1,0 +1,245 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v1.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  validate:
+    name: Pre-release Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run full validation
+        run: |
+          python Tools/validators/validate_game_data.py --root . --fail-on-warning
+
+      - name: Validate all JSON files
+        run: |
+          npm install -g jsonlint
+          find Data UE5 Server -name "*.json" -type f -exec jsonlint -q {} \;
+
+  build-data-package:
+    name: Build Data Package
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create data package
+        run: |
+          VERSION="${{ github.event.inputs.version || github.ref_name }}"
+          echo "Building package for version: $VERSION"
+
+          # Create distribution directory
+          mkdir -p dist
+
+          # Package game data
+          tar -czvf dist/game-data-${VERSION}.tar.gz \
+            Data/ \
+            --exclude='*.bak' \
+            --exclude='*.tmp'
+
+          # Package UE5 specifications
+          tar -czvf dist/ue5-specs-${VERSION}.tar.gz \
+            UE5/ \
+            --exclude='*.bak' \
+            --exclude='*.tmp'
+
+          # Package server configurations
+          tar -czvf dist/server-config-${VERSION}.tar.gz \
+            Server/ \
+            --exclude='*.bak' \
+            --exclude='*.tmp'
+
+          # Create combined package
+          tar -czvf dist/realm-of-eternity-full-${VERSION}.tar.gz \
+            Data/ \
+            UE5/ \
+            Server/ \
+            Tools/ \
+            --exclude='*.bak' \
+            --exclude='*.tmp'
+
+          # Generate checksums
+          cd dist
+          sha256sum *.tar.gz > checksums.sha256
+          cat checksums.sha256
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-packages
+          path: dist/
+
+  generate-docs:
+    name: Generate Documentation
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate API documentation
+        run: |
+          npm install -g redocly-cli
+          mkdir -p docs
+          redocly build-docs Server/api/openapi.yaml -o docs/api.html || true
+
+      - name: Generate data statistics
+        run: |
+          python -c "
+          import json
+          from pathlib import Path
+
+          stats = {
+              'items': 0,
+              'npcs': 0,
+              'quests': 0,
+              'skills': 0,
+              'bosses': 0,
+              'regions': 0
+          }
+
+          # Count items
+          items_file = Path('Data/Items/items.json')
+          if items_file.exists():
+              with open(items_file) as f:
+                  data = json.load(f)
+                  stats['items'] = len(data.get('items', []))
+
+          # Count skill files
+          skills_dir = Path('Data/Skills')
+          if skills_dir.exists():
+              stats['skills'] = len(list(skills_dir.glob('*.json')))
+
+          # Generate markdown
+          with open('docs/statistics.md', 'w') as f:
+              f.write('# Realm of Eternity - Data Statistics\n\n')
+              f.write('| Category | Count |\n')
+              f.write('|----------|-------|\n')
+              for category, count in stats.items():
+                  f.write(f'| {category.title()} | {count} |\n')
+          "
+
+      - name: Upload documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation
+          path: docs/
+
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [build-data-package, generate-docs]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          name: release-packages
+          path: dist/
+
+      - name: Download documentation
+        uses: actions/download-artifact@v4
+        with:
+          name: documentation
+          path: docs/
+
+      - name: Generate release notes
+        run: |
+          VERSION="${{ github.event.inputs.version || github.ref_name }}"
+          cat > release-notes.md << 'EOF'
+          # Realm of Eternity ${VERSION}
+
+          ## What's Included
+
+          ### Game Data
+          - Items, NPCs, and monster definitions
+          - Quest and achievement data
+          - Skill progression configurations
+          - World region definitions
+
+          ### UE5 Specifications
+          - Rendering and graphics specifications
+          - Audio and sound design configurations
+          - Physics and animation settings
+          - QA testing and benchmark specs
+
+          ### Server Components
+          - Database schemas and migrations
+          - API specifications (OpenAPI 3.1)
+          - Anti-cheat configurations
+          - Server runtime configs
+
+          ### Tools
+          - JSON schema validators
+          - Procedural content generators
+          - CI/CD workflow templates
+
+          ## Installation
+
+          1. Download the appropriate package for your needs
+          2. Extract to your project directory
+          3. Follow integration guides in documentation
+
+          ## Checksums
+
+          See `checksums.sha256` for file verification.
+          EOF
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.version || github.ref_name }}
+          name: Realm of Eternity ${{ github.event.inputs.version || github.ref_name }}
+          body_path: release-notes.md
+          files: |
+            dist/*.tar.gz
+            dist/checksums.sha256
+            docs/*
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  notify:
+    name: Send Notifications
+    runs-on: ubuntu-latest
+    needs: create-release
+    if: success()
+    steps:
+      - name: Send success notification
+        run: |
+          VERSION="${{ github.event.inputs.version || github.ref_name }}"
+          echo "Release ${VERSION} completed successfully!"
+          # Add webhook notifications here if needed
+          # curl -X POST -H 'Content-type: application/json' \
+          #   --data '{"text":"Realm of Eternity '${VERSION}' released!"}' \
+          #   ${{ secrets.SLACK_WEBHOOK_URL }}
