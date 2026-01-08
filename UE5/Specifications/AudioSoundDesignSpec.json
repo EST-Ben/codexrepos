@@ -85,7 +85,7 @@
         "tempo": "moderate",
         "mood": "hopeful"
       },
-      "morytania": {
+      "dreadmire_marshes": {
         "style": "gothic_horror",
         "instruments": ["organ", "choir", "low_strings", "bells"],
         "tempo": "slow",
@@ -109,7 +109,7 @@
         "tempo": "flowing",
         "mood": "mystical"
       },
-      "karamja": {
+      "celestine_archipelago": {
         "style": "tribal_tropical",
         "instruments": ["steel_drums", "bongos", "marimba", "shakers"],
         "tempo": "upbeat",

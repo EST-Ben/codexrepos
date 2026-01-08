@@ -269,7 +269,7 @@
         "abilities": {
           "goad": {
             "scroll": "goad_scroll",
-            "effect": "teleport_to_karamja_hunting_area",
+            "effect": "teleport_to_celestine_archipelago_hunting_area",
             "points": 3
           }
         },
@@ -538,7 +538,7 @@
       "cost": 500000,
       "claim_cost": 1000000,
       "npc": "Probita",
-      "location": "Varrock"
+      "location": "Thornhaven"
     },
     "pet_sources": {
       "boss_drops": "rare_drop_table_addition",

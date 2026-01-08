@@ -144,7 +144,7 @@
         "slayer_level": 7,
         "combat_level": 12,
         "hitpoints": 18,
-        "locations": ["lumbridge_swamp_caves", "dorgesh_kaan"],
+        "locations": ["millbrook_swamp_caves", "dorgesh_kaan"],
         "xp_per_kill": 14
       },
       {
@@ -153,7 +153,7 @@
         "slayer_level": 10,
         "combat_level": 23,
         "hitpoints": 30,
-        "locations": ["fremennik_slayer_dungeon", "lumbridge_swamp_caves"],
+        "locations": ["fremennik_slayer_dungeon", "millbrook_swamp_caves"],
         "poison": true,
         "superior_variant": "chasm_crawler",
         "xp_per_kill": 26
@@ -175,7 +175,7 @@
         "slayer_level": 17,
         "combat_level": 23,
         "hitpoints": 30,
-        "locations": ["lumbridge_swamp_caves"],
+        "locations": ["millbrook_swamp_caves"],
         "special_equipment": "spiny_helmet",
         "xp_per_kill": 28
       },
@@ -185,7 +185,7 @@
         "slayer_level": 20,
         "combat_level": 29,
         "hitpoints": 35,
-        "locations": ["fremennik_slayer_dungeon", "lumbridge_swamp_caves"],
+        "locations": ["fremennik_slayer_dungeon", "millbrook_swamp_caves"],
         "finishing_method": "bag_of_salt",
         "superior_variant": "giant_rockslug",
         "xp_per_kill": 32
@@ -595,7 +595,7 @@
     {
       "id": "slayer_tower",
       "name": "Slayer Tower",
-      "location": "Morytania",
+      "location": "Dreadmire Marshes",
       "floors": 3,
       "monsters": ["crawling_hands", "banshees", "infernal_mages", "bloodveld", "aberrant_spectres", "gargoyles", "nechryael", "abyssal_demons"],
       "rooftop_access": {"agility": 71}

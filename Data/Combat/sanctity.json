@@ -718,7 +718,7 @@
         "name": "Altar",
         "favor_restore_percent": 100,
         "xp_multiplier": 1.0,
-        "locations": ["lumbridge_church", "varrock_church", "falador_church", "ardougne_monastery"]
+        "locations": ["millbrook_church", "thornhaven_church", "stoneguard_church", "ardougne_monastery"]
       },
       {
         "id": "chaos_altar",

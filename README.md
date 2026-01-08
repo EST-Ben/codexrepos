@@ -1,6 +1,6 @@
 # Realm of Eternity
 
-An open-world MMORPG built with Unreal Engine 5, inspired by classic MMOs like RuneScape but with modern graphics and expanded freedom.
+An open-world MMORPG built with Unreal Engine 5, featuring classless progression, a player-driven economy, and the freedom to pursue any path in a vast fantasy world.
 
 ## Vision
 

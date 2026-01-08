@@ -259,7 +259,7 @@
       "name": "Temple Trekking",
       "description": "Escort NPCs through dangerous swamps",
       "type": "pve_solo",
-      "location": "morytania",
+      "location": "dreadmire_marshes",
       "playerCount": { "min": 1, "max": 1 },
       "matchDuration": null,
       "mechanics": {

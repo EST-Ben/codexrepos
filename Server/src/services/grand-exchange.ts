@@ -91,11 +91,11 @@ const buyLimits: Map<string, Map<string, { count: number; resetAt: number }>> = 
 
 // Mock item database (would be loaded from Data/Items)
 const itemDatabase: Map<string, ItemDefinition> = new Map([
-  ['dragon_scimitar', { id: 'dragon_scimitar', name: 'Dragon Scimitar', tradeable: true, buyLimit: 70, members: true }],
-  ['abyssal_whip', { id: 'abyssal_whip', name: 'Abyssal Whip', tradeable: true, buyLimit: 70, members: true }],
+  ['obsidian_blade', { id: 'obsidian_blade', name: 'Obsidian Blade', tradeable: true, buyLimit: 70, members: true }],
+  ['voidfang_whip', { id: 'voidfang_whip', name: 'Voidfang Whip', tradeable: true, buyLimit: 70, members: true }],
   ['gold_coins', { id: 'gold_coins', name: 'Coins', tradeable: false, members: false }],
   ['iron_ore', { id: 'iron_ore', name: 'Iron Ore', tradeable: true, buyLimit: 25000, members: false }],
-  ['lobster', { id: 'lobster', name: 'Lobster', tradeable: true, buyLimit: 10000, members: false }],
+  ['silverscale_fish', { id: 'silverscale_fish', name: 'Silverscale Fish', tradeable: true, buyLimit: 10000, members: false }],
 ]);
 
 // Mock player inventories (would be database)
