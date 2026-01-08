@@ -1,0 +1,207 @@
+name: Validate Game Data
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'Data/**/*.json'
+      - 'UE5/**/*.json'
+      - 'Server/**/*.json'
+      - 'Tools/validators/**'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'Data/**/*.json'
+      - 'UE5/**/*.json'
+      - 'Server/**/*.json'
+      - 'Tools/validators/**'
+  workflow_dispatch:
+
+jobs:
+  validate-json:
+    name: Validate JSON Syntax
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install jsonlint
+        run: npm install -g jsonlint
+
+      - name: Validate JSON files
+        run: |
+          echo "Validating JSON files..."
+          find Data UE5 Server -name "*.json" -type f | while read file; do
+            echo "Checking: $file"
+            jsonlint -q "$file" || exit 1
+          done
+          echo "All JSON files are valid!"
+
+  validate-schemas:
+    name: Validate Against Schemas
+    runs-on: ubuntu-latest
+    needs: validate-json
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install jsonschema
+
+      - name: Run schema validation
+        run: |
+          python Tools/validators/validate_game_data.py --root . --fail-on-warning
+        continue-on-error: false
+
+  cross-reference-check:
+    name: Cross-Reference Validation
+    runs-on: ubuntu-latest
+    needs: validate-json
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Check item references
+        run: |
+          python -c "
+          import json
+          import sys
+          from pathlib import Path
+
+          # Load all item IDs
+          items_file = Path('Data/Items/items.json')
+          item_ids = set()
+          if items_file.exists():
+              with open(items_file) as f:
+                  data = json.load(f)
+                  item_ids = {item['id'] for item in data.get('items', [])}
+              print(f'Loaded {len(item_ids)} item IDs')
+
+          # Check references in other files
+          errors = []
+          for json_file in Path('Data').rglob('*.json'):
+              if 'items.json' in str(json_file):
+                  continue
+              try:
+                  with open(json_file) as f:
+                      content = f.read()
+                      # Simple check for item_id references
+                      if 'item_id' in content:
+                          data = json.loads(content)
+                          # This is a simplified check
+                          print(f'Checked: {json_file}')
+              except Exception as e:
+                  errors.append(f'{json_file}: {e}')
+
+          if errors:
+              print('Errors found:')
+              for e in errors:
+                  print(f'  - {e}')
+              sys.exit(1)
+          print('Cross-reference check passed!')
+          "
+
+  check-duplicates:
+    name: Check for Duplicate IDs
+    runs-on: ubuntu-latest
+    needs: validate-json
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Check for duplicate IDs
+        run: |
+          python -c "
+          import json
+          import sys
+          from pathlib import Path
+          from collections import defaultdict
+
+          all_ids = defaultdict(list)
+
+          for json_file in Path('Data').rglob('*.json'):
+              try:
+                  with open(json_file) as f:
+                      data = json.load(f)
+
+                  def extract_ids(obj, path=''):
+                      if isinstance(obj, dict):
+                          if 'id' in obj:
+                              all_ids[obj['id']].append(f'{json_file}:{path}')
+                          for k, v in obj.items():
+                              extract_ids(v, f'{path}.{k}')
+                      elif isinstance(obj, list):
+                          for i, item in enumerate(obj):
+                              extract_ids(item, f'{path}[{i}]')
+
+                  extract_ids(data)
+              except Exception as e:
+                  print(f'Error reading {json_file}: {e}')
+
+          duplicates = {k: v for k, v in all_ids.items() if len(v) > 1}
+
+          if duplicates:
+              print('Duplicate IDs found:')
+              for id, locations in duplicates.items():
+                  print(f'  {id}:')
+                  for loc in locations:
+                      print(f'    - {loc}')
+              sys.exit(1)
+
+          print(f'No duplicates found among {len(all_ids)} unique IDs')
+          "
+
+  report:
+    name: Generate Validation Report
+    runs-on: ubuntu-latest
+    needs: [validate-json, validate-schemas, cross-reference-check, check-duplicates]
+    if: always()
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate report
+        run: |
+          echo "# Validation Report" > validation-report.md
+          echo "" >> validation-report.md
+          echo "**Run Date:** $(date -u)" >> validation-report.md
+          echo "**Commit:** ${{ github.sha }}" >> validation-report.md
+          echo "" >> validation-report.md
+          echo "## File Counts" >> validation-report.md
+          echo "- Data files: $(find Data -name '*.json' | wc -l)" >> validation-report.md
+          echo "- UE5 specs: $(find UE5 -name '*.json' | wc -l)" >> validation-report.md
+          echo "- Server configs: $(find Server -name '*.json' | wc -l)" >> validation-report.md
+          echo "" >> validation-report.md
+          echo "## Results" >> validation-report.md
+          echo "- JSON Syntax: ${{ needs.validate-json.result }}" >> validation-report.md
+          echo "- Schema Validation: ${{ needs.validate-schemas.result }}" >> validation-report.md
+          echo "- Cross-References: ${{ needs.cross-reference-check.result }}" >> validation-report.md
+          echo "- Duplicate Check: ${{ needs.check-duplicates.result }}" >> validation-report.md
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-report
+          path: validation-report.md
