@@ -1,0 +1,482 @@
+{
+  "version": "1.0.0",
+  "description": "Regional achievement diary system for Realm of Eternity",
+
+  "diary_mechanics": {
+    "tiers": ["easy", "medium", "hard", "elite"],
+    "completion_tracking": true,
+    "reward_claiming_npc": true,
+    "lamp_rewards": {
+      "easy": 2500,
+      "medium": 7500,
+      "hard": 15000,
+      "elite": 50000
+    },
+    "lamp_skill_requirement": {
+      "easy": 30,
+      "medium": 40,
+      "hard": 50,
+      "elite": 70
+    }
+  },
+
+  "diaries": {
+    "lumbridge_draynor": {
+      "id": "lumbridge_draynor",
+      "name": "Lumbridge & Draynor Diary",
+      "region": "mistral",
+      "reward_npc": "Hatius Cosaintus",
+      "reward_location": "Lumbridge",
+
+      "tasks": {
+        "easy": [
+          {"id": 1, "description": "Complete the Restless Ghost quest", "type": "quest"},
+          {"id": 2, "description": "Kill a cow in Lumbridge", "type": "combat"},
+          {"id": 3, "description": "Mine some copper ore at Lumbridge Swamp", "type": "skilling", "skill": "mining", "level": 1},
+          {"id": 4, "description": "Catch some shrimp at Lumbridge Swamp", "type": "skilling", "skill": "fishing", "level": 1},
+          {"id": 5, "description": "Bake bread on the Lumbridge Castle range", "type": "skilling", "skill": "cooking", "level": 1},
+          {"id": 6, "description": "Light a fire at the Lumbridge Castle courtyard", "type": "skilling", "skill": "firemaking", "level": 1},
+          {"id": 7, "description": "Enter the H.A.M. Hideout", "type": "exploration"},
+          {"id": 8, "description": "Chop and burn oak logs in Lumbridge", "type": "skilling", "skill": "woodcutting", "level": 15},
+          {"id": 9, "description": "Kill a duck in Lumbridge", "type": "combat"},
+          {"id": 10, "description": "Craft water runes at the Water Altar", "type": "skilling", "skill": "runecrafting", "level": 5}
+        ],
+        "medium": [
+          {"id": 1, "description": "Complete the Lost City quest", "type": "quest"},
+          {"id": 2, "description": "Cast Lumbridge Home Teleport", "type": "magic"},
+          {"id": 3, "description": "Get a slayer task from Chaeldar", "type": "skilling", "skill": "slayer"},
+          {"id": 4, "description": "Catch some salmon in Lumbridge", "type": "skilling", "skill": "fishing", "level": 30},
+          {"id": 5, "description": "Craft a coif in the Lumbridge cow field", "type": "skilling", "skill": "crafting", "level": 38},
+          {"id": 6, "description": "Chop some willow logs in Draynor Village", "type": "skilling", "skill": "woodcutting", "level": 30},
+          {"id": 7, "description": "Pickpocket Martin the Master Gardener", "type": "skilling", "skill": "thieving", "level": 38},
+          {"id": 8, "description": "Catch an essence impling in Puro-Puro", "type": "skilling", "skill": "hunter", "level": 42},
+          {"id": 9, "description": "Craft 56 cosmic runes simultaneously", "type": "skilling", "skill": "runecrafting", "level": 59}
+        ],
+        "hard": [
+          {"id": 1, "description": "Complete Tears of Guthix in 2 minutes or less", "type": "minigame"},
+          {"id": 2, "description": "Cast Bones to Peaches in Al Kharid Palace", "type": "magic", "level": 60},
+          {"id": 3, "description": "Smith an adamant platebody on Lumbridge Castle", "type": "skilling", "skill": "smithing", "level": 88},
+          {"id": 4, "description": "Train a prayer on the Ectofuntus", "type": "skilling", "skill": "prayer"},
+          {"id": 5, "description": "Craft 140 water runes at once", "type": "skilling", "skill": "runecrafting", "level": 76},
+          {"id": 6, "description": "Chop some magic logs in Draynor Village", "type": "skilling", "skill": "woodcutting", "level": 75}
+        ],
+        "elite": [
+          {"id": 1, "description": "Craft 252 or more air runes simultaneously", "type": "skilling", "skill": "runecrafting", "level": 88},
+          {"id": 2, "description": "Chop magic logs at the Mage Training Arena", "type": "skilling", "skill": "woodcutting", "level": 75},
+          {"id": 3, "description": "Smith a rune platebody at the Draynor manor ruins", "type": "skilling", "skill": "smithing", "level": 99}
+        ]
+      },
+
+      "rewards": {
+        "easy": {
+          "item": "explorers_ring_1",
+          "perks": ["30_free_low_alchemy_casts_per_day", "run_energy_restore_twice_daily"]
+        },
+        "medium": {
+          "item": "explorers_ring_2",
+          "perks": ["all_easy_perks", "fairy_ring_in_lumbridge_swamp", "additional_run_restore"]
+        },
+        "hard": {
+          "item": "explorers_ring_3",
+          "perks": ["all_medium_perks", "unlimited_teleports_to_cabbage_patch", "high_alchemy_casts_daily"]
+        },
+        "elite": {
+          "item": "explorers_ring_4",
+          "perks": ["all_hard_perks", "unlimited_run_restores", "100_percent_block_rate_lumbridge_slayer_tasks"]
+        }
+      }
+    },
+
+    "varrock": {
+      "id": "varrock",
+      "name": "Varrock Diary",
+      "region": "mistral",
+      "reward_npc": "Toby",
+      "reward_location": "Varrock",
+
+      "tasks": {
+        "easy": [
+          {"id": 1, "description": "Browse Zaff's superior staves", "type": "interaction"},
+          {"id": 2, "description": "Mine iron ore south of Varrock", "type": "skilling", "skill": "mining", "level": 15},
+          {"id": 3, "description": "Make a normal plank at the sawmill", "type": "interaction"},
+          {"id": 4, "description": "Enter the Champions' Guild", "type": "exploration", "quest_points": 32},
+          {"id": 5, "description": "Buy a newspaper from Benny", "type": "interaction"},
+          {"id": 6, "description": "Give a stray dog a bone", "type": "interaction"}
+        ],
+        "medium": [
+          {"id": 1, "description": "Use the spirit tree north of Varrock", "type": "transportation"},
+          {"id": 2, "description": "Teleport to the Grand Exchange", "type": "magic", "level": 25},
+          {"id": 3, "description": "Get a Slayer task from Vannaka", "type": "slayer"},
+          {"id": 4, "description": "Make mahogany planks at the sawmill", "type": "skilling"},
+          {"id": 5, "description": "Pick a white tree fruit", "type": "skilling", "skill": "farming", "level": 25}
+        ],
+        "hard": [
+          {"id": 1, "description": "Trade furs with the Fancy Clothes Store", "type": "interaction"},
+          {"id": 2, "description": "Smith and fletch 10 adamant darts", "type": "skilling", "skill": "smithing", "level": 74},
+          {"id": 3, "description": "Teleport to Paddewwa", "type": "magic", "skill": "magic", "level": 54}
+        ],
+        "elite": [
+          {"id": 1, "description": "Create a super combat potion in Varrock west bank", "type": "skilling", "skill": "herblore", "level": 90},
+          {"id": 2, "description": "Smith a rune platebody at the Varrock anvil", "type": "skilling", "skill": "smithing", "level": 99},
+          {"id": 3, "description": "Make 20 mahogany planks in one go", "type": "interaction"}
+        ]
+      },
+
+      "rewards": {
+        "easy": {
+          "item": "varrock_armour_1",
+          "perks": ["10_percent_chance_mine_2_ores", "zaff_sells_15_staves_daily"]
+        },
+        "medium": {
+          "item": "varrock_armour_2",
+          "perks": ["all_easy_perks", "30_staves_daily", "10_percent_chance_smelt_2_bars"]
+        },
+        "hard": {
+          "item": "varrock_armour_3",
+          "perks": ["all_medium_perks", "60_staves_daily", "varrock_teleport_to_ge"]
+        },
+        "elite": {
+          "item": "varrock_armour_4",
+          "perks": ["all_hard_perks", "120_staves_daily", "skull_sceptre_unlimited"]
+        }
+      }
+    },
+
+    "falador": {
+      "id": "falador",
+      "name": "Falador Diary",
+      "region": "asgarnia",
+      "reward_npc": "Sir Rebral",
+      "reward_location": "Falador",
+
+      "tasks": {
+        "easy": [
+          {"id": 1, "description": "Find out what's in store for you from the Falador fortune teller", "type": "interaction"},
+          {"id": 2, "description": "Kill a duck in Falador Park", "type": "combat"},
+          {"id": 3, "description": "Make a mind tiara", "type": "skilling", "skill": "runecrafting"},
+          {"id": 4, "description": "Fill a bucket from the pump north of the west bank", "type": "interaction"},
+          {"id": 5, "description": "Climb over the wall south of the farming patch", "type": "agility"}
+        ],
+        "medium": [
+          {"id": 1, "description": "Light a bullseye lantern in the Chemist's house", "type": "skilling", "skill": "firemaking", "level": 49},
+          {"id": 2, "description": "Telegrab wine of zamorak at the chaos temple", "type": "magic", "level": 33},
+          {"id": 3, "description": "Unlock the crystal chest in Taverley", "type": "interaction"},
+          {"id": 4, "description": "Grapple up and then jump off the north Falador wall", "type": "agility", "level": 11}
+        ],
+        "hard": [
+          {"id": 1, "description": "Craft 140 mind runes simultaneously", "type": "skilling", "skill": "runecrafting", "level": 56},
+          {"id": 2, "description": "Kill a mole with a dharok's set", "type": "combat"},
+          {"id": 3, "description": "Kill a skeletal wyvern in the Asgarnia Ice Dungeon", "type": "combat", "skill": "slayer", "level": 72}
+        ],
+        "elite": [
+          {"id": 1, "description": "Craft 252 air runes simultaneously", "type": "skilling", "skill": "runecrafting", "level": 88},
+          {"id": 2, "description": "Perform a skillcape emote in Falador Park", "type": "emote", "level": 99},
+          {"id": 3, "description": "Jump on the Falador wall and pass through the underwall tunnel", "type": "agility", "level": 80}
+        ]
+      },
+
+      "rewards": {
+        "easy": {
+          "item": "falador_shield_1",
+          "perks": ["prayer_restore_at_statue", "10_percent_more_mole_parts"]
+        },
+        "medium": {
+          "item": "falador_shield_2",
+          "perks": ["all_easy_perks", "faster_respawn_in_falador_farm", "extra_prayer_restore"]
+        },
+        "hard": {
+          "item": "falador_shield_3",
+          "perks": ["all_medium_perks", "giant_mole_locator", "prayer_restore_twice_daily"]
+        },
+        "elite": {
+          "item": "falador_shield_4",
+          "perks": ["all_hard_perks", "tree_patch_never_diseased", "shortcut_to_mole_lair"]
+        }
+      }
+    },
+
+    "wilderness": {
+      "id": "wilderness",
+      "name": "Wilderness Diary",
+      "region": "wilderness",
+      "reward_npc": "Lesser Fanatic",
+      "reward_location": "Fountain of Rune",
+
+      "tasks": {
+        "easy": [
+          {"id": 1, "description": "Cast Low Alchemy at the Fountain of Rune", "type": "magic"},
+          {"id": 2, "description": "Mine some iron ore in the Wilderness", "type": "skilling", "skill": "mining"},
+          {"id": 3, "description": "Kill a mammoth in the Wilderness", "type": "combat"},
+          {"id": 4, "description": "Enter the Chaos Temple", "type": "exploration"},
+          {"id": 5, "description": "Kill a earth warrior in the Edgeville Dungeon", "type": "combat"}
+        ],
+        "medium": [
+          {"id": 1, "description": "Mine mithril ore in the Hobgoblin Mine", "type": "skilling", "skill": "mining", "level": 55},
+          {"id": 2, "description": "Kill a bloodveld in the Wilderness Slayer Cave", "type": "combat", "skill": "slayer", "level": 50},
+          {"id": 3, "description": "Offer bones at the Chaos Temple altar", "type": "skilling", "skill": "prayer"},
+          {"id": 4, "description": "Kill the Chaos Elemental", "type": "boss"}
+        ],
+        "hard": [
+          {"id": 1, "description": "Kill a spiritual warrior in the Wilderness", "type": "combat", "skill": "slayer", "level": 68},
+          {"id": 2, "description": "Kill a lava dragon", "type": "boss"},
+          {"id": 3, "description": "Kill Callisto", "type": "boss"},
+          {"id": 4, "description": "Charge an air orb", "type": "skilling", "skill": "magic", "level": 66}
+        ],
+        "elite": [
+          {"id": 1, "description": "Kill Callisto, Venenatis, and Vet'ion", "type": "boss"},
+          {"id": 2, "description": "Teleport to Ghorrock", "type": "magic", "skill": "magic", "level": 96},
+          {"id": 3, "description": "Fish and cook a dark crab in the Wilderness", "type": "skilling", "skill": "fishing", "level": 85}
+        ]
+      },
+
+      "rewards": {
+        "easy": {
+          "item": "wilderness_sword_1",
+          "perks": ["free_teleport_to_edgeville_lever", "noted_dragon_bones_from_green_dragons"]
+        },
+        "medium": {
+          "item": "wilderness_sword_2",
+          "perks": ["all_easy_perks", "increased_slayer_points_from_wilderness_tasks"]
+        },
+        "hard": {
+          "item": "wilderness_sword_3",
+          "perks": ["all_medium_perks", "noted_lava_dragon_bones", "free_access_to_resource_area"]
+        },
+        "elite": {
+          "item": "wilderness_sword_4",
+          "perks": ["all_hard_perks", "50_percent_increased_dark_crab_catch", "unlimited_teleports_to_fountain"]
+        }
+      }
+    },
+
+    "morytania": {
+      "id": "morytania",
+      "name": "Morytania Diary",
+      "region": "morytania",
+      "reward_npc": "Le-sabre",
+      "reward_location": "Canifis",
+
+      "tasks": {
+        "easy": [
+          {"id": 1, "description": "Craft any snelm from scratch in Morytania", "type": "skilling", "skill": "crafting"},
+          {"id": 2, "description": "Cook a thin snail on the Mort Myre swamp", "type": "skilling", "skill": "cooking"},
+          {"id": 3, "description": "Kill a banshee in the Slayer Tower", "type": "combat", "skill": "slayer", "level": 15},
+          {"id": 4, "description": "Mazchna in Canifis", "type": "slayer"},
+          {"id": 5, "description": "Enter Mort Myre Swamp", "type": "exploration"}
+        ],
+        "medium": [
+          {"id": 1, "description": "Catch a swamp lizard in Canifis", "type": "skilling", "skill": "hunter", "level": 29},
+          {"id": 2, "description": "Complete a game of Trouble Brewing", "type": "minigame"},
+          {"id": 3, "description": "Make a batch of cannonballs at Port Phasmatys", "type": "skilling", "skill": "smithing", "level": 35},
+          {"id": 4, "description": "Kill a werewolf in Canifis in human form", "type": "combat"}
+        ],
+        "hard": [
+          {"id": 1, "description": "Enter the Kharyrll portal at your POH", "type": "construction", "level": 50},
+          {"id": 2, "description": "Defeat the barrows brothers", "type": "boss"},
+          {"id": 3, "description": "Harvest watermelons from the Morytania farming patch", "type": "skilling", "skill": "farming", "level": 47},
+          {"id": 4, "description": "Kill a cave horror", "type": "combat", "skill": "slayer", "level": 58}
+        ],
+        "elite": [
+          {"id": 1, "description": "Catch a shark in Burgh de Rott with your bare hands", "type": "skilling", "skill": "fishing", "level": 96},
+          {"id": 2, "description": "Complete the Theatre of Blood", "type": "raid"},
+          {"id": 3, "description": "Craft blood runes at the true altar", "type": "skilling", "skill": "runecrafting", "level": 77}
+        ]
+      },
+
+      "rewards": {
+        "easy": {
+          "item": "morytania_legs_1",
+          "perks": ["double_slayer_tower_contract_points", "50_percent_more_runes_from_shades"]
+        },
+        "medium": {
+          "item": "morytania_legs_2",
+          "perks": ["all_easy_perks", "robin_offers_7_teleports_daily", "bonus_slayer_xp_in_tower"]
+        },
+        "hard": {
+          "item": "morytania_legs_3",
+          "perks": ["all_medium_perks", "50_percent_more_runes_from_barrows", "bonecrusher_effect"]
+        },
+        "elite": {
+          "item": "morytania_legs_4",
+          "perks": ["all_hard_perks", "double_runes_from_barrows", "free_daily_tob_entry"]
+        }
+      }
+    },
+
+    "kandarin": {
+      "id": "kandarin",
+      "name": "Kandarin Diary",
+      "region": "kandarin",
+      "reward_npc": "The Wedge",
+      "reward_location": "Seers' Village",
+
+      "rewards": {
+        "easy": {
+          "item": "kandarin_headgear_1",
+          "perks": ["coal_bag_holds_extra_coal", "10_percent_more_marks_of_grace_seers"]
+        },
+        "medium": {
+          "item": "kandarin_headgear_2",
+          "perks": ["all_easy_perks", "15_percent_more_marks_seers", "flax_to_bow_string_daily"]
+        },
+        "hard": {
+          "item": "kandarin_headgear_3",
+          "perks": ["all_medium_perks", "10_percent_more_seer_agility_xp", "sherlock_teleport"]
+        },
+        "elite": {
+          "item": "kandarin_headgear_4",
+          "perks": ["all_hard_perks", "25_percent_piety_duration", "15_percent_more_agility_xp"]
+        }
+      }
+    },
+
+    "ardougne": {
+      "id": "ardougne",
+      "name": "Ardougne Diary",
+      "region": "kandarin",
+      "reward_npc": "Two-pints",
+      "reward_location": "Ardougne",
+
+      "rewards": {
+        "easy": {
+          "item": "ardougne_cloak_1",
+          "perks": ["unlimited_monastery_teleports", "10_percent_thieving_success_ardougne"]
+        },
+        "medium": {
+          "item": "ardougne_cloak_2",
+          "perks": ["all_easy_perks", "fairy_ring_in_tower", "10_percent_pickpocket_success"]
+        },
+        "hard": {
+          "item": "ardougne_cloak_3",
+          "perks": ["all_medium_perks", "noted_dragon_bones_from_tower", "150_noted_pure_essence_daily"]
+        },
+        "elite": {
+          "item": "ardougne_cloak_4",
+          "perks": ["all_hard_perks", "250_noted_pure_essence_daily", "tokkul_bank_access"]
+        }
+      }
+    },
+
+    "fremennik": {
+      "id": "fremennik",
+      "name": "Fremennik Diary",
+      "region": "fremennik",
+      "reward_npc": "Thorodin",
+      "reward_location": "Rellekka",
+
+      "rewards": {
+        "easy": {
+          "item": "fremennik_sea_boots_1",
+          "perks": ["peer_the_seer_deposit_box", "lyre_teleport_to_rellekka"]
+        },
+        "medium": {
+          "item": "fremennik_sea_boots_2",
+          "perks": ["all_easy_perks", "neitiznot_teleport", "bonus_xp_on_frem_slayer"]
+        },
+        "hard": {
+          "item": "fremennik_sea_boots_3",
+          "perks": ["all_medium_perks", "noted_dagannoth_bones", "shortcut_to_trollweiss"]
+        },
+        "elite": {
+          "item": "fremennik_sea_boots_4",
+          "perks": ["all_hard_perks", "seal_of_passage_not_required", "noted_dk_bones"]
+        }
+      }
+    },
+
+    "karamja": {
+      "id": "karamja",
+      "name": "Karamja Diary",
+      "region": "karamja",
+      "reward_npc": "Pirate Jackie the Fruit",
+      "reward_location": "Musa Point",
+
+      "rewards": {
+        "easy": {
+          "item": "karamja_gloves_1",
+          "perks": ["1_free_trip_to_brimhaven_daily", "gem_rocks_increased_chance"]
+        },
+        "medium": {
+          "item": "karamja_gloves_2",
+          "perks": ["all_easy_perks", "10_percent_more_agility_arena_tickets", "access_to_gem_mine"]
+        },
+        "hard": {
+          "item": "karamja_gloves_3",
+          "perks": ["all_medium_perks", "10_percent_more_shilo_gem_rocks", "unlimited_teleports_gem_mine"]
+        },
+        "elite": {
+          "item": "karamja_gloves_4",
+          "perks": ["all_hard_perks", "double_karambwan", "free_cart_rides"]
+        }
+      }
+    },
+
+    "desert": {
+      "id": "desert",
+      "name": "Desert Diary",
+      "region": "kharidian_desert",
+      "reward_npc": "Jarr",
+      "reward_location": "Shantay Pass",
+
+      "rewards": {
+        "easy": {
+          "item": "desert_amulet_1",
+          "perks": ["nardah_teleport_once_daily", "free_shantay_passes"]
+        },
+        "medium": {
+          "item": "desert_amulet_2",
+          "perks": ["all_easy_perks", "nardah_teleport_unlimited", "granite_mine_shortcut"]
+        },
+        "hard": {
+          "item": "desert_amulet_3",
+          "perks": ["all_medium_perks", "kalphite_cave_teleport", "noted_clay_from_quarry"]
+        },
+        "elite": {
+          "item": "desert_amulet_4",
+          "perks": ["all_hard_perks", "kq_shortcut", "free_carpet_rides"]
+        }
+      }
+    },
+
+    "western_provinces": {
+      "id": "western_provinces",
+      "name": "Western Provinces Diary",
+      "region": "tirannwn",
+      "reward_npc": "Elder Gnome Child",
+      "reward_location": "Tree Gnome Stronghold",
+
+      "rewards": {
+        "easy": {
+          "item": "western_banner_1",
+          "perks": ["50_percent_more_chompy_spawn", "free_gnome_glider"]
+        },
+        "medium": {
+          "item": "western_banner_2",
+          "perks": ["all_easy_perks", "100_percent_more_chompy_spawn", "pest_control_teleport"]
+        },
+        "hard": {
+          "item": "western_banner_3",
+          "perks": ["all_medium_perks", "crystal_equipment_20_percent_cheaper", "faster_elf_trap_reset"]
+        },
+        "elite": {
+          "item": "western_banner_4",
+          "perks": ["all_hard_perks", "prifddinas_teleport", "150_percent_more_chompy_spawn"]
+        }
+      }
+    }
+  },
+
+  "ue5_implementation": {
+    "diary_interface": {
+      "map_integration": true,
+      "progress_visualization": true,
+      "tier_badges": true,
+      "completion_celebration": true
+    },
+    "reward_equipment": {
+      "unique_models": true,
+      "tier_visual_upgrades": true,
+      "perk_particle_effects": true
+    }
+  }
+}
